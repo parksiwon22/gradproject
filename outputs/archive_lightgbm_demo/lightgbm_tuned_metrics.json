@@ -1,0 +1,18 @@
+{
+  "model": "LightGBM tuned - conservative",
+  "train_rows": 17352,
+  "test_rows": 8784,
+  "mae": 6.555036567359854,
+  "rmse": 10.089315582909995,
+  "best_params": {
+    "name": "conservative",
+    "n_estimators": 1200,
+    "learning_rate": 0.015,
+    "num_leaves": 15,
+    "max_depth": 5,
+    "min_child_samples": 50,
+    "subsample": 0.85,
+    "colsample_bytree": 0.85,
+    "reg_lambda": 3.0
+  }
+}
