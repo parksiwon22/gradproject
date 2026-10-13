@@ -1,0 +1,86 @@
+{
+  "purpose": "current-environment reproduction; does not replace ZIP benchmark",
+  "python": "3.12.14",
+  "versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.17.0",
+    "joblib": "1.5.3",
+    "matplotlib": "3.10.8"
+  },
+  "daily_counts": {
+    "train": 235,
+    "validation": 30,
+    "test": 92
+  },
+  "row_counts": {
+    "train": 5640,
+    "validation": 720,
+    "test": 2208
+  },
+  "selected_model": "validation_selected_profile_hgb_blend",
+  "profile_alpha": 0.23,
+  "daily_weekly_alpha": 0.69,
+  "ramp_threshold": 0.3,
+  "test_metrics": [
+    {
+      "split": "final_test",
+      "model": "daily_profile_baseline",
+      "sample_count": 2208,
+      "MAE": 13.575801630434784,
+      "MAPE": 0.1081077670852157,
+      "R2": 0.2687645532250048,
+      "bias": 0.0726222826086956
+    },
+    {
+      "split": "final_test",
+      "model": "weekly_profile_baseline",
+      "sample_count": 2208,
+      "MAE": 12.163908514492755,
+      "MAPE": 0.0979176089861766,
+      "R2": 0.4529914542959916,
+      "bias": -0.2383106884057975
+    },
+    {
+      "split": "final_test",
+      "model": "validation_selected_daily_weekly_blend",
+      "sample_count": 2208,
+      "MAE": 11.616226721014494,
+      "MAPE": 0.0927510102903897,
+      "R2": 0.5202331924590985,
+      "bias": -0.0237669384057967
+    },
+    {
+      "split": "final_test",
+      "model": "direct_hgb_day_ahead_residual",
+      "sample_count": 2208,
+      "MAE": 12.11775655026606,
+      "MAPE": 0.0978002076772718,
+      "R2": 0.5978928898741698,
+      "bias": -0.0622657466032872
+    },
+    {
+      "split": "final_test",
+      "model": "validation_selected_profile_hgb_blend",
+      "sample_count": 2208,
+      "MAE": 11.417824834353596,
+      "MAPE": 0.0918303917791346,
+      "R2": 0.6260368198787589,
+      "bias": -0.0534110207178604
+    }
+  ],
+  "classifier_test_metrics": [
+    {
+      "split": "final_test",
+      "model": "day_ahead_ramp_classifier",
+      "ramp_probability_threshold": 0.3,
+      "ramp_precision": 0.4318181818181818,
+      "ramp_recall": 0.1241830065359477,
+      "ramp_F1": 0.1928934010152284,
+      "predicted_ramp_count": 44.0,
+      "actual_ramp_count": 153.0
+    }
+  ],
+  "exact_zip_metrics_reproduced": false
+}

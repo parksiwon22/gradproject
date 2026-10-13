@@ -1,0 +1,117 @@
+[
+  {
+    "zip_path": "pkg/00_HANDOFF_README.md",
+    "bytes": 1879,
+    "sha256": "932a4911826ec2fb2056c8a12799c6d6924d72328033b875fa6ea62cfba92853"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/smp_predictor_v5.py",
+    "bytes": 47195,
+    "sha256": "dc8138ec735a5b6a322af3d4c02669b30a1a991d2ba2f6c30086b1644d5b0679"
+  },
+  {
+    "zip_path": "pkg/99_legacy_ignore/smp_simple_LSTM_old.py",
+    "bytes": 9375,
+    "sha256": "ba58974ab891f174c926128d384199a3d687e3c0e4bda13c54a99fcf87a7dfc0"
+  },
+  {
+    "zip_path": "pkg/99_legacy_ignore/lightgbm_tuned_metrics.json",
+    "bytes": 361,
+    "sha256": "b514f687c6f9942dfb4f10bde6ae5672d038b145c65a5cf1a9942b22f86317c4"
+  },
+  {
+    "zip_path": "pkg/02_web/app.py",
+    "bytes": 11111,
+    "sha256": "e4a64c0a7477881e4c6f4a380e61625e91a8c644701c70f3cea32e22da13c219"
+  },
+  {
+    "zip_path": "pkg/02_web/requirements.txt",
+    "bytes": 33,
+    "sha256": "550cdc0cd33b7bcf330c514ecfc02ff8b8310f588e1f2a0734aa68cc62ea0b05"
+  },
+  {
+    "zip_path": "pkg/03_docs_pdf/∞áäδáÑ∞ÿêδ│┤_∞ñæΩ░äδ│┤Ω│á∞ä£_δ░£φæ£.pdf",
+    "bytes": 821783,
+    "sha256": "888c60c8d56acf7faa268e262e5debf849f9e908eca68f39909ab2fc995cf06b"
+  },
+  {
+    "zip_path": "pkg/03_docs_pdf/261_∞óàφò⌐∞äñΩ│ä_smp_∞òîΩ│áδª¼∞ªÿ_∞áäΩ╕░∞░¿_∞╢⌐∞áä∞òîδª╝∞ï£∞èñφà£.pdf",
+    "bytes": 536730,
+    "sha256": "83e127fb3b0d0b75c3df7ce60317d70d9ccbd5af334be041162a7706b6eade04"
+  },
+  {
+    "zip_path": "pkg/03_docs_pdf/2026δàäδÅä_∞óàφò⌐∞äñΩ│ä_1∞░¿_∞ñæΩ░äδ│┤Ω│á∞ä£__1∞í░.pdf",
+    "bytes": 160045,
+    "sha256": "ab81fa9709990bd06dec3f62b0c200dba7d5c5a9e835e6fb0bd42c8280d60456"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/data/aligned_hourly_all_features_2023.csv",
+    "bytes": 4049633,
+    "sha256": "aa9101486434d9a812edf9fc9d56b3a6b93e1140a288c7de55f68bbbac6419f2"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/models_config/day_ahead_feature_metadata.json",
+    "bytes": 5910,
+    "sha256": "b6870369c75383afc2c7f1fd600fa09418a7f1654c116f76c7024b1b8a98374c"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/models_config/day_ahead_policy.json",
+    "bytes": 6040,
+    "sha256": "f80b463629c7961402fca1916bea223f9b364298f148c05d58d9e64aa759bc2b"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/results/v5_model_comparison.csv",
+    "bytes": 1891,
+    "sha256": "4f6710c4854f4ab98882aa255eb82fa88902ccc7a5ce2e3cd7139fde8485a95d"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/results/v5_day_ahead_predictions.csv",
+    "bytes": 423198,
+    "sha256": "3bbdc45deaeb087cbdaf1d7bdae408dc65c64b15bd8fd32db1cd0e7561bb2550"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/results/v5_charging_window_backtest.csv",
+    "bytes": 6516,
+    "sha256": "6b8f64867fa1bd43b1aa64bfbe9fad9a52a2ba2b5002c705ee3393d3b07e9d21"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/results/v5_training_summary.json",
+    "bytes": 4404,
+    "sha256": "fd3dd61dbc2aa5dd4881156215c2cf5e56f7cb54bb2d0196971124bf30d92eea"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/results/v5_risk_metrics.csv",
+    "bytes": 1969,
+    "sha256": "c358c80cfe56cbb4e64a1900d5333efd7121fcb6bee28690a3b0191da5fe48b3"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/results/README_V5.md",
+    "bytes": 1672,
+    "sha256": "094a173d6a258cbc64d8a9bfd456e47227884fd316e68494aad226ead34a9adf"
+  },
+  {
+    "zip_path": "pkg/01_model_v5/results/v5_per_horizon_metrics.csv",
+    "bytes": 25403,
+    "sha256": "46f686fed696101f732874bda48d566d792cd5a46bfce9f711170db8f0043226"
+  },
+  {
+    "zip_path": "pkg/02_web/services/v5_web_adapter.py",
+    "bytes": 5296,
+    "sha256": "e9da1ff1a31287b4f74c7559b32fb6952518d9feab86cc0aedea00bd6c6caf9b"
+  },
+  {
+    "zip_path": "pkg/02_web/outputs/v5_metrics.json",
+    "bytes": 233,
+    "sha256": "cd5621c9cf262503ba5a99f7e03939807a53049280300c2d73fa15a48b602b6a"
+  },
+  {
+    "zip_path": "pkg/02_web/outputs/next_day_smp_forecast_tuned.csv",
+    "bytes": 4150,
+    "sha256": "4937ff91ea13f237ceb3276e6858b87dff7004a1b96babde30baff494e2e05b8"
+  },
+  {
+    "zip_path": "pkg/02_web/outputs/recommended_3h_charging_window_tuned.csv",
+    "bytes": 688,
+    "sha256": "9b3bd37bc64a58f2e61789de3c142fd74160c4be7582c6948b3b30e6a9708b09"
+  }
+]

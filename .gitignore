@@ -1,0 +1,16 @@
+__pycache__/
+.matplotlib-cache/
+model_v5/results/
+*.pyc
+.venv/
+.env
+.streamlit/secrets.toml
+private_data/
+private_reference/
+runs/
+*.joblib
+*.zip
+*.hwpx
+*.docx
+*.pdf
+*.pptx

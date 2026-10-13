@@ -1,0 +1,245 @@
+{
+  "selected_model_name": "validation_selected_profile_hgb_blend",
+  "selected_model_column": "profile_hgb_blend",
+  "daily_weekly_profile_blend_alpha": 0.69,
+  "profile_hgb_blend_alpha": 0.31,
+  "ramp_probability_threshold": 0.45,
+  "validation_model_selection": [
+    {
+      "split": "validation",
+      "model": "daily_profile_baseline",
+      "sample_count": 720,
+      "MAE": 8.664013888888888,
+      "MAPE": 0.06910825461136279,
+      "R2": 0.5879971154235667,
+      "bias": 0.9182916666666666
+    },
+    {
+      "split": "validation",
+      "model": "weekly_profile_baseline",
+      "sample_count": 720,
+      "MAE": 9.837041666666666,
+      "MAPE": 0.08397503072647781,
+      "R2": 0.42622435568409756,
+      "bias": 4.311680555555556
+    },
+    {
+      "split": "validation",
+      "model": "validation_selected_daily_weekly_blend",
+      "sample_count": 720,
+      "MAE": 8.137905555555557,
+      "MAPE": 0.06666481557324604,
+      "R2": 0.6494577339049565,
+      "bias": 1.9702422222222225
+    },
+    {
+      "split": "validation",
+      "model": "direct_hgb_day_ahead_residual",
+      "sample_count": 720,
+      "MAE": 7.635230742362132,
+      "MAPE": 0.06152199011506264,
+      "R2": 0.7101581879907202,
+      "bias": 1.1739039870042698
+    },
+    {
+      "split": "validation",
+      "model": "validation_selected_profile_hgb_blend",
+      "sample_count": 720,
+      "MAE": 7.393895160228408,
+      "MAPE": 0.060209906861255824,
+      "R2": 0.7160570740570599,
+      "bias": 1.420768839921828
+    }
+  ],
+  "daily_weekly_alpha_selection_top": [
+    {
+      "alpha": 0.69,
+      "MAE": 8.137905555555557,
+      "R2": 0.6494577339049565
+    },
+    {
+      "alpha": 0.7,
+      "MAE": 8.138094444444445,
+      "R2": 0.649040493392943
+    },
+    {
+      "alpha": 0.71,
+      "MAE": 8.138763611111111,
+      "R2": 0.6485188955419854
+    },
+    {
+      "alpha": 0.68,
+      "MAE": 8.139308333333334,
+      "R2": 0.6497706170780262
+    },
+    {
+      "alpha": 0.72,
+      "MAE": 8.140570555555556,
+      "R2": 0.6478929403520837
+    },
+    {
+      "alpha": 0.73,
+      "MAE": 8.143444444444444,
+      "R2": 0.647162627823238
+    },
+    {
+      "alpha": 0.67,
+      "MAE": 8.145345833333334,
+      "R2": 0.6499791429121519
+    },
+    {
+      "alpha": 0.74,
+      "MAE": 8.14741,
+      "R2": 0.6463279579554483
+    },
+    {
+      "alpha": 0.66,
+      "MAE": 8.151433333333333,
+      "R2": 0.6500833114073332
+    },
+    {
+      "alpha": 0.75,
+      "MAE": 8.15170138888889,
+      "R2": 0.6453889307487146
+    }
+  ],
+  "profile_hgb_alpha_selection_top": [
+    {
+      "alpha": 0.31,
+      "MAE": 7.393895160228408,
+      "R2": 0.7160570740570599
+    },
+    {
+      "alpha": 0.32,
+      "MAE": 7.394157110402232,
+      "R2": 0.7158776024721716
+    },
+    {
+      "alpha": 0.33,
+      "MAE": 7.3944190605760545,
+      "R2": 0.7156750209977714
+    },
+    {
+      "alpha": 0.3,
+      "MAE": 7.394547560995379,
+      "R2": 0.7162134357524365
+    },
+    {
+      "alpha": 0.34,
+      "MAE": 7.3947364084110925,
+      "R2": 0.7154493296338592
+    },
+    {
+      "alpha": 0.35,
+      "MAE": 7.395330639334146,
+      "R2": 0.7152005283804352
+    },
+    {
+      "alpha": 0.29,
+      "MAE": 7.395798371158549,
+      "R2": 0.716346687558301
+    },
+    {
+      "alpha": 0.36,
+      "MAE": 7.396437739374688,
+      "R2": 0.7149286172374996
+    },
+    {
+      "alpha": 0.28,
+      "MAE": 7.39775571466195,
+      "R2": 0.7164568294746538
+    },
+    {
+      "alpha": 0.37,
+      "MAE": 7.397863977398488,
+      "R2": 0.7146335962050518
+    }
+  ],
+  "ramp_threshold_selection_top": [
+    {
+      "threshold": 0.45,
+      "precision": 0.5,
+      "recall": 0.38636363636363635,
+      "F1": 0.4358974358974359,
+      "predicted_count": 34,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.5,
+      "precision": 0.5333333333333333,
+      "recall": 0.36363636363636365,
+      "F1": 0.43243243243243246,
+      "predicted_count": 30,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.3,
+      "precision": 0.4318181818181818,
+      "recall": 0.4318181818181818,
+      "F1": 0.4318181818181818,
+      "predicted_count": 44,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.35,
+      "precision": 0.4318181818181818,
+      "recall": 0.4318181818181818,
+      "F1": 0.4318181818181818,
+      "predicted_count": 44,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.25,
+      "precision": 0.4,
+      "recall": 0.45454545454545453,
+      "F1": 0.425531914893617,
+      "predicted_count": 50,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.4,
+      "precision": 0.43902439024390244,
+      "recall": 0.4090909090909091,
+      "F1": 0.4235294117647059,
+      "predicted_count": 41,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.2,
+      "precision": 0.3387096774193548,
+      "recall": 0.4772727272727273,
+      "F1": 0.39622641509433965,
+      "predicted_count": 62,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.15,
+      "precision": 0.3235294117647059,
+      "recall": 0.5,
+      "F1": 0.39285714285714285,
+      "predicted_count": 68,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.55,
+      "precision": 0.52,
+      "recall": 0.29545454545454547,
+      "F1": 0.37681159420289856,
+      "predicted_count": 25,
+      "actual_count": 44
+    },
+    {
+      "threshold": 0.1,
+      "precision": 0.27906976744186046,
+      "recall": 0.5454545454545454,
+      "F1": 0.36923076923076925,
+      "predicted_count": 86,
+      "actual_count": 44
+    }
+  ],
+  "risk_rules": {
+    "risk_level": "thresholds based on predicted_smp and ramp_probability",
+    "price_weather": "transparent labels based on predicted_smp and ramp_probability",
+    "note": "가격 날씨는 SMP 예측 기반 위험도이며 실제 기상예보와 다릅니다."
+  }
+}

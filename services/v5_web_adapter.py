@@ -8,7 +8,8 @@ import pandas as pd
 
 WEB_ROOT = Path(__file__).resolve().parents[1]
 OUTPUTS = WEB_ROOT / "outputs"
-V5_ROOT = Path(r"C:\smpsmp\smpsmpcodexuse\versions\v5_day_ahead")
+import os
+V5_ROOT = Path(os.environ.get("SMP_V5_RUN_DIR", WEB_ROOT / "runs" / "v5"))
 V5_PREDICTIONS = V5_ROOT / "results" / "v5_day_ahead_predictions.csv"
 V5_COMPARISON = V5_ROOT / "results" / "v5_model_comparison.csv"
 V5_CHARGING = V5_ROOT / "results" / "v5_charging_window_backtest.csv"
@@ -20,6 +21,12 @@ METRICS_OUT = OUTPUTS / "v5_metrics.json"
 DEFAULT_TARGET_DATE = "2023-10-01"
 MODEL_SOURCE = "V5_DAY_AHEAD_DIRECT_HGB"
 SELECTED_MODEL = "validation_selected_profile_hgb_blend"
+POLICY_PATH = V5_ROOT / "models/day_ahead_policy.json"
+REFERENCE_POLICY = WEB_ROOT / "model_v5/models_config/day_ahead_policy.json"
+
+def load_policy() -> dict:
+    path = POLICY_PATH if POLICY_PATH.exists() else REFERENCE_POLICY
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _hour_for_web(timestamp: pd.Timestamp) -> int:
@@ -27,8 +34,9 @@ def _hour_for_web(timestamp: pd.Timestamp) -> int:
 
 
 def _selected_prediction_column(df: pd.DataFrame) -> str:
-    if "profile_hgb_blend" in df.columns:
-        return "profile_hgb_blend"
+    selected = load_policy()["selected_model_column"]
+    if selected in df.columns:
+        return str(selected)
     if "predicted_smp" in df.columns:
         return "predicted_smp"
     raise ValueError("No selected V5 prediction column found.")
@@ -52,9 +60,14 @@ def build_forecast_for_web(target_date: str | None = None) -> pd.DataFrame:
     df = pd.read_csv(V5_PREDICTIONS, encoding="utf-8-sig")
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     df["target_date"] = df["target_date"].astype(str)
+    if target_date is not None and target_date not in _complete_days(df):
+        raise ValueError("Requested date is not a complete available V5 day.")
     demo_date = choose_demo_day(df, target_date or DEFAULT_TARGET_DATE)
     day = df[df["target_date"] == demo_date].sort_values("horizon").copy()
-    if len(day) != 24:
+    if (len(day) != 24 or set(day["horizon"]) != set(range(1, 25))
+            or day["timestamp"].duplicated().any()
+            or not day["timestamp"].diff().dropna().eq(pd.Timedelta(hours=1)).all()
+            or not day["timestamp"].dt.normalize().eq(pd.Timestamp(demo_date)).all()):
         raise ValueError(f"Selected demo day {demo_date} does not have exactly 24 rows.")
 
     selected_col = _selected_prediction_column(day)
@@ -69,7 +82,7 @@ def build_forecast_for_web(target_date: str | None = None) -> pd.DataFrame:
             "ramp_probability": day["ramp_probability"].astype(float),
             "risk_level": day["risk_level"].astype(str),
             "price_weather": day["price_weather"].astype(str),
-            "model_name": SELECTED_MODEL,
+            "model_name": load_policy()["selected_model_name"],
             "source": MODEL_SOURCE,
         }
     )
@@ -79,6 +92,8 @@ def build_forecast_for_web(target_date: str | None = None) -> pd.DataFrame:
 
 
 def cheapest_consecutive_block(df: pd.DataFrame, duration_hours: int = 3) -> pd.DataFrame:
+    if not isinstance(duration_hours, int) or not 1 <= duration_hours <= 24:
+        raise ValueError("Charging duration must be an integer from 1 to 24.")
     ordered = df.sort_values("datetime").reset_index(drop=True)
     candidates: list[tuple[float, int, pd.DataFrame]] = []
     for start in range(0, len(ordered) - duration_hours + 1):
@@ -95,11 +110,16 @@ def cheapest_consecutive_block(df: pd.DataFrame, duration_hours: int = 3) -> pd.
 
 
 def write_v5_metrics() -> None:
+    selected = load_policy()["selected_model_name"]
+    comparison = pd.read_csv(V5_COMPARISON, encoding="utf-8-sig")
+    charging = pd.read_csv(V5_CHARGING, encoding="utf-8-sig")
+    test = comparison[comparison["split"] == "final_test"]
+    charge = charging[(charging["split"] == "final_test") & (charging["model"] == selected)]
     metrics = {
-        "selected_model": SELECTED_MODEL,
-        "final_test_mae": 11.0938,
-        "daily_profile_mae": 13.5758,
-        "average_charging_regret": 2.4643,
+        "selected_model": selected,
+        "final_test_mae": float(test[test["model"] == selected]["MAE"].iloc[0]),
+        "daily_profile_mae": float(test[test["model"] == "daily_profile_baseline"]["MAE"].iloc[0]),
+        "average_charging_regret": float(charge["average_regret"].mean()),
         "forecast_horizon": 24,
         "model_source": MODEL_SOURCE,
     }
