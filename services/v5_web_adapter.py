@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -8,10 +9,10 @@ import pandas as pd
 
 WEB_ROOT = Path(__file__).resolve().parents[1]
 OUTPUTS = WEB_ROOT / "outputs"
-V5_ROOT = Path(r"C:\smpsmp\smpsmpcodexuse\versions\v5_day_ahead")
-V5_PREDICTIONS = V5_ROOT / "results" / "v5_day_ahead_predictions.csv"
-V5_COMPARISON = V5_ROOT / "results" / "v5_model_comparison.csv"
-V5_CHARGING = V5_ROOT / "results" / "v5_charging_window_backtest.csv"
+V5_RESULTS = Path(os.environ.get("SMP_RESULTS_DIR", WEB_ROOT / "artifacts" / "results"))
+V5_PREDICTIONS = V5_RESULTS / "v5_day_ahead_predictions.csv"
+V5_COMPARISON = V5_RESULTS / "v5_model_comparison.csv"
+V5_CHARGING = V5_RESULTS / "v5_charging_window_backtest.csv"
 
 FORECAST_OUT = OUTPUTS / "next_day_smp_forecast_tuned.csv"
 RECOMMENDATION_OUT = OUTPUTS / "recommended_3h_charging_window_tuned.csv"
@@ -27,6 +28,12 @@ def _hour_for_web(timestamp: pd.Timestamp) -> int:
 
 
 def _selected_prediction_column(df: pd.DataFrame) -> str:
+    policy = Path(os.environ.get("SMP_MODELS_DIR", WEB_ROOT / "artifacts" / "models")) / "day_ahead_policy.json"
+    if policy.exists():
+        column = json.loads(policy.read_text(encoding="utf-8"))["selected_model_column"]
+        if column not in df.columns:
+            raise ValueError(f"Selected model column missing: {column}")
+        return column
     if "profile_hgb_blend" in df.columns:
         return "profile_hgb_blend"
     if "predicted_smp" in df.columns:
@@ -79,6 +86,8 @@ def build_forecast_for_web(target_date: str | None = None) -> pd.DataFrame:
 
 
 def cheapest_consecutive_block(df: pd.DataFrame, duration_hours: int = 3) -> pd.DataFrame:
+    if duration_hours < 1:
+        raise ValueError("duration_hours must be positive")
     ordered = df.sort_values("datetime").reset_index(drop=True)
     candidates: list[tuple[float, int, pd.DataFrame]] = []
     for start in range(0, len(ordered) - duration_hours + 1):
@@ -95,11 +104,18 @@ def cheapest_consecutive_block(df: pd.DataFrame, duration_hours: int = 3) -> pd.
 
 
 def write_v5_metrics() -> None:
+    comparison = pd.read_csv(V5_COMPARISON)
+    summary = json.loads((V5_RESULTS / "v5_training_summary.json").read_text(encoding="utf-8"))
+    selected = summary["selected_model"]
+    test = comparison[comparison["split"] == "final_test"].set_index("model")
+    charging = pd.read_csv(V5_CHARGING)
+    regret = charging[(charging["split"] == "final_test") & (charging["model"] == selected)]["average_regret"].mean()
     metrics = {
-        "selected_model": SELECTED_MODEL,
-        "final_test_mae": 11.0938,
-        "daily_profile_mae": 13.5758,
-        "average_charging_regret": 2.4643,
+        "selected_model": selected,
+        "final_test_mae": float(test.loc[selected, "MAE"]),
+        "final_test_r2": float(test.loc[selected, "R2"]),
+        "daily_profile_mae": float(test.loc["daily_profile_baseline", "MAE"]),
+        "average_charging_regret": float(regret),
         "forecast_horizon": 24,
         "model_source": MODEL_SOURCE,
     }

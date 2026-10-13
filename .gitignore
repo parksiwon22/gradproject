@@ -1,0 +1,12 @@
+/.venv/
+/local_original/
+/data/*
+!/data/README.md
+/artifacts/*
+!/artifacts/README.md
+__pycache__/
+*.joblib
+.pytest_cache/
+.env
+/results/
+*.log

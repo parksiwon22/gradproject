@@ -1,8 +1,9 @@
 {
   "selected_model": "validation_selected_profile_hgb_blend",
-  "final_test_mae": 11.0938,
-  "daily_profile_mae": 13.5758,
-  "average_charging_regret": 2.4643,
+  "final_test_mae": 11.093786148024114,
+  "final_test_r2": 0.6429194848696833,
+  "daily_profile_mae": 13.575801630434784,
+  "average_charging_regret": 2.464329710144928,
   "forecast_horizon": 24,
   "model_source": "V5_DAY_AHEAD_DIRECT_HGB"
 }
