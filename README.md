@@ -2,7 +2,7 @@
 
 현재 app.py는 첨부 V5와 동일 내용의 Streamlit 앱이고, 2023-10-01 저장된 24시간 SMP와 충전 추천을 보여주는 과거 데모다. 실시간 데이터 수집이나 매일 알림은 아직 구현되지 않았다. main의 LightGBM 파일은 현재 앱이 읽는 V5 기준 파일이 아니다.
 
-개발은 CODEX_TASKS.md부터 시작한다. 실제 감사는 PROJECT_AUDIT.md, 전체 방향은 PROJECT_SPEC.md, 모델/데이터/화면 요구사항은 MODEL_EXPERIMENT_PLAN.md, DATA_API_PLAN.md, WEB_REQUIREMENTS.md에 있다.
+2026-10-14 연구 재설계 추천은 발표 전 AI 예측, 공식 가격 수신 후 재최적화와 가상 V2G를 결합한 C 최소형이다. 현재 문서만 수정했으며 구현/배포 완료를 뜻하지 않는다. RESEARCH_DIRECTION.md와 CODEX_PROMPT.md를 먼저 읽고 CODEX_TASKS.md부터 개발한다. 실제 감사는 PROJECT_AUDIT.md, 전체 방향은 PROJECT_SPEC.md, 모델/데이터/화면 요구사항은 MODEL_EXPERIMENT_PLAN.md, DATA_API_PLAN.md, WEB_REQUIREMENTS.md에 있다.
 
 ## 웹 실행
 

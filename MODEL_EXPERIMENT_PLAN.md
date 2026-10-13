@@ -1,61 +1,51 @@
-# V6 모델 비교 및 검증 계획
+# V6 발표 전 가격 예측과 의사결정 실험
 
-## 1. 고정 기준
+수정 2026-10-14. 이 명세는 추천 C안의 실험 계획이며 이미 개선된 결과가 아니다. 원 V5 결과는 PROJECT_AUDIT.md와 benchmarks/v5를 따른다.
 
-V5는 63개 특성과 horizon을 사용한 pooled direct residual HGB이다. 24개 별도 모델이나 재귀 예측이 아니다. 전일 동일시간 가격에 잔차를 더하고 일/주 프로파일과 혼합한다. 분류기는 직전 실제 시간보다 가격이 15원/kWh 이상 오른 사건을 학습한다. 미래 실제값은 라벨과 평가에만 사용한다.
+## 1. 분리된 세 기준
 
-첨부 기준은 train 235일, validation 30일(2023-09), test 92일(2023-10~12), 각각 5640/720/2208행이다. 저장 테스트 MAE 11.093786, daily baseline 13.575802, R² 0.642919다. 급등 F1은 validation 0.435897, test 0.277512이며 test recall 0.189542다. 가격 >=170은 49시간이고 모두 과소예측되었다. 상세 재현 이슈는 PROJECT_AUDIT.md를 먼저 읽는다.
+V5-archive는 D-1 23시 정보의 저장 결과 MAE11.093786, F1 test .277512를 보존한다. V5-current-environment는 재실행11.417825이며 원환경 차이가 미해결이다. V6-prepublication은 D-1 09시 제안 origin에 재학습한 새 모델이다. 처음 두 결과를 마지막 모델의 같은 난이도 baseline으로 쓰지 않는다.
 
-원본 2023-10~12 결과가 이미 공개적으로 검토되었으므로 V6의 새로운 미열람 독립 테스트로 간주하지 않는다. 재현/회귀검증 데이터로만 쓴다.
+V6 비교 기준은 동일 09시 정보로 만든 same-hour lag48, weekly lag168, validation에서 혼합비를 선택한 profile다. HGB의 학습/추론 계약은 같은 target 24행과 lead_hours15~38이다. 종전 V5 target-24h profile 중 origin 이후 D-1 09~23시 정보는 금지한다. target-48h, target-168h의 실제 시각과 publication을 확인한다. cutoff 이전 알려진 오늘 하루전 가격은 별도 officially_known feature family로만 사용하고 알려진 내일 타깃은 예측 적격성에서 제외한다.
 
-## 2. 데이터와 분할
+## 2. 최소 모델과 데이터
 
-데이터 기간은 권한과 품질이 확보된 연속 3년 이상을 목표로 하며 2021~2025 및 2026 완료분 확보 가능성을 조사한다. 실제 확보 전 수집 완료라고 쓰지 않는다. 육지를 기본 후보로 하되 ZIP SMP의 시장구분은 원출처에서 확인한다. 제주를 혼합하지 않는다. 개정 제도와 가격 상한, 데이터 정의 변경은 별도 구간으로 기록한다.
+첫 비교는 HGB 1 family와 profile로 제한한다. 손실 squared_error/absolute_error, leaf15/31, iteration200/400 등 최대8 조합과 seed42를 기본 제안으로 한다. V5 source는 수정하지 않는다. 데이터는 SMP와 calendar부터 시작하며 publication 확인이 안 된 일별 reserve/LNG/사후 weather 값을 억지로 넣지 않는다. 미래 날씨는 당시 forecast vintage를 얻은 공통기간에서만 추가한다.
 
-확보 시 가장 최근의 완료된 3개월을 untouched test로 동결하고 날짜 목록과 해시를 기록한다. 이전 구간에서 최소 4개 월별 expanding-window 검증 fold를 만든다. 각 fold는 fit / chronological early-stop / selection 구간을 시간순으로 분리한다. 학습 라벨의 interval_end가 해당 fold의 모델 fit cutoff 이후인 행을 제거한다. 날짜별 24행은 같이 움직이며 셔플 분할하지 않는다. 공통 warm-up 및 결측 규칙으로 후보 간 같은 날을 평가한다. 탈락한 날도 사유와 개수를 보고한다.
+2023 데이터는 구조검증 및 historical-assumption replay에 재사용할 수 있지만, V5 test가 이미 검토된 사실과 원 시장구분/publication 미확인을 표시한다. 2023년 결과를 untouched prospective test나 2026 제주 RT 결과로 부르지 않는다. 신규 공개권한/품질이 확인된 기간의 최근3개월을 test로 동결하고 이전 기간에서 월별 expanding folds를 구성한다. 미열람 기간이 없으면 결과는 탐색 평가로 표시한다.
 
-스케일링, 결측 대체 통계, 변수선택, 가격 분위수, peak 가중치, 확률 보정, 혼합계수와 경고 임계값은 각 학습/검증 구간 안에서만 정한다. HGB early_stopping='auto'는 큰 데이터에서 내부 무작위 분할을 켤 수 있으므로 V6에서는 명시적 시간순 early-stop 데이터 또는 early_stopping=False와 검증 iteration 선택을 사용한다. V5 설정은 바꾸지 않는다.
+각 날짜24행은 같은 split에 둔다. label interval_end와 publication은 모델 fit cutoff를 넘지 않는다. 전처리/분위수/혼합비/calibration/threshold는 fit/validation에서만 정한다. early stopping은 chronological validation을 명시하거나 끄고 iteration을 검증으로 고른다. 가짜 역보간/미래 실제치로 결측이나 과거 예보를 채우지 않는다.
 
-## 3. 공정한 모델 비교
+## 3. 조건별 정책 실험
 
-| 후보 | 최초 비교 설정 | 추가 실험 | 제한 |
-| --- | --- | --- | --- |
-| V5 동결 | 원본 HGB 및 프로파일 정책 | 원환경 재현 | 저장 기준과 재실행 기준 구분 |
-| HGB | squared_error, absolute_error, max_iter 200/400, leaf 15/31 | quantile 0.1/0.5/0.9 | 시간순 early-stop |
-| LightGBM | regression 및 regression_l1, leaves 15/31, lr .03/.05 | quantile, peak 가중치 | 동일 feature와 split |
-| CatBoost | RMSE 및 MAE, depth 4/6, lr .03/.05 | Quantile, 캘린더 범주형 별도 ablation | 범주 처리 이득은 추가 실험으로 표시 |
-| XGBoost | reg:squarederror 및 reg:absoluteerror, hist, depth 3/6 | reg:quantileerror | 지원 버전 확인 후 환경 고정 |
-| 단순 기준선 | 전일, 전주, 검증 혼합 | 공식 가격 이용 가능 기준선 | 공식 값은 예측 MAE 경쟁과 구분 |
+| 정책 | 정보/행동 규칙 |
+| --- | --- |
+| P0 즉시충전 | 연결 시 목표까지 가능한 출력으로 충전, 방전 없음 |
+| P1 공식정보만 | 미공개 미래가격을 모르는 정의된 myopic/즉시 fallback, 공식 확보 후 최적화 |
+| P2 오전 예측 고정 | origin의 알려진 오늘가격+내일예측으로 계획, 출발/물리조건 변화 외 가격갱신 없음 |
+| P3 예측+재최적화 | P2와 같은 초기정보, 새 공식 version 수신시 남은 슬롯만 재계획 |
+| Oracle | 최초부터 전체 미래 평가가격을 아는 offline 하한, 실행정책으로 사용 금지 |
 
-단계 A는 모델 family당 12개 이하 사전 정의 조합, 같은 63개 특성과 잔차 타깃, CPU와 seed=42를 사용한다. family별 탐색시간 상한을 초기 30분으로 두고 실행 횟수와 중단 사유를 기록한다. 단계 B는 상위 2 family에서 seed 7/42/2026으로 안정성을 검증한다. 단계 C에서 직접가격 타깃 대 잔차, pooled horizon 대 시간군 모델을 비교한다. 한 번에 하나의 변경만 도입한다. optional 모델 패키지는 별도 lock으로 두고 미설치 family는 실패/미실행으로 명시한다.
+P1을 의도적으로 충전 못 하게 기다리게 만든 뒤 AI 승리라고 해석하지 않는다. 미공개 구간의 fallback를 사전 고정하고, 필요하면 즉시충전 fallback와 오늘 알려진 가격 내 myopic 정책을 각각 제시한다. 모든 정책은 같은 연결기간/출발SOC/말단에너지/효율/열화/실행빈도/수출한도를 갖는다. 계획이 바뀌기 전 실제 시행한 출력은 반드시 SOC에 반영한다.
 
-## 4. 피크 과소예측 실험
+시나리오 S1: 공표 전부터 연결, 출발 다음 날 오전. S2: 공식 수신 후22시 연결, 출발 다음 날08시. S3: 공식값 지연/누락. S4: 조기 출발 또는 연결 중단. 날짜간 가격범위를 충분히 확보하며 없는 날 가격을 같은 날짜00시로 이어붙이지 않는다.
 
-희소 피크, 평균으로의 수축, 프로파일 혼합, 누락된 계통/기상 정보, 계절과 제도 변화가 원인 후보다. 현재 증거는 >=170 49시간 모두 과소예측과 test 최고 예측 176.52 대 실제 218.25다. 원인이 확정되었다고 쓰지 않는다.
+오전에 내일가격을 예측했더라도 실행이 공식 수신 후만이면 P3와 P1이 같을 수 있다. 이것을 'AI 가치가 없음/제한됨' 대조 결과로 보고한다. 재최적화는 P2보다 좋아도 P1보다 좋아야 AI의 증분가치를 주장할 근거가 생긴다. 실제 API 수신 로그가 없으면 17/23시 공개 이벤트는 가정 민감도이며 실측 효과로 부르지 않는다.
 
-E0: 피크 발생일별 bias, 오차, 입력 결측, 시간군 및 모델 간 오차를 진단한다. E1: train 가격 상위 10%/5% 샘플 가중치 1/2/4를 비교한다. E2: absolute_error와 squared_error, q=.5/.8/.9를 비교한다. 상위 분위수는 위험용 출력이며 점예측을 무조건 대체하지 않는다. E3: train-only threshold의 peak classifier와 conditional regressor를 결합하고 검증자료에서 확률을 보정한다. E4: lag 48/72/336, 24/72시간 통계, hour별 프로파일 변동, 예보 net load 후보를 추가한다. E5: 당시 예보가 확보된 공통기간에서 예보 미사용/사용을 비교한다. 가중치로 평균 오차와 허위 경보가 늘어나는지도 보고한다.
+## 4. 지표
 
-고가(>=150,>=170), 급등(delta>=15,>=20), 일 최고가격 오차 및 최고시각 오차는 별도 지표다. V5 분류기의 class balancing 점수는 보정된 사건 발생확률이라고 가정하지 않는다. PR-AUC, Brier score, reliability curve와 검증 calibration을 추가하고 임계값은 오경보 비용을 반영해 정한다. UI 라벨의 고정 임계값과 모델의 검증 임계값을 정책 파일 한 곳에서 관리한다.
+모델 MAE/RMSE/bias/horizon 및 피크 conditional MAE, PR-AUC/F1/recall/calibration을 보고한다. 비용은 실제 평가가격에서의 구매비, 가상판매대금, 열화비, 순운전비, P0/P1 대비 차이, oracle regret다. 제약 위반수, 출발SOC 실패율, 불가능 요청비율, 열화 throughput, 실행시간, 실행 전후 계획변경량도 보고한다.
 
-## 5. 지표와 선정 규칙
+같은 날짜/차량조건의 paired 차이를 집계하고 7일 block-bootstrap 95% CI를 선택 분석으로 둔다. 초기 소규모 탐색에서 복잡한 유의성 주장보다 개별 시나리오와 실패 원인을 우선한다. 공식가격이 업데이트된 후의 미래 행동은 새 version으로 계획하되 과거 비용은 당시의 확정된 평가정책으로 평가한다. snapshot 정정 실험과 실제 정산가격 실험은 구분한다.
 
-모든 후보의 MAE, RMSE, R², MAPE(0 근처 취약성 표시), signed bias, horizon별/계절별 지표를 남긴다. peak conditional MAE와 bias, 과소예측 비율, ramp precision/recall/F1/PR-AUC, 예측구간 coverage/width/pinball loss를 함께 보고한다.
+모델 선정은 validation MAE를 기본으로 하되 regret와 목표SOC 결과를 함께 검토한다. 이전 2%/5% gate를 다른 cutoff의 V5 숫자에 적용하지 않는다. 개선 없으면 오전 profile을 유지해도 C의 정보공개/경제성 연구는 수행할 수 있다. test를 보고 후보/요금/threshold를 바꾸면 탐색으로 재분류한다.
 
-충전은 2/3/4/5/6/8시간에 대해 실제 가격으로 계산한 regret, exact match, overlap을 보고한다. V5 regret는 고정 1kW, 1시간 슬롯 가정의 가격 합 차이며 실제 사용자의 원화 절감액이 아니다. V6에서는 가용시간, 효율, 부분시간과 실제 요금으로 총 구매비를 비교한다. 추천에 실제 미래값을 쓰지 않고 실제값은 oracle 평가에만 쓴다.
+## 5. 피크, 장기 및 family 확장
 
-사전 기본 선정 규칙: 검증 fold 평균 MAE가 현실적 V5 대비 2% 이상 낮고, peak MAE와 충전 regret가 각 5% 초과 악화하지 않으면 채택 후보가 된다. 이 수치는 프로젝트 기본 제안이며 승인 가능한 기술 선택이다. 탈락 시 V5 유지, peak 특화 모델은 위험 레이어로만 검토한다. 일 단위 paired block bootstrap(7일 블록, 2000회)로 MAE/regret 차이 95% CI를 보고하고 계절별 안정성도 검토한다. 이 통계만으로 보장된 우월성을 주장하지 않는다.
+피크 위험은 발표 전 미공개가격에 대한 보조 출력이다. 발표 후 알려진 고가시간은 실제 가격 경고이지 예측확률이 아니다. class balancing score를 calibration 없이 발생확률로 표시하지 않는다. 최소품 이후 train-only peak weights1/2/4와 quantile를 ablation하며 평균 MAE/regret 악화를 함께 보고한다.
 
-최종 모델과 모든 정책을 validation에서 동결한 뒤 test를 한 번 평가한다. 테스트를 본 뒤 재튜닝하면 그 결과는 탐색으로 재분류하고 새로운 테스트기간을 마련한다. 공식 가격이 이미 확보된 23시 서비스의 효용은 별도의 서비스 KPI로 평가한다.
+LightGBM/CatBoost/XGBoost는 같은 09시 schema/표본의 optional family다. 2일 이상은 target_date/lead시간/휴일 선공개 적격성을 새로 정의한다. 제주 RT 및 DA-RT 편차는 15분 RT 별도 데이터가 확보된 후 진행하며 육지 또는2023 V5 타깃을 이름만 바꿔 사용하지 않는다.
 
-## 6. 재현 산출물
+## 6. 기록
 
-각 run은 source SHA, 데이터 hash 및 발표시각 정책, 환경 lock, split 날짜, seed, 실제 parameters, feature 순서, 예측 CSV, 모델, calibration, 정책, 실패로그를 보존한다. 원본 baseline 폴더와 outputs는 자동 overwrite 금지다. joblib은 신뢰할 수 있는 내부 생성물만 로드한다.
-
-## 공식 근거
-
-- HGB와 손실/early stopping: https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingRegressor.html
-- LightGBM objectives: https://lightgbm.readthedocs.io/en/stable/Parameters.html
-- CatBoost regression losses: https://catboost.ai/docs/en/concepts/loss-functions-regression
-- XGBoost objectives: https://xgboost.readthedocs.io/en/stable/parameter.html
-
-각 라이브러리의 지원 손실을 확인한 비교 제안이다. 이 프로젝트에서 우월성이 확인된 모델 목록이 아니다.
+run마다 source/config/env/data hash, market/product, cutoff, eligible_dates, excluded reason, feature timestamp/availability, split manifest, policy+tariff+degradation assumptions, model parameters, action/SOC/price-vintage trace를 저장한다. benchmarks/v5와 원본 outputs는 overwrite 금지. 기록은 공개권한이 확인된 집계만 Git에 올린다.
