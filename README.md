@@ -68,3 +68,10 @@ python -m streamlit run app.py
 7개 단위·통합 테스트와 Streamlit 서버 HTTP 확인이 통과했습니다.
 학습 데이터는 2023년뿐이며 실시간 미래 예측 성능을 검증한 결과는 아닙니다.
 후속 V6 실험은 V5를 유지하고 별도 소스·산출물 폴더에서 진행하세요.
+
+## V5 동결 및 후속 준비
+
+현재 V6 모델 개선과 웹 개편은 사용자 시작 지시까지 대기합니다.
+[로컬 자산 경로·재생성·Cloud 확보 안내](docs/PRIVATE_ASSETS_AND_CLOUD.md)와
+[Work 명세서 수신 절차](docs/WORK_SPEC_HANDOFF.md)를 참고하세요.
+Cloud 비공개 자료 전송은 아직 설정하지 않았습니다.
