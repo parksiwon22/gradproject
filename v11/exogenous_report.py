@@ -16,7 +16,8 @@ def main():
     inventory=[]
     for name,col,resolution in [('demand_hourly_all.csv','timestamp','hourly observations nationwide'),('power_daily_all.csv','date','daily peak-state nationwide'),('weather_daily_all.csv','date','daily Seoul108'),('demand_forecast_hourly.csv','timestamp','hourly forecast archive mainland')]:
         f=read_date(EXO/name,col)
-        for year,g in f.groupby(f[col].dt.year): inventory.append(dict(data=name,year=int(year),rows=len(g),complete_rows=int(g.dropna().shape[0]),resolution=resolution))
+        values=[c for c in f if c not in [col,'first_seen','historical_issued_at']]
+        for year,g in f.groupby(f[col].dt.year): inventory.append(dict(data=name,year=int(year),rows=len(g),complete_rows=int(g.dropna(subset=values).shape[0]),resolution=resolution,historical_issue_known_rows=int(g.historical_issued_at.notna().sum()) if 'historical_issued_at' in g else 0))
     inventory=pd.DataFrame(inventory)
     inventory.to_csv(ROOT/'docs/V11_EXOGENOUS_DATA_INVENTORY.csv',index=False)
     experiments=json.loads((EXO/'experiments/experiments.json').read_text(encoding='utf-8'))

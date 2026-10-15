@@ -21,10 +21,10 @@
 | weather_daily_all.csv | 2024 | 366 | 362 | daily Seoul108 |
 | weather_daily_all.csv | 2025 | 365 | 364 | daily Seoul108 |
 | weather_daily_all.csv | 2026 | 288 | 287 | daily Seoul108 |
-| demand_forecast_hourly.csv | 2023 | 8760 | 0 | hourly forecast archive mainland |
-| demand_forecast_hourly.csv | 2024 | 8784 | 0 | hourly forecast archive mainland |
-| demand_forecast_hourly.csv | 2025 | 8760 | 0 | hourly forecast archive mainland |
-| demand_forecast_hourly.csv | 2026 | 6912 | 0 | hourly forecast archive mainland |
+| demand_forecast_hourly.csv | 2023 | 8760 | 8760 | hourly forecast archive mainland |
+| demand_forecast_hourly.csv | 2024 | 8784 | 8784 | hourly forecast archive mainland |
+| demand_forecast_hourly.csv | 2025 | 8760 | 8760 | hourly forecast archive mainland |
+| demand_forecast_hourly.csv | 2026 | 6912 | 6912 | hourly forecast archive mainland |
 
 수요시간자료는2023 8,760/2024 8,784/2025 8,760시간을 확보했다.2026 시간별 수요실적은 미확보다. 대신2026에는 공식 일별 최대전력/공급능력/예비력/예비율을 수집했다. 이것을 시간별 실제 수요로 바꾸어 부르지 않는다. 일별 값은 과거 특정 날짜의 요약이라는 별도 피처로 시간행에 결합했다.
 
