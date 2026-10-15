@@ -103,3 +103,12 @@ if (exo/'production_exogenous.joblib').exists():
             st.caption('실제 발표 기상예보를 입력한 별도 연구 시나리오도 저장했습니다. 과거 학습에는 관측 대용값을 사용해 예보 입력 성능은 검증되지 않았으며 EV 추천에는 적용하지 않습니다.')
         api=read(exo/'api_connection_status.json',{})
         st.write('API 연결 상태', {k:v for k,v in api.items() if k!='at'})
+
+if (HOME/'kma_apihub/connection_status.json').exists():
+    with st.expander('기상청 API허브 · 시간 관측 수집 현황'):
+        st.write(read(HOME/'kma_apihub/connection_status.json',{}))
+        inventory=read(HOME/'kma_apihub/inventory.json',{})
+        stations=inventory.get('stations',[])
+        if stations:
+            st.dataframe(pd.DataFrame([{k:v for k,v in s.items() if k!='missing_fraction'} for s in stations]),hide_index=True)
+        st.caption('관측자료와 발표 예보는 별도입니다. 시간 관측자료는 수집 중이며 연간 전체 자료 확보를 의미하지 않습니다. 과거 발표 예보 API가 승인되기 전에는 이 자료로 예보 모델을 대체하거나 기본 운영 모델을 변경하지 않습니다.')
