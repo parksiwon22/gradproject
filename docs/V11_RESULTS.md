@@ -81,7 +81,7 @@ V5 MAE11.093786, R²0.642919(원63피처·기존검증정책). 새21피처 Extra
 
 SQLite에시장/시간/정정version을 append한다. 동일값은 새 price row를 만들지 않고 last_seen만 갱신한다. 원응답은SHA256별 저장해 바이트 동일 파일을 중복 생성하지 않는다. 증분조회는 최근7일을 재확인하고 장기정정은 --backfill 재감사한다. 요청3회 재시도, 실패로그와 마지막 성공시각을 기록한다. 네트워크/무결성 실패 시 기존가격 보존. 새로운 수집이 기존학습모델을 자동으로 바꾸지는 않는다.
 
-Windows 작업 `GradprojectV11Local`을 현재 개인 사용자로 등록했다. 매시간 수집 및 매일23:05 KST 작업이며 중복실행은 무시한다. 컴퓨터가 꺼져 있거나 로그아웃하면 실행되지 않을 수 있고 StartWhenAvailable로 복귀 후 실행한다. 실제 작동상태/LastTaskResult는 작업 스케줄러에서 확인한다. 모델 자동재학습·데이터 외부업로드는 포함하지 않는다.
+Windows 작업 `GradprojectV11Local`을 현재 개인 사용자로 등록했다. 매시간 수집 및 매일23:05 KST 작업이며 중복실행은 무시한다. 첫 자동실행은2026-10-15 22:18:46 KST에 시작했고22:19:31에 파이프라인4단계 모두 종료코드0으로 완료했다. 작업 스케줄러 LastTaskResult=0, Ready 및 다음실행23:05를 확인했다. 컴퓨터가 꺼져 있거나 로그아웃하면 실행되지 않을 수 있고 StartWhenAvailable로 복귀 후 실행한다. 모델 자동재학습·데이터 외부업로드는 포함하지 않는다.
 
 [GitHub Actions 과금 안내](https://docs.github.com/en/billing/concepts/product-billing/github-actions)에 따르면 공개저장소 표준 hosted runner는 무료 사용 범위가 있으나 private 저장소/runner 종류/저장량에는 제한·과금이 적용될 수 있다. 노트북이 꺼져도 hosted runner는 동작하지만 원자료 비공개 저장·키권한·artifact노출·영구저장소를 별도로 설계해야 한다. 이번에는 Actions workflow나 원자료 자동커밋을 활성화하지 않았다.
 
@@ -114,6 +114,6 @@ Get-ScheduledTaskInfo -TaskName GradprojectV11Local
 
 ## 검증과 미완료
 
-테스트는 중복·시장분리·정정과 as-of vintage, API3회실패 시 기존자료 보존, 부분일·NaN·중복 거부, 음수가격, 두 horizon의 미래값 불변성, 공개상태 구분, 예측 불변, oracle regret0, 시간순 분리, Streamlit 조작을 검증한다. V5 기존 재현·추론도 재확인했다. 초기 샌드박스 임시폴더 권한/HTTP 제약과 백업 writer 종료 전 CRC 검사에서 실패했으며 수정 후 재검증했다. 최종 상태는 v11_tests_verified.log와 최종 보고를 참조한다.
+테스트14개가 최종 통과했다. 중복·시장분리·정정과 as-of vintage, API3회실패 시 기존자료 보존, 부분일·NaN·중복 거부, 음수가격, 두 horizon의 미래값 불변성, 공개상태 구분, 예측 불변, oracle regret0, 시간순 분리, Streamlit 조작을 검증했다. V5 기존 재현·추론도 재확인했다. pip check와 V11 Streamlit 실제 HTTP health도 통과했다. 초기 샌드박스 임시폴더 권한/HTTP 제약과 백업 writer 종료 전 CRC 검사에서 실패했으며 수정 후 재검증했다. 로그는 v11_tests_verified.log, v11_smoke_final.log, v11_backup_final.log에 보존했다.
 
 미완료: 전체 경로의 최초 공개시각 증명, 원63피처의 다년 자료와 예보 vintage, 제주2024-03-21 누락 및 시장상품 전환 감사, 10월17일 가격 도착 후 전향오차, 원V5의2026 동일조건 평가, 노트북 종료 중에도 동작할 비공개 서버. 23시 이전 preview를 23시 본실행으로 주장하지 않는다.
