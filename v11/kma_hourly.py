@@ -40,8 +40,10 @@ def parse(payload):
         values=[float(p[11]),float(p[13]),float(p[3]),float(p[-12]),float(p[-13]),float(p[15])]
         values=[np.nan if v in ((-99,-999) if i==0 else (-9,-99,-999)) else v for i,v in enumerate(values)]
         if any(v<0 for v in values[1:] if np.isfinite(v)): raise ValueError('invalid negative non-temperature ASOS value')
-        rows.append(dict(timestamp=pd.to_datetime(p[0],format='%Y%m%d%H%M').tz_localize('Asia/Seoul'),station_id=stn,**dict(zip(FIELDS,values))))
-    return pd.DataFrame(rows,columns=['timestamp','station_id']+FIELDS)
+        rows.append(dict(timestamp=p[0],station_id=stn,**dict(zip(FIELDS,values))))
+    frame=pd.DataFrame(rows,columns=['timestamp','station_id']+FIELDS)
+    frame['timestamp']=pd.to_datetime(frame.timestamp,format='%Y%m%d%H%M').dt.tz_localize('Asia/Seoul')
+    return frame
 
 def collect_one(timestamp, refresh=False):
     credential=key('KMA_APIHUB_AUTH_KEY')
