@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from v11.store import connect,latest,now
 from v11.features import FEATURES,build
-from v11.forecast import write_once
+from v12.records import write_once
 from v11.evaluate import metrics
 from v12.research import HOME,predict,risk_predict
 

@@ -2,6 +2,7 @@
 import hashlib
 import json
 import time
+from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
@@ -14,6 +15,22 @@ from v11.train import factories
 from v11.evaluate import metrics
 
 HOME=ROOT/'artifacts/v12'
+
+def describe_parameters(bundle):
+    result={}
+    for key,value in bundle.items():
+        if hasattr(value,'get_params'): result[key]=value.get_params()
+        elif isinstance(value,dict): result[key]=describe_parameters(value)
+        elif key=='members': result[key]=[describe_parameters(b) for b in value]
+        elif isinstance(value,(str,int,float,bool)) or value is None: result[key]=value
+        elif key=='weights': result[key]=value
+    return result
+
+def validation_improved(row,baseline):
+    no_worse=all(row[key]<=baseline[key]+1e-9 for key in ('MAE','peak_MAE','EV_regret'))
+    strictly_better=any(row[key]<baseline[key]-1e-9 for key in ('MAE','peak_MAE','EV_regret'))
+    risk_tradeoff=row['peak_F1']>baseline['peak_F1']+1e-9 and row['MAE']<=baseline['MAE']*1.1 and row['EV_regret']<=baseline['EV_regret']
+    return bool(no_worse and strictly_better or risk_tradeoff)
 
 def risk_predict(bundle,f):
     raw=bundle['classifier'].predict_proba(f[FEATURES])[:,1]
@@ -57,8 +74,9 @@ def scored(f,p,threshold):
     result.update(training_q95_peak_MAE=tail['peak_MAE'],training_q95_F1=tail['peak_F1'],training_q95_hours=tail['peak_hours'],false_alarm_rate=float(np.mean((np.asarray(p)>=150)&(f.actual_smp.to_numpy()<150))))
     return result
 
-def run():
-    folder=HOME/'study'; folder.mkdir(parents=True,exist_ok=True)
+def run(output=None):
+    folder=Path(output) if output else HOME/'study'; folder.mkdir(parents=True,exist_ok=True)
+    if (folder/'design_before_scores.json').exists(): raise FileExistsError('Existing experiment preserved; choose a new --output directory')
     design=dict(at=now(),origin='D-2 23:00 KST; candidate earlier horizon, not certified universally unpublished',seed=42,
         train=['2023-01-01','2025-06-30'],calibration=['2025-07-01','2025-09-30'],selection=['2025-10-01','2025-12-31'],
         retrospective_audit=['2026-01-01','2026-06-30'],known_failure_diagnosis=['2026-10-01','2026-10-15'],
@@ -77,7 +95,7 @@ def run():
     def register(name,bundle,hypothesis,started=None):
         p=predict(bundle,val); record=dict(name=name,split='selection',**scored(val,p,q95))
         bundles[name]=bundle; predictions[name]=p; rows.append(record)
-        experiments.append(dict(name=name,status='success',hypothesis=hypothesis,seconds=time.monotonic()-(started or timer),kind=bundle['kind'],parameters=bundle['model'].get_params() if 'model' in bundle else {},features=FEATURES))
+        experiments.append(dict(name=name,status='success',hypothesis=hypothesis,seconds=time.monotonic()-(started or timer),kind=bundle['kind'],parameters=describe_parameters(bundle),features=FEATURES))
         joblib.dump(bundle,folder/(name+'.joblib'))
         (folder/'experiments.json').write_text(json.dumps(experiments,indent=2,default=str),encoding='utf-8')
         pd.DataFrame(rows).to_csv(folder/'selection_metrics.csv',index=False)
@@ -131,7 +149,7 @@ def run():
     baseline=next(r for r in rows if r['name']=='hgb_none')
     for r in rows:
         r['selection_score']=np.mean([r['MAE']/baseline['MAE'],(r['peak_MAE'] or 0)/(baseline['peak_MAE'] or 1),r['EV_regret']/max(baseline['EV_regret'],1e-9),1-r['peak_F1']])
-        r['validation_improved']=bool(r['MAE']<=baseline['MAE'] and (r['peak_MAE'] or 0)<=(baseline['peak_MAE'] or 0) and r['EV_regret']<=baseline['EV_regret'] or r['peak_F1']>baseline['peak_F1'] and r['MAE']<=baseline['MAE']*1.1 and r['EV_regret']<=baseline['EV_regret'])
+        r['validation_improved']=validation_improved(r,baseline)
     ranking=pd.DataFrame(rows).sort_values(['selection_score','MAE']); top=ranking[ranking.validation_improved].name.head(3).tolist()
     selection=dict(at=now(),top3=top,baseline='hgb_none',gate_from_calibration=gate,calibrated_validation_Brier=brier_score_loss(val.actual_smp>=150,risk_predict(risk,val)),not_promoted=True,remaining_top_diagnostic=ranking.name.head(3).tolist())
     (folder/'selection_before_audit.json').write_text(json.dumps(selection,indent=2),encoding='utf-8')
@@ -147,7 +165,10 @@ def run():
         out['peak_probability']=risk_predict(risk,frame); out.to_csv(folder/(periodname+'_predictions.csv'),index=False)
     pd.DataFrame(auditrows).to_csv(folder/'audit_metrics.csv',index=False)
     # Standalone fixed baseline stays separate from the existing V11 operating model.
-    joblib.dump(dict(bundle=anchor,risk=risk,features=FEATURES,trained_through=train.target_date.max(),data_hash=design['source_hash'],horizon_days=2,kind='V12_RESEARCH_BASELINE_NOT_V11_REPLACEMENT'),HOME/'forward_model.joblib')
+    if output is None and not (HOME/'forward_model.joblib').exists():
+        joblib.dump(dict(bundle=anchor,risk=risk,features=FEATURES,trained_through=train.target_date.max(),data_hash=design['source_hash'],horizon_days=2,kind='V12_RESEARCH_BASELINE_NOT_V11_REPLACEMENT'),HOME/'forward_model.joblib')
     print('Finished registered candidates:',len(rows),'seconds',round(time.monotonic()-timer,1),'top validation-qualified',top,flush=True)
 
-if __name__=='__main__': run()
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(); parser.add_argument('--output'); run(parser.parse_args().output)

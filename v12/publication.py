@@ -1,14 +1,22 @@
 """Public-source receipt windows, not inferred universal publication times."""
 import hashlib
 import json
+import re
 import urllib.request
 import pandas as pd
 from v11.store import connect,ingest,latest,now
 from v11.public_prices import parse_public
 from v11.collect import request as epsis_request
 from v11.store import parse as parse_epsis
-from v11.forecast import write_once
+from v12.records import write_once
 from v12.research import HOME
+
+def parse_eps_response(payload):
+    text=payload.decode('utf-8')
+    if not re.search(r'gridData\s*=\s*\[\s*\]',text) or 'var c1' not in text:
+        raise ValueError('unrecognized EPSIS body is a failed probe, not absence')
+    if not re.search(r'gridData\.push\(',text): return None
+    return parse_epsis(text)
 
 def classify(frame,day):
     if frame is None: return 'not_observed'
@@ -27,12 +35,14 @@ def monitor():
             try:
                 if source=='general_public':
                     url='https://www.kpx.or.kr/smpInland.es?mid=a10404080100&issue_date='+day
-                    payload=urllib.request.urlopen(url,timeout=25).read(); frame=parse_public(payload.decode('utf-8'),day)
+                    payload=urllib.request.urlopen(url,timeout=25).read(); text=payload.decode('utf-8')
+                    labels=re.findall(r'>\s*(\d{1,2})h\s*<',text)
+                    if not set(map(str,range(1,25))).issubset(labels): raise ValueError('unrecognized public page is not absence')
+                    frame=parse_public(text,day)
                 else:
                     url='https://epsis.kpx.or.kr/epsisnew/selectEkmaSmpShd.ajax'
                     payload=epsis_request(market,day,day)
-                    try: frame=parse_epsis(payload.decode('utf-8'))
-                    except ValueError: frame=None
+                    frame=parse_eps_response(payload)
                 status=classify(frame,day); digest=hashlib.sha256(payload).hexdigest()
                 path=folder/(digest+'.raw')
                 if not path.exists(): path.write_bytes(payload)
@@ -61,7 +71,9 @@ def summarize():
             g=g.sort_values('checked_at'); yes=g[g.status=='official_acquired']
             first=yes.checked_at.min() if len(yes) else None
             before=g[(g.status=='not_observed')&(g.checked_at<first)] if first else g[g.status=='not_observed']
-            result.append(dict(target_date=day,source=source,market=market,first_observed_available=first,last_successful_absence_before_first=before.checked_at.max() if len(before) else None,exact_first_publication_unknown=True,method='sampled local receipt; interval bound applies only to queried source and assumes no cache/reversion'))
+            success=g[g.status.isin(['official_acquired','not_observed'])]
+            gaps=pd.to_datetime(success.checked_at,utc=True).sort_values().diff().dt.total_seconds()/60
+            result.append(dict(target_date=day,source=source,market=market,first_observed_available=first,last_successful_absence_before_first=before.checked_at.max() if len(before) else None,successful_observation_count=len(success),longest_successful_observation_gap_minutes=float(gaps.max()) if gaps.notna().any() else None,exact_first_publication_unknown=True,method='sampled local receipt; interval bound applies only to queried source and assumes no cache/reversion; collection can have gaps'))
     (HOME/'publication/summary.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
 
 if __name__=='__main__': monitor()

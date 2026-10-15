@@ -72,7 +72,8 @@ if st.button('G2V 및 가상 V2G 최적화'):
         ev=EV(capacity,initial,target,charge,discharge,eff/100,deff/100,minimum,maximum,wear,ratio)
         g=optimize(price,times,ev,begin,end); v=optimize(price,times,ev,begin,end,True)
         immediate=baseline(price,times,ev,begin,end); uniform=baseline(price,times,ev,begin,end,True)
-        st.dataframe(pd.DataFrame([dict(plan=name,net_cost=x['net_cost']) for name,x in [('즉시충전',immediate),('균등충전',uniform),('G2V',g),('가상 V2G',v)]]),hide_index=True)
+        st.dataframe(pd.DataFrame([dict(plan=name,purchase_cost=x['purchase_cost'],export_credit=x['export_credit'],degradation_cost=x['degradation_cost'],net_cost=x['net_cost'],saving_vs_immediate=immediate['net_cost']-x['net_cost']) for name,x in [('즉시충전',immediate),('균등충전',uniform),('G2V',g),('가상 V2G',v)]]),hide_index=True)
+        st.write('G2V 대비 가상 V2G 순비용 절감',g['net_cost']-v['net_cost'])
         st.write('G2V 종료 SOC',g['ending_soc'],' · V2G 종료 SOC',v['ending_soc'])
         for title,plan in [('G2V',g),('가상 V2G',v)]:
             st.write(title); schedule=plan['schedule'].copy(); schedule['price_source']=['official' if source.startswith('공식') and pd.notna(x) else 'saved_prediction' for x in official]
@@ -80,5 +81,12 @@ if st.button('G2V 및 가상 V2G 최적화'):
         if official.notna().all():
             st.write('실제 공식가격 기준 regret',{'G2V':regret(g,official,times,ev,begin,end),'V2G':regret(v,official,times,ev,begin,end,True)})
         else: st.info('아직 실제가격이 없는 시간이 있어 사후 regret 평가를 완료하지 않았습니다.')
+        from v12.decisions import save_interactive
+        saved=save_interactive({'G2V':g,'V2G':v},dict(source_forecast=file.name,price_policy=source,start=begin.isoformat(),end=end.isoformat(),prices=[dict(timestamp=t.isoformat(),value=float(value),source='official' if source.startswith('공식') and pd.notna(known) else 'saved_prediction') for t,value,known in zip(times,price,official)]))
+        st.caption('이 충방전 의사결정은 로컬에 불변 저장했습니다: '+saved.name+' · 실제가격 수신 후 자동 사후 평가 대상입니다.')
         st.caption('비용에는 설정한 충방전 손실·열화 가정이 포함됩니다. V2G는 동시 충방전을 금지한 MILP이며 망요금·세금·실물 양방향 충전기는 포함하지 않습니다.')
     except ValueError as exc: st.error(str(exc))
+with st.expander('저장된 사용자 충방전 의사결정의 사후 평가'):
+    history=[e for e in read(HOME/'decision_evaluation_index.json',[]) if e.get('cohort')=='interactive_decisions']
+    if history: st.dataframe(pd.DataFrame(history),hide_index=True)
+    else: st.caption('평가 기록이 없거나 다음 자동 평가 실행을 기다리는 중입니다.')

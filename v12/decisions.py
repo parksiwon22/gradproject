@@ -4,9 +4,18 @@ import json
 import numpy as np
 import pandas as pd
 from v11.store import connect,latest,now
-from v11.forecast import write_once
+from v12.records import write_once
 from v12.research import HOME
 from v12.ev import EV,optimize,baseline,regret
+
+def save_interactive(plans,context):
+    folder=HOME/'interactive_decisions'; folder.mkdir(parents=True,exist_ok=True)
+    stamp=pd.Timestamp.now(tz='UTC').strftime('%Y%m%dT%H%M%S%f')
+    record=dict(at=now(),scenario='user-configured hypothetical SMP settlement',context=context,plans={})
+    for name,plan in plans.items():
+        record['plans'][name]={k:v for k,v in plan.items() if k!='schedule'}
+        record['plans'][name]['schedule']=plan['schedule'].to_dict('records')
+    path=folder/(stamp+'.json'); write_once(path,record); return path
 
 def freeze():
     folder=HOME/'decisions'; folder.mkdir(parents=True,exist_ok=True)
@@ -27,12 +36,12 @@ def freeze():
 def evaluate():
     folder=HOME/'decision_evaluations'; folder.mkdir(parents=True,exist_ok=True)
     db=connect(); prices=latest(db,'land').set_index('timestamp').smp; db.close(); summaries=[]
-    for file in (HOME/'decisions').glob('*.json'):
+    for file in list((HOME/'decisions').glob('*.json'))+list((HOME/'interactive_decisions').glob('*.json')):
         record=json.loads(file.read_text(encoding='utf-8'))
         for name,plan in record['plans'].items():
             f=pd.DataFrame(plan['schedule']); times=pd.DatetimeIndex(pd.to_datetime(f.timestamp,utc=True).dt.tz_convert('Asia/Seoul'))
             actual=prices.reindex(times)
-            result=dict(decision=file.name,plan=name,status='awaiting_actual',available_hours=int(actual.notna().sum()))
+            result=dict(decision=file.name,cohort=file.parent.name,plan=name,status='awaiting_actual',available_hours=int(actual.notna().sum()))
             if actual.notna().all():
                 ev=EV(**plan['assumptions']); loaded={**plan,'schedule':f}
                 result.update(status='evaluated',**regret(loaded,actual,times,ev,v2g=name=='V2G'))

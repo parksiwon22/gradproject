@@ -3,6 +3,7 @@ import json
 import joblib
 import numpy as np
 import pandas as pd
+from pathlib import Path
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score
@@ -11,8 +12,9 @@ from v11.features import build,FEATURES
 from v11.train import factories
 from v12.research import HOME,predict,risk_predict,scored
 
-def main():
-    folder=HOME/'relative_followup'; folder.mkdir(parents=True,exist_ok=True)
+def main(output=None):
+    folder=Path(output) if output else HOME/'relative_followup'; folder.mkdir(parents=True,exist_ok=True)
+    if (folder/'design_before_scores.json').exists(): raise FileExistsError('Existing follow-up preserved; choose a new --output directory')
     db=connect(); raw=latest(db,'land'); db.close(); data=build(raw,days_ahead=2)
     train=data[data.target_date<'2025-07-01']; cal=data[(data.target_date>='2025-07-01')&(data.target_date<'2025-10-01')]
     val=data[(data.target_date>='2025-10-01')&(data.target_date<'2026-01-01')].reset_index(drop=True)
@@ -28,13 +30,18 @@ def main():
     gates=[.05,.1,.2,.35,.5]; prob=risk_predict(risk,cal); gate=max(gates,key=lambda t:f1_score(ycal,prob>=t,zero_division=0))
     expert=factories()['extra_trees'](); high=train[labels]; expert.fit(high[FEATURES],high.actual_smp-high.daily)
     anchor=joblib.load(HOME/'study/hgb_none.joblib'); rows=[]; experiments=[]
+    output=val[['timestamp','target_date','actual_smp']].copy()
     for name,hard,strength in [('relative_soft',False,1),('relative_hard',True,1),('relative_soft_half',False,.5)]:
         bundle=dict(kind='relative_peak',risk=risk,expert=expert,anchor=anchor,threshold=gate,hard=hard,strength=strength)
         p=predict(bundle,val); rows.append(dict(name=name,split='selection',**scored(val,p,float(train.actual_smp.quantile(.95)))))
+        output[name]=p
         experiments.append(dict(name=name,status='success',hypothesis=design['motivation'],classifier_parameters=classifier.get_params(),expert_parameters=expert.get_params(),strength=strength,gate_from_calibration=gate))
         joblib.dump(bundle,folder/(name+'.joblib'))
     pd.DataFrame(rows).to_csv(folder/'selection_metrics.csv',index=False)
+    output.to_csv(folder/'selection_predictions.csv',index=False)
     (folder/'experiments.json').write_text(json.dumps(experiments,indent=2,default=str),encoding='utf-8')
     print(pd.DataFrame(rows)[['name','MAE','peak_MAE','peak_F1','EV_regret']].to_string(index=False))
 
-if __name__=='__main__': main()
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(); parser.add_argument('--output'); main(parser.parse_args().output)

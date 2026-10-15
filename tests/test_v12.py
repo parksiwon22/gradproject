@@ -5,8 +5,8 @@ import numpy as np
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from v12.ev import EV,optimize,baseline,regret
-from v12.publication import classify
-from v11.forecast import write_once
+from v12.publication import classify,parse_eps_response
+from v12.records import write_once
 from v11.features import build,FEATURES
 
 class EVTests(unittest.TestCase):
@@ -48,6 +48,16 @@ class EVTests(unittest.TestCase):
         with self.assertRaises(ValueError): optimize([1,2],self.times(2),EV(charge_eff=0))
 
 class ForwardTests(unittest.TestCase):
+    def test_unchanged_predictions_are_not_an_improved_candidate(self):
+        from v12.research import validation_improved
+        baseline=dict(MAE=10.,peak_MAE=30.,EV_regret=5.,peak_F1=.2)
+        self.assertFalse(validation_improved(baseline.copy(),baseline))
+        self.assertTrue(validation_improved({**baseline,'MAE':9.},baseline))
+        self.assertFalse(validation_improved({**baseline,'MAE':12.,'peak_F1':.4},baseline))
+    def test_error_html_is_not_successful_absence(self):
+        with self.assertRaises(ValueError): parse_eps_response(b'<html>Service unavailable</html>')
+        with self.assertRaises(ValueError): parse_eps_response(b'var c1; gridData=[]; gridData.push(broken);')
+        self.assertIsNone(parse_eps_response(b'var c1,c2; gridData = [];'))
     def test_not_observed_is_not_universal_nonpublication(self):
         self.assertEqual(classify(None,'2026-10-16'),'not_observed')
         f=pd.DataFrame({'timestamp':pd.date_range('2026-10-16',periods=24,freq='h',tz='Asia/Seoul'),'smp':100})
