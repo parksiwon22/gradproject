@@ -32,7 +32,7 @@ def issue(clock=None):
         f=build(raw,targets=times,days_ahead=2,include_labels=False)
         known=current[current.timestamp.isin(times)]
         record=dict(schema=12,issued_at=clock.isoformat(),reference_origin=origin.isoformat(),target_date=target.strftime('%Y-%m-%d'),market='land',horizon='D-2 23h',
-            actual_generation_delay_minutes=(clock-origin).total_seconds()/60,model=name,model_version=hashlib.sha256(joblib.dumps(bundle)).hexdigest() if hasattr(joblib,'dumps') else hashlib.sha256((HOME/'study'/(name+'.joblib')).read_bytes()).hexdigest(),
+            actual_generation_delay_minutes=(clock-origin).total_seconds()/60,model=name,model_version=hashlib.sha256((HOME/'study'/(name+'.joblib')).read_bytes()).hexdigest(),
             trained_through=production['trained_through'],weather_forecast_used=False,demand_forecast_used=False,weather_forecast_issue=None,demand_forecast_issue=None,
             publication_claim='Only checked unauthenticated public sources; universal first-publication time unknown',official_smp_known_at_issue=len(known)==24,features=FEATURES)
         if len(f)!=24:

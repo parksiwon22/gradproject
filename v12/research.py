@@ -40,6 +40,11 @@ def predict(bundle,f):
         if bundle['gate']=='hard': prob=(prob>=bundle['threshold']).astype(float)
         if bundle['gate']=='risk_warning_only': return base
         return (1-prob)*base+prob*expert
+    if kind=='relative_peak':
+        prob=risk_predict(bundle['risk'],f)
+        if bundle['hard']: prob=(prob>=bundle['threshold']).astype(float)
+        base=predict(bundle['anchor'],f); severity=bundle['expert'].predict(f[FEATURES])
+        return base+bundle['strength']*prob*np.maximum(0,severity-(base-baseline))
     out=bundle['model'].predict(f[FEATURES])+(f.origin_price.to_numpy() if kind=='origin_delta' else baseline)
     if kind=='residual_correction': out=out+np.where(risk_predict(bundle['risk'],f)>=bundle['threshold'],bundle['correction'],0)
     return out

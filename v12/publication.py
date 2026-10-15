@@ -13,6 +13,8 @@ from v12.research import HOME
 def classify(frame,day):
     if frame is None: return 'not_observed'
     matched=frame[frame.timestamp.dt.strftime('%Y-%m-%d')==day]
+    if len(matched)==24 and matched.smp.eq(0).all(): return 'unverified_all_zero'
+    if matched.timestamp.duplicated().any(): return 'invalid_duplicate_hours'
     return 'official_acquired' if len(matched)==24 else 'not_observed'
 
 def monitor():
