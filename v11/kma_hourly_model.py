@@ -1,4 +1,4 @@
-"""Fixed chronological pilot: delayed observations are NOT weather forecasts."""
+"""Fixed chronological study: delayed observations are NOT weather forecasts."""
 import hashlib
 import json
 import joblib
@@ -23,18 +23,18 @@ def attach(base,observations):
     return f,columns
 
 def main():
-    folder=FOLDER/'pilot'; folder.mkdir(parents=True,exist_ok=True)
+    folder=FOLDER/'hourly_study'; folder.mkdir(parents=True,exist_ok=True)
     config=dict(at=now(),seed=42,family='hgb',tuning='none; reuse previous HGB parameters',
-        train_targets=[['2023-01-03','2023-01-04'],['2024-01-03','2024-01-04'],['2025-01-03','2025-02-02']],
-        validation_targets=['2026-04-03','2026-04-09'],test_targets=['2026-10-03','2026-10-15'],
-        warning='Small seasonal pilot; not a full-year benchmark. 2026Q3 is excluded. Historical release times unknown. Lagged observations are not issued weather forecasts. Demand forecast archive vintage unknown.',
+        train_targets=[['2023-01-01','2026-03-31']],
+        validation_targets=['2026-04-01','2026-06-30'],test_targets=['2026-10-01','2026-10-15'],
+        warning='October holdout is short, not a full-year benchmark. 2026Q3 is excluded from tuning and scoring. Historical release times unknown. Lagged observations are not issued weather forecasts. Demand forecast archive vintage unknown.',
         missing_policy='No interpolation. Common whole days with all 7 stations temperature/RH/wind present; other source missing values retained for HGB native missing handling.',
         requested_groups_C_D='Not run: archived issued-weather-forecast API authorization denied. No observed target-weather surrogate.',
         selection='no promotion or winner selection from held-out results')
     # Persist design before reading any new held-out scores.
     (folder/'design_before_evaluation.json').write_text(json.dumps(config,indent=2),encoding='utf-8')
     db=connect(); prices=latest(db,'land'); db.close()
-    source=FOLDER/'observations_hourly.csv'; observations=read_date(source,'timestamp')
+    source=FOLDER/'observations_period_hourly.csv'; observations=read_date(source,'timestamp')
     data,weather=attach(build(prices),observations)
     demand=read_date(EXO/'demand_forecast_hourly.csv','timestamp')
     data=data.merge(demand[['timestamp','day_ahead_demand_mw']],on='timestamp',how='left')
@@ -57,20 +57,28 @@ def main():
     rows=[]; output=test[['timestamp','target_date','actual_smp']].copy()
     for name,columns in groups.items():
         estimator=model('hgb'); estimator.fit(train[columns],train.actual_smp-train.daily)
-        bundle=dict(model=estimator,features=columns,family='hgb',group=name,kind='PILOT_NOT_PRODUCTION',historical_weather_forecast_used=False)
+        bundle=dict(model=estimator,features=columns,family='hgb',group=name,kind='DELAYED_OBSERVATIONS_RESEARCH_NOT_PRODUCTION',historical_weather_forecast_used=False,created_at=now(),trained_through=train.target_date.max())
         joblib.dump(bundle,folder/(name+'.joblib'))
         for split,f in [('validation',val),('test',test)]:
             pred=predict(bundle,f); rows.append(dict(group=name,split=split,**metrics(f,pred)))
             if split=='test': output[name]=pred
         print(name,'trained and evaluated',flush=True)
     pd.DataFrame(rows).to_csv(folder/'metrics.csv',index=False); output.to_csv(folder/'test_predictions.csv',index=False)
+    make_plot(output,groups)
+    print(pd.DataFrame(rows).query("split == 'test'")[['group','MAE','peak_MAE','peak_F1','EV_regret']].to_string(index=False),flush=True)
+
+def make_plot(output,groups):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    fig,ax=plt.subplots(figsize=(13,4))
-    chart=output.head(168)
-    for col in ['actual_smp']+list(groups): ax.plot(chart.timestamp,chart[col],label=col,linewidth=1)
-    ax.set_ylabel('KRW/kWh'); ax.legend(fontsize=7); fig.autofmt_xdate(); fig.tight_layout(); fig.savefig(folder/'comparison.png',dpi=160); plt.close(fig)
-    print(pd.DataFrame(rows).query("split == 'test'")[['group','MAE','peak_MAE','peak_F1','EV_regret']].to_string(index=False),flush=True)
+    output=output.copy(); output.timestamp=pd.to_datetime(output.timestamp,utc=True).dt.tz_convert('Asia/Seoul')
+    peakday=output.loc[output.actual_smp.idxmax(),'target_date']
+    fig,axes=plt.subplots(2,1,figsize=(13,7))
+    labels=['Actual SMP','SMP only','+ archived demand forecast','+ delayed ASOS observations','+ demand + delayed observations']
+    for ax,chart,title in [(axes[0],output,'Full fixed October evaluation'),(axes[1],output[output.target_date==peakday],'Highest actual-price day: '+str(peakday))]:
+        for col,label in zip(['actual_smp']+list(groups),labels): ax.plot(chart.timestamp,chart[col],label=label,linewidth=1.2)
+        ax.axhline(150,color='gray',linestyle='--',linewidth=.8,label='Peak threshold 150')
+        ax.set_ylabel('KRW/kWh'); ax.set_title(title); ax.legend(fontsize=7,ncol=3); ax.tick_params(axis='x',labelrotation=25)
+    fig.tight_layout(); fig.savefig(FOLDER/'hourly_study/comparison.png',dpi=160); plt.close(fig)
 
 if __name__=='__main__': main()

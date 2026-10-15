@@ -14,6 +14,7 @@ FOLDER = HOME / 'kma_apihub'
 BASE = 'https://apihub.kma.go.kr/api/'
 
 def request(path, params, credential):
+    if not credential: return None, {'reason': 'environment_key_unavailable'}
     url = BASE + path + '?' + urllib.parse.urlencode({**params, 'authKey': credential})
     try:
         with urllib.request.urlopen(url, timeout=45) as response:
@@ -21,7 +22,11 @@ def request(path, params, credential):
     except urllib.error.HTTPError as exc:
         body = exc.read().decode('utf-8', errors='replace').lower()
         category = 'permission_or_service_restriction_unresolved'
-        if 'api' in body and ('신청' in body or '승인' in body):
+        if exc.code>=500: category='upstream_service_failure'
+        elif exc.code==429: category='service_limit'
+        elif exc.code==400: category='request_parameter_rejected'
+        elif exc.code==401: category='authentication_rejected'
+        elif 'api' in body and ('신청' in body or '승인' in body):
             category = 'service_application_or_approval'
         elif 'key' in body and ('invalid' in body or '인증' in body):
             category = 'authentication_rejected'

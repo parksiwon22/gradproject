@@ -6,10 +6,22 @@ from v11.authenticated_data import key
 from v11.kma_apihub import FOLDER
 from v11.kma_hourly import collect_one,export
 from v11.store import now
+from v11.kma_archive import month,export as export_period
 
 def main():
     if not key('KMA_APIHUB_AUTH_KEY'): return
     end=pd.Timestamp.now(tz='Asia/Seoul').floor('h')-pd.Timedelta(hours=2)
+    if (FOLDER/'observations_period_hourly.csv').exists():
+        # Recheck a 72-hour correction window instead of repeatedly fetching
+        # an entire month on a personal laptop.
+        start=end.normalize()-pd.Timedelta(days=2)
+        stamp,result=month(start,end,refresh=True)
+        if isinstance(result,dict):
+            (FOLDER/'refresh_status.json').write_text(json.dumps(dict(at=now(),failed=1,period=stamp,result=result)),encoding='utf-8')
+            raise SystemExit(1)
+        export_period()
+        (FOLDER/'refresh_status.json').write_text(json.dumps(dict(at=now(),failed=0,period=stamp,forecast_api='authorization still denied; no automatic promotion')),encoding='utf-8')
+        return
     recent=list(pd.date_range(end-pd.Timedelta(hours=3),end,freq='h'))
     results=[]
     # Recent observations are refreshed so corrections append immutable raw

@@ -12,6 +12,7 @@ def main():
     commands=[['v11.collect'],['v11.public_prices'],['v11.audit'],['v11.forecast']+(['--preview'] if args.preview else [])]
     if (HOME/'exogenous/production_exogenous.joblib').exists(): commands.append(['v11.exogenous_refresh'])
     if (HOME/'kma_apihub/connection_status.json').exists(): commands.append(['v11.kma_refresh'])
+    if (HOME/'kma_apihub/hourly_study/OBS_SMP_delayed_ASOS_NOT_FORECAST.joblib').exists(): commands.append(['v11.kma_live'])
     for command in commands:
         with (HOME/'pipeline.log').open('a',encoding='utf-8') as log:
             log.write('\n'+now()+' '+command[0]+'\n'); log.flush()

@@ -21,7 +21,7 @@ def main():
         archive.write(temporary,'prices.sqlite')
         if extra_temporary: archive.write(extra_temporary,'v11/exogenous/observations.sqlite')
         for item in HOME.rglob('*'):
-            if item.is_file() and (item.suffix in ['.json','.js','.html','.csv'] or item.name in ['production.joblib','production_2day.joblib','production_exogenous.joblib','production_exogenous_2day.joblib','weather_forecast_proxy_1day.joblib','weather_forecast_proxy_2day.joblib']): archive.write(item,'v11/'+item.relative_to(HOME).as_posix())
+            if item.is_file() and (item.suffix in ['.json','.js','.html','.csv','.raw'] or ('kma_apihub' in item.parts and item.suffix in ['.joblib','.png']) or item.name in ['production.joblib','production_2day.joblib','production_exogenous.joblib','production_exogenous_2day.joblib','weather_forecast_proxy_1day.joblib','weather_forecast_proxy_2day.joblib']): archive.write(item,'v11/'+item.relative_to(HOME).as_posix())
     # Verify after closing the writer, so all compression buffers are flushed.
     with zipfile.ZipFile(path,'r') as verification:
         result=verification.testzip()

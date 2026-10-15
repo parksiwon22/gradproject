@@ -107,8 +107,15 @@ if (exo/'production_exogenous.joblib').exists():
 if (HOME/'kma_apihub/connection_status.json').exists():
     with st.expander('기상청 API허브 · 시간 관측 수집 현황'):
         st.write(read(HOME/'kma_apihub/connection_status.json',{}))
-        inventory=read(HOME/'kma_apihub/inventory.json',{})
+        inventory=read(HOME/'kma_apihub/period_inventory.json',read(HOME/'kma_apihub/inventory.json',{}))
         stations=inventory.get('stations',[])
         if stations:
             st.dataframe(pd.DataFrame([{k:v for k,v in s.items() if k!='missing_fraction'} for s in stations]),hide_index=True)
-        st.caption('관측자료와 발표 예보는 별도입니다. 시간 관측자료는 수집 중이며 연간 전체 자료 확보를 의미하지 않습니다. 과거 발표 예보 API가 승인되기 전에는 이 자료로 예보 모델을 대체하거나 기본 운영 모델을 변경하지 않습니다.')
+        st.caption('관측자료와 발표 예보는 별도입니다. 표의 확보 건수와 결측률은 로컬 수집 결과이며 관측소 전체 운영기간을 보증하지 않습니다. 과거 발표 예보를 확보·검증하기 전에는 관측자료로 예보 모델을 대체하거나 기본 운영 모델을 변경하지 않습니다.')
+        forward=sorted((HOME/'kma_apihub/forward_records').glob('*.json'),reverse=True)
+        if forward:
+            entry=read(forward[0],{})
+            st.write('지연 관측 모델의 전향 검증 기록', {k:v for k,v in entry.items() if k not in ('rows','source_observations','features')})
+            if entry.get('status')=='created':
+                st.line_chart(pd.DataFrame(entry['rows']).set_index('timestamp')[['predicted_smp']])
+            else: st.caption('기준시각까지 실제 수신한 입력이 부족하면 예측을 생성하지 않고 사유만 불변 기록합니다.')

@@ -5,11 +5,13 @@ import unittest
 from unittest.mock import patch
 import urllib.error
 import io
+import hashlib
 import pandas as pd
 from pandas.testing import assert_frame_equal
 from v11 import kma_hourly as hourly
 from v11.kma_apihub import request
 from v11.kma_hourly_model import attach
+from v11 import kma_live
 
 def payload(temperature='-9.0',ww=''):
     # Numeric prefix through WP; WW can be absent, one code, or several codes.
@@ -61,5 +63,17 @@ class KmaTests(unittest.TestCase):
         obs.loc[obs.timestamp==target,hourly.FIELDS]=9999
         b,_=attach(base,obs)
         assert_frame_equal(a[cols],b[cols])
+    def test_late_received_correction_cannot_enter_cutoff_replay(self):
+        with tempfile.TemporaryDirectory() as tmp,patch.object(kma_live,'FOLDER',Path(tmp)):
+            folder=Path(tmp)/'period_raw'; folder.mkdir()
+            for name,temp,receipt in [('initial','-9.0','2023-01-01T01:00:00+09:00'),('correction','1.0','2023-01-02T01:00:00+09:00')]:
+                body=payload(temp); raw=folder/(name+'.raw'); raw.write_bytes(body)
+                meta=dict(first_seen=receipt,params=dict(tm1='202301010000',tm2='202301010000'),raw=raw.name,sha256=hashlib.sha256(body).hexdigest())
+                (folder/(name+'.manifest.json')).write_text(json.dumps(meta))
+            times=pd.DatetimeIndex([pd.Timestamp('2023-01-01',tz='Asia/Seoul')])
+            frame=kma_live.observations_asof(times,pd.Timestamp('2023-01-01T23:00:00+09:00'))
+            self.assertEqual(frame.iloc[0].temperature_c,-9)
+            early=kma_live.observations_asof(times,pd.Timestamp('2023-01-01T00:00:00+09:00'))
+            self.assertTrue(early.empty)
 
 if __name__=='__main__': unittest.main()
