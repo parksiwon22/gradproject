@@ -1,0 +1,16 @@
+data,year,rows,complete_rows,resolution
+demand_hourly_all.csv,2023,8760,8760,hourly observations nationwide
+demand_hourly_all.csv,2024,8784,8784,hourly observations nationwide
+demand_hourly_all.csv,2025,8760,8760,hourly observations nationwide
+power_daily_all.csv,2023,365,365,daily peak-state nationwide
+power_daily_all.csv,2024,366,366,daily peak-state nationwide
+power_daily_all.csv,2025,365,365,daily peak-state nationwide
+power_daily_all.csv,2026,287,287,daily peak-state nationwide
+weather_daily_all.csv,2023,365,363,daily Seoul108
+weather_daily_all.csv,2024,366,362,daily Seoul108
+weather_daily_all.csv,2025,365,364,daily Seoul108
+weather_daily_all.csv,2026,288,287,daily Seoul108
+demand_forecast_hourly.csv,2023,8760,0,hourly forecast archive mainland
+demand_forecast_hourly.csv,2024,8784,0,hourly forecast archive mainland
+demand_forecast_hourly.csv,2025,8760,0,hourly forecast archive mainland
+demand_forecast_hourly.csv,2026,6912,0,hourly forecast archive mainland

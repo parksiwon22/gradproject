@@ -46,6 +46,15 @@ def collect_forecast():
     result.to_csv(EXO/'latest_weather_forecast.csv',index=False)
     return result
 
+def forecast_asof(bound):
+    frames=[]
+    for file in (EXO/'weather_forecast_vintages').glob('*.csv'):
+        f=read_date(file,'timestamp')
+        f=f[(pd.to_datetime(f.first_seen,utc=True)<=pd.Timestamp(bound))&(pd.to_datetime(f.issued_at,utc=True)<=pd.Timestamp(bound))]
+        frames.append(f)
+    if not frames: return pd.DataFrame()
+    return pd.concat(frames).sort_values(['issued_at','first_seen']).drop_duplicates('timestamp',keep='last')
+
 def ledger():
     db=sqlite3.connect(EXO/'observations.sqlite')
     db.execute('CREATE TABLE IF NOT EXISTS observations (kind TEXT,date TEXT,field TEXT,value REAL,first_seen TEXT,last_seen TEXT,revision INTEGER,PRIMARY KEY(kind,date,field,revision))')
@@ -99,9 +108,44 @@ def issue():
     (EXO/'latest_exogenous_forecast_index.json').write_text(json.dumps(output,indent=2),encoding='utf-8')
     return output
 
+def issue_weather_proxy():
+    current=pd.Timestamp.now(tz='Asia/Seoul'); origin=current.normalize()+pd.Timedelta(hours=23); bound=min(current,origin).tz_convert('UTC').isoformat()
+    forecast=forecast_asof(bound)
+    if forecast.empty: return []
+    db=connect(); raw=latest(db,'land',as_of=bound); official=latest(db,'land'); db.close()
+    folder=EXO/'weather_proxy_forecasts'; folder.mkdir(exist_ok=True)
+    outputs=[]
+    for ahead in (1,2):
+        target=current.normalize()+pd.Timedelta(days=ahead); timestamps=pd.date_range(target,periods=24,freq='h'); weather=forecast[forecast.timestamp.isin(timestamps)]
+        modelpath=EXO/f'weather_forecast_proxy_{ahead}day.joblib'
+        if len(weather)!=24 or not modelpath.exists(): continue
+        b=joblib.load(modelpath); f=build(raw,targets=timestamps,days_ahead=ahead,include_labels=False)
+        values=dict(temperature_mean_c=float(weather.temperature_c.mean()),temperature_max_c=float(weather.temperature_c.max()),temperature_min_c=float(weather.temperature_c.min()),wind_mean_ms=float(weather.wind_ms.mean()),humidity_mean_percent=float(weather.humidity_percent.mean()))
+        for name,value in values.items(): f['PROXY_'+name]=value
+        pred=predict(b,f); known=official.set_index('timestamp').smp.reindex(timestamps)
+        record=dict(issued_at=current.isoformat(),target_date=target.strftime('%Y-%m-%d'),days_ahead=ahead,kind='EXPERIMENTAL_FORECAST_INPUT_OBSERVED_WEATHER_TRAINING_PROXY',warning='Historical training used target-day observed weather; live uses actual published weather forecasts. No historical forecast-input accuracy validation. Not an approved replacement model.',weather_forecast_used=True,weather_input_values=values,weather_issued_at=sorted(weather.issued_at.unique()),weather_first_seen_max=weather.first_seen.max(),input_asof=bound,location_warning='ASOS108 history versus Seoul public forecast grid; spatial mismatch',target_smp_already_known=bool(known.notna().all()),features=b['features'],model_hash=hashlib.sha256(modelpath.read_bytes()).hexdigest(),rows=[dict(timestamp=t.isoformat(),predicted_smp=float(v),official_smp_at_issue=float(k) if pd.notna(k) else None) for t,v,k in zip(timestamps,pred,known)])
+        path=folder/(target.strftime('%Y-%m-%d')+'_'+str(ahead)+'day_'+current.strftime('%Y%m%dT%H%M%S%f')+'.json'); write_once(path,record); outputs.append(str(path))
+    return outputs
+
+def reconcile():
+    db=connect(); actual=latest(db,'land'); db.close()
+    results=[]; folder=EXO/'evaluations'; folder.mkdir(exist_ok=True)
+    for source in ['forecasts','weather_proxy_forecasts']:
+        for file in (EXO/source).glob('*.json'):
+            record=json.loads(file.read_text(encoding='utf-8')); f=pd.DataFrame(record['rows']); f.timestamp=pd.to_datetime(f.timestamp,utc=True).dt.tz_convert('Asia/Seoul')
+            f=f.merge(actual[['timestamp','smp','snapshot','first_seen']],on='timestamp',how='left')
+            known_before=record.get('mode')=='official_known' or record.get('target_smp_already_known',False)
+            result=dict(forecast_file=file.name,kind=record.get('kind',record.get('mode')),issued_at=record['issued_at'],target_date=record['target_date'],actual_hours=int(f.smp.notna().sum()),model_MAE=float(np.mean(abs(f.predicted_smp-f.smp))) if f.smp.notna().all() else None,known_before_issue=known_before,interpretation='Official-known diagnostic' if known_before else 'Prospective record; publication eligibility and proxy training limits remain',rows=f.replace({np.nan:None}).to_dict('records'))
+            digest=hashlib.sha256(f.to_csv(index=False).encode()).hexdigest()[:12]
+            path=folder/(file.stem+'_'+digest+'.json')
+            if not path.exists(): write_once(path,result)
+            results.append({k:v for k,v in result.items() if k!='rows'})
+    (EXO/'recent_accuracy.json').write_text(json.dumps(results,indent=2),encoding='utf-8')
+    return results
+
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--refresh-forecast',action='store_true'); args=p.parse_args()
     if args.refresh_forecast: collect_forecast()
-    record_observations(); print(issue())
+    record_observations(); print(issue()); print('weather forecast proxy:',issue_weather_proxy()); reconcile()
 
 if __name__=='__main__': main()

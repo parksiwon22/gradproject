@@ -33,7 +33,7 @@ def main():
     frames=[]; failed=[]
     for i,date in enumerate(ends):
         day=date.strftime('%Y-%m-%d'); path=folder/(day+'.csv')
-        if path.exists():
+        if path.exists() and not args.latest:
             f=pd.read_csv(path); f.timestamp=pd.to_datetime(f.timestamp,utc=True).dt.tz_convert('Asia/Seoul'); frames.append(f); continue
         url='https://www.kpx.or.kr/pssInland.es?mid=a10606090100&issue_date='+day
         try:
@@ -43,14 +43,21 @@ def main():
             print('archived demand forecast',i+1,'/',len(ends),day,len(f),flush=True)
         except Exception as exc: failed.append(dict(day=day,error=type(exc).__name__))
         time.sleep(.5)
-        if frames:
+        if frames and not args.latest:
             pd.concat(frames).sort_values('first_seen').drop_duplicates('timestamp',keep='last').sort_values('timestamp').to_csv(EXO/'demand_forecast_hourly.csv',index=False)
     if args.latest and (EXO/'demand_forecast_archive.csv').exists():
         old=pd.read_csv(EXO/'demand_forecast_archive.csv'); old.timestamp=pd.to_datetime(old.timestamp,utc=True).dt.tz_convert('Asia/Seoul'); frames.append(old)
     all_data=pd.concat(frames).sort_values('first_seen').drop_duplicates('timestamp',keep='last').sort_values('timestamp')
     all_data=all_data[all_data.timestamp>=pd.Timestamp('2023-01-01',tz='Asia/Seoul')]
-    all_data.to_csv(EXO/'demand_forecast_hourly.csv',index=False)
-    if not args.latest: all_data.to_csv(EXO/'demand_forecast_archive.csv',index=False)
+    previous_path=EXO/'demand_forecast_hourly.csv'
+    if previous_path.exists():
+        previous=pd.read_csv(previous_path); previous.timestamp=pd.to_datetime(previous.timestamp,utc=True).dt.tz_convert('Asia/Seoul')
+        old=previous.set_index('timestamp')
+        for index,row in all_data.iterrows():
+            if row.timestamp in old.index and float(old.loc[row.timestamp,'day_ahead_demand_mw'])==row.day_ahead_demand_mw:
+                all_data.loc[index,'first_seen']=old.loc[row.timestamp,'first_seen']
+    all_data.to_csv(previous_path,index=False)
+    all_data.to_csv(EXO/'demand_forecast_archive.csv',index=False)
     (EXO/'demand_forecast_status.json').write_text(json.dumps(dict(at=now(),failed=failed,counts=all_data.groupby(all_data.timestamp.dt.year).size().to_dict(),warning='Original historical issue/publication time unknown; use separate retrospective forecast-value research, not certified as-of replay'),indent=2),encoding='utf-8')
     print('Demand forecast collection complete',len(all_data),flush=True)
 

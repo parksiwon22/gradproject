@@ -81,10 +81,10 @@ def asos(backfill=False):
     status['year_counts']=f.groupby(f.timestamp.dt.year).size().to_dict()
     return status
 
-def kpx():
+def kpx(date=None):
     credential=key('KPX_SERVICE_KEY')
     if not credential: return dict(connected=False,reason='KPX_SERVICE_KEY absent')
-    date=pd.Timestamp.now(tz='Asia/Seoul').strftime('%Y%m%d')
+    date=date or pd.Timestamp.now(tz='Asia/Seoul').strftime('%Y%m%d')
     parameters=dict(pageNo=1,numOfRows=100,dataType='json',date=date)
     try: result=call(KPX,parameters,credential)
     except RuntimeError as exc: return dict(connected=False,reason=str(exc))
@@ -97,13 +97,16 @@ def kpx():
     if isinstance(items,dict): items=items.get('item',[])
     if isinstance(items,list):
         status['example_rows']=len(items)
-        pd.DataFrame(items).to_csv(EXO/'kpx_api_latest_rows.csv',index=False)
+        if items: pd.DataFrame(items).to_csv(EXO/'kpx_api_latest_rows.csv',index=False)
     return status
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--backfill',action='store_true'); p.add_argument('--kpx-only',action='store_true'); a=p.parse_args()
     EXO.mkdir(exist_ok=True)
-    result={'KPX':kpx()}
+    path=EXO/'api_connection_status.json'
+    previous=json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
+    result={k:v for k,v in previous.items() if k!='at'}
+    result['KPX']=kpx()
     if not a.kpx_only: result['ASOS']=asos(a.backfill)
     (EXO/'api_connection_status.json').write_text(json.dumps(dict(at=now(),**result),indent=2),encoding='utf-8')
     print(json.dumps(result,indent=2))

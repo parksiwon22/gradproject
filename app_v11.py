@@ -83,3 +83,23 @@ with st.expander('수집 상태 및 데이터 출처'):
     st.write('출처: KPX EPSIS 시간별 SMP 및 KPX 일반 공개 육지 SMP. 제주 자료는 별도 보관하며 이 화면에서 육지와 혼합하지 않습니다.')
     st.write('기상·수요 예보의 당시 발표본이 없어 현재 모델은 SMP 이력과 달력만 사용합니다.')
     if not failures.empty: st.dataframe(failures,hide_index=True)
+
+exo=HOME/'exogenous'
+if (exo/'production_exogenous.joblib').exists():
+    with st.expander('수요·기상 외생변수 실험 · 기존 EV 계산과 별도'):
+        st.caption('원 V11은 SMP·달력21피처입니다. 아래 모델은 지연된 일별 수요·공급예비력과 서울 기상을 추가한43피처 실험입니다.')
+        options=sorted((exo/'forecasts').glob('*.json'),reverse=True)
+        if options:
+            extra=read(options[0],{})
+            st.write('대상 '+extra['target_date']+' · 실제 생성 '+extra['issued_at'])
+            st.write('외생변수 기준일 '+extra['first_exogenous_day']+' · '+extra['mode'])
+            ef=pd.DataFrame(extra['rows']); ef.timestamp=pd.to_datetime(ef.timestamp,utc=True).dt.tz_convert('Asia/Seoul')
+            ef=ef.merge(actual[['timestamp','smp']],on='timestamp',how='left')
+            st.line_chart(ef.set_index('timestamp')[['predicted_smp','smp']])
+            st.warning('시간별2026 수요 실적이나 당시 기상예보로 검증된 모델이 아닙니다. 사후 역사자료의 발표시각은 미확인입니다. 현재 실제 수신한 과거 일별 관측만 입력하며 미래 실제 기상·수요는 넣지 않습니다.')
+            st.write('실제 입력변수',extra['features'])
+        proxy=sorted((exo/'weather_proxy_forecasts').glob('*.json'),reverse=True)
+        if proxy:
+            st.caption('실제 발표 기상예보를 입력한 별도 연구 시나리오도 저장했습니다. 과거 학습에는 관측 대용값을 사용해 예보 입력 성능은 검증되지 않았으며 EV 추천에는 적용하지 않습니다.')
+        api=read(exo/'api_connection_status.json',{})
+        st.write('API 연결 상태', {k:v for k,v in api.items() if k!='at'})
