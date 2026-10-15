@@ -11,6 +11,8 @@ import pandas as pd
 
 ROOT=Path(__file__).resolve().parents[1]
 HOME=ROOT/'artifacts/v11'
+import os
+os.environ.setdefault('MPLCONFIGDIR',str(HOME/'matplotlib-cache'))
 KST=ZoneInfo('Asia/Seoul')
 
 def now(): return datetime.now(timezone.utc).isoformat()
