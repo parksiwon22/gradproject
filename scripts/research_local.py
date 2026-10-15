@@ -22,6 +22,8 @@ def metrics(frame, pred, threshold):
     peak = y >= threshold
     alert = pred >= threshold
     result = dict(MAE=mean_absolute_error(y, pred), RMSE=float(np.sqrt(mean_squared_error(y, pred))), R2=r2_score(y, pred), peak_threshold=threshold, peak_count=int(peak.sum()), peak_MAE=float(np.mean(abs(pred[peak]-y[peak]))) if peak.any() else None, peak_Bias=float(np.mean(pred[peak]-y[peak])) if peak.any() else None, peak_Precision=precision_score(peak, alert, zero_division=0), peak_Recall=recall_score(peak, alert, zero_division=0), peak_F1=f1_score(peak, alert, zero_division=0), false_alarms=int((alert & ~peak).sum()))
+    descriptive_peak = y >= np.quantile(y, .95)
+    result['descriptive_top5_MAE'] = float(np.mean(abs(pred[descriptive_peak]-y[descriptive_peak])))
     costs, optimal, overlaps, errors, maxerr = [], [], [], [], []
     ramp_up, ramp_down = [], []
     for _, indexes in frame.groupby('target_date', sort=True).indices.items():
@@ -55,7 +57,8 @@ def run():
     test = data[data.target_date >= '2023-10-01'].reset_index(drop=True)
     assert (pd.to_datetime(data.origin_timestamp) < pd.to_datetime(data.timestamp)).all()
     assert pd.to_datetime(data.origin_timestamp).dt.hour.eq(23).all()
-    threshold = float(train.actual_smp.quantile(.95))
+    # Fixed domain threshold from V5; training 95th percentile has no later events.
+    threshold = 150.0
     manifest = dict(run='local-20261015-new', seed=SEED, data_sha256=hashlib.sha256(v5.DATA_PATH.read_bytes()).hexdigest(), features=features, source='local aligned_hourly_all_features_2023.csv; original feature provenance not independently re-audited', cutoff='previous day 23:00; source publication lags unverified', periods={'train':[train.target_date.min(),train.target_date.max()], 'calibration':[cal.target_date.min(),cal.target_date.max()], 'validation':[val.target_date.min(),val.target_date.max()], 'historical_test':[test.target_date.min(),test.target_date.max()]}, packages={x:importlib.metadata.version(x) for x in ['numpy','pandas','scikit-learn','joblib']}, experiments=[])
     frames = {'calibration':cal,'validation':val,'historical_test':test}
     predictions = {s:{} for s in frames}
@@ -96,6 +99,8 @@ def run():
         predictions[s]['peak_gate']=predictions[s]['hgb']*(1-probability)+predictions[s]['hgb_quantile90']*probability
         pd.DataFrame({'timestamp':f.timestamp,'peak_probability':probability,'q90_price':predictions[s]['hgb_quantile90']}).to_csv(OUT/(s+'_risk.csv'),index=False)
     manifest['calibration']={'hour_bias':bias.to_dict(),'global_bias_diagnostic':correction,'classifier_parameters':classifier.get_params()}
+    manifest['derived_models']={'daily_profile':'previous same-hour price','fixed_profile_069':'0.69 daily + 0.31 weekly; inherited V5 profile coefficient','hour_residual_correction':'HGB + July mean residual per target hour','ensemble':'0.5 HGB + 0.5 peak weighted HGB','peak_gate':'(1 - classifier score) * HGB + score * residual q90; scores not calibrated'}
+    manifest['quantile_coverage']={s:float(np.mean(f.actual_smp.to_numpy() <= predictions[s]['hgb_quantile90'])) for s,f in frames.items()}
     rows=[]
     for s,f in frames.items():
         for name,p in predictions[s].items(): rows.append(dict(split=s,model=name,**metrics(f,p,threshold)))
@@ -134,6 +139,7 @@ def run():
         ax.set_ylabel('SMP (KRW/kWh)'); ax.legend(); fig.autofmt_xdate(); fig.tight_layout(); fig.savefig(OUT/(period+'.png')); plt.close(fig)
     diagnostic=f.assign(error=p-f.actual_smp,abs_error=abs(p-f.actual_smp)).groupby('target_hour').agg(MAE=('abs_error','mean'),Bias=('error','mean'))
     diagnostic.to_csv(OUT/'hourly_errors.csv')
+    f.assign(predicted=p).groupby('target_date').agg(actual_max=('actual_smp','max'),predicted_max=('predicted','max')).to_csv(OUT/'daily_maxima.csv')
     print(table[table.split=='historical_test'].to_string(index=False),flush=True)
     print('validation-selected:',winner,flush=True)
 
