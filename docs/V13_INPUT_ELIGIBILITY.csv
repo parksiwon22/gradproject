@@ -1,0 +1,9 @@
+variable,availability,operational_use,limitation
+SMP history with local first_seen,acquired,21 price/calendar features at D-2 cutoff,first_seen is not universal public release time
+Historical demand forecast,acquired research archive,no,original issue vintages not certified; D-2 target coverage not established
+KMA forecast issue archive,403 on last V12 check,no,no archived issue payload obtained; no repeated unauthorized retries
+ASOS hourly observations,7 stations 232376 station-hours at V11 last run,no in V12 D-2 model,observations are not target-day forecasts; delayed-ASOS research retained
+Generator availability and outages,not acquired,no,eligible public issue-time series and history not verified
+Generation mix outlook,not acquired,no,forecast issue time and target coverage not verified
+Fuel prices,not acquired,no,publication vintages and economic lag need verification
+Daily reserve statistics,acquired research table,no,hourly as-of reserve forecast not available; post-event state cannot explain causality alone
