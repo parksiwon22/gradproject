@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-16T12:50:02.507431+00:00",
+  "tests": {
+    "total": 76,
+    "passed": 76,
+    "failed": 0,
+    "skipped": 0,
+    "log": "artifacts/v15/full_tests_verified.log"
+  },
+  "http_smoke": "passed",
+  "live_server": "http://127.0.0.1:8505/",
+  "streamlit_buttons": "EV optimize and saved seven-policy replay passed",
+  "scheduler": {
+    "name": "GradprojectV15Candidates",
+    "test_exit_code": 0,
+    "multiple_instances": "IgnoreNew",
+    "interval_minutes": 15
+  },
+  "preservation": {
+    "records": {
+      "checked": 89,
+      "unchanged": true,
+      "mismatch_count": 0
+    },
+    "models": {
+      "checked": 119,
+      "unchanged": true,
+      "mismatch_count": 0
+    },
+    "packages": {
+      "checked": 3,
+      "unchanged": true,
+      "mismatch_count": 0
+    }
+  },
+  "operating_model_replaced": false,
+  "public_deployment_changed": false,
+  "limitations": [
+    "Historical CV previously viewed;2026 used only for diagnosis",
+    "V15 candidate forward records0; inherited independent D2 days1; spike days0",
+    "No new officially timestamped external forecasts acquired",
+    "Finite scenarios did not limit actual losses; choose G2V"
+  ],
+  "personal_github_identity_verified": "parksiwon22",
+  "implementation_commit": "b923503",
+  "research_design_commit": "9307fde",
+  "model_candidate_count": 2,
+  "policy_day_simulations": 3822,
+  "forward": {
+    "inherited_independent_target_days": 1,
+    "inherited_evaluated_days": 1,
+    "evaluated_spike_days": 0,
+    "new_V15_records": 0,
+    "target_day_not_yet_elapsed_at_report": true
+  }
+}
