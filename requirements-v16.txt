@@ -1,0 +1,2 @@
+-r requirements-v14.txt
+pypdf==6.10.0
