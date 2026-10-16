@@ -1,0 +1,46 @@
+[
+  {
+    "source": "https://apis.data.go.kr/B552115/SmpWithForecastDemand/getSmpWithForecastDemand",
+    "target_date": "20261018",
+    "checked_at": "2026-10-16T23:11:18.927443+00:00",
+    "reference_origin": "2026-10-16T23:00:00+09:00",
+    "original_issue_time": null,
+    "used_by_model": false,
+    "D2_eligible": false,
+    "status": "response_received",
+    "resultCode": "00",
+    "rows": 24,
+    "first_seen": "2026-10-16T23:11:20.241302+00:00",
+    "sha256": "7e00cf623a782016c18ab87b6f32b5c69d04a9d82b97dcba7b68394d3fe2355d",
+    "reason": "No original publication vintage; current first receipt is after reference cutoff, no as-of substitution"
+  },
+  {
+    "source": "https://apis.data.go.kr/B552115/SmpWithForecastDemand/getSmpWithForecastDemand",
+    "target_date": "20261019",
+    "checked_at": "2026-10-16T23:11:20.245101+00:00",
+    "reference_origin": "2026-10-16T23:00:00+09:00",
+    "original_issue_time": null,
+    "used_by_model": false,
+    "D2_eligible": false,
+    "status": "response_received",
+    "resultCode": "00",
+    "rows": 24,
+    "first_seen": "2026-10-16T23:11:24.423188+00:00",
+    "sha256": "1f71ed6bed2c7d7b6e2049d76d820c2cea29c9179165cec403cd89c871a9ae19",
+    "reason": "No original publication vintage; current first receipt is after reference cutoff, no as-of substitution"
+  },
+  {
+    "source": "https://www.kpx.or.kr/board.es?bid=0018&mid=a10109030500",
+    "kind": "maintenance_archive",
+    "documents": 198,
+    "historical_original_vintage_verified": false,
+    "used_by_V17_model": false,
+    "reason": "V16 maintenance study did not consistently improve peak and EV metrics; historical replacement history unresolved"
+  },
+  {
+    "source": "https://apihub.kma.go.kr/apiList.do?seqApi=10&seqApiSub=286",
+    "kind": "weather_forecast",
+    "status": "Prior403 unresolved; not retried by V17",
+    "used_by_model": false
+  }
+]

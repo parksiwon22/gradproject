@@ -1,0 +1,24 @@
+[
+  {
+    "target_date": "20261018",
+    "source": "https://apis.data.go.kr/B552115/SmpWithForecastDemand/getSmpWithForecastDemand",
+    "first_received_at": "2026-10-16T23:11:20.241302+00:00",
+    "validated_hours": 24,
+    "sha256": "7e00cf623a782016c18ab87b6f32b5c69d04a9d82b97dcba7b68394d3fe2355d",
+    "ingest": {
+      "skipped": "Already ingested snapshot; never replay stale correction"
+    },
+    "interpretation": "Official API published price at receipt; original first public release and final settlement not certified"
+  },
+  {
+    "target_date": "20261019",
+    "source": "https://apis.data.go.kr/B552115/SmpWithForecastDemand/getSmpWithForecastDemand",
+    "first_received_at": "2026-10-16T23:11:24.423188+00:00",
+    "validated_hours": 24,
+    "sha256": "1f71ed6bed2c7d7b6e2049d76d820c2cea29c9179165cec403cd89c871a9ae19",
+    "ingest": {
+      "skipped": "Already ingested snapshot; never replay stale correction"
+    },
+    "interpretation": "Official API published price at receipt; original first public release and final settlement not certified"
+  }
+]

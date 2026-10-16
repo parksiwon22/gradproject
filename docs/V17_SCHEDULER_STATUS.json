@@ -1,0 +1,82 @@
+[
+  {
+    "TaskName": "GradprojectV11Local",
+    "Arguments": "-m v11.pipeline",
+    "State": "Ready",
+    "LastRunTime": "2026-10-16T23:18:47.0000000+09:00",
+    "LastTaskResult": 0,
+    "NextRunTime": "2026-10-17T08:18:46.0000000+09:00",
+    "MultipleInstances": "IgnoreNew",
+    "ExecutionTimeLimit": "PT30M",
+    "TriggerBoundaries": [
+      "2026-10-15T22:18:46+09:00",
+      "2026-10-15T23:05:00+09:00"
+    ]
+  },
+  {
+    "TaskName": "GradprojectV12ForwardEV",
+    "Arguments": "-m v12.pipeline",
+    "State": "Ready",
+    "LastRunTime": "2026-10-17T08:11:34.0000000+09:00",
+    "LastTaskResult": 0,
+    "NextRunTime": "2026-10-17T08:26:33.0000000+09:00",
+    "MultipleInstances": "IgnoreNew",
+    "ExecutionTimeLimit": "PT10M",
+    "TriggerBoundaries": [
+      "2026-10-15T23:56:33+09:00"
+    ]
+  },
+  {
+    "TaskName": "GradprojectV13Audit",
+    "Arguments": "-m v13.service",
+    "State": "Ready",
+    "LastRunTime": "2026-10-17T08:05:36.0000000+09:00",
+    "LastTaskResult": 0,
+    "NextRunTime": "2026-10-17T08:20:35.0000000+09:00",
+    "MultipleInstances": "IgnoreNew",
+    "ExecutionTimeLimit": "PT5M",
+    "TriggerBoundaries": [
+      "2026-10-16T06:50:35+09:00"
+    ]
+  },
+  {
+    "TaskName": "GradprojectV14Candidates",
+    "Arguments": "-m v14.forward",
+    "State": "Ready",
+    "LastRunTime": "2026-10-17T08:13:21.0000000+09:00",
+    "LastTaskResult": 0,
+    "NextRunTime": "2026-10-17T08:28:20.0000000+09:00",
+    "MultipleInstances": "IgnoreNew",
+    "ExecutionTimeLimit": "PT5M",
+    "TriggerBoundaries": [
+      "2026-10-16T20:58:20+09:00"
+    ]
+  },
+  {
+    "TaskName": "GradprojectV15Candidates",
+    "Arguments": "-m v17.service",
+    "State": "Ready",
+    "LastRunTime": "2026-10-17T08:10:33.0000000+09:00",
+    "LastTaskResult": 0,
+    "NextRunTime": "2026-10-17T08:25:32.0000000+09:00",
+    "MultipleInstances": "IgnoreNew",
+    "ExecutionTimeLimit": "PT5M",
+    "TriggerBoundaries": [
+      "2026-10-16T23:00:00+09:00",
+      "2026-10-16T23:25:32+09:00"
+    ]
+  },
+  {
+    "TaskName": "GradprojectV16Audit",
+    "Arguments": "-m v16.monitor",
+    "State": "Ready",
+    "LastRunTime": "2026-10-17T08:14:53.0000000+09:00",
+    "LastTaskResult": 0,
+    "NextRunTime": "2026-10-17T08:29:52.0000000+09:00",
+    "MultipleInstances": "IgnoreNew",
+    "ExecutionTimeLimit": "PT5M",
+    "TriggerBoundaries": [
+      "2026-10-16T22:44:52+09:00"
+    ]
+  }
+]

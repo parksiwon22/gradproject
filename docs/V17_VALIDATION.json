@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-16T23:27:51.621634+00:00",
+  "tests": 98,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "test_log": "artifacts/v17/tests_all_final98_after_fix.log",
+  "test_log_sha256": "919ccbf6faeeea7050b931736103836d54f28decf4fd44d8e72217664d6b701d",
+  "HTTP_smoke": "passed",
+  "local_demo_url": "http://127.0.0.1:8507/",
+  "preservation": {
+    "at": "2026-10-16T23:27:51.546619+00:00",
+    "checked": 719,
+    "changed": 0,
+    "unchanged": true
+  },
+  "V17_forecast_sha256_unchanged": true,
+  "prior_apps_and_research_source_unchanged": true,
+  "old_V14_test_fixture_pinned": true,
+  "API_receipt_correction_regression": "passed",
+  "service_final_smoke": "all stages success",
+  "operating_model_replaced": false,
+  "public_deployment": false,
+  "github_authenticated_account": "parksiwon22"
+}

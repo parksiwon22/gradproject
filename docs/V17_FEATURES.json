@@ -1,0 +1,57 @@
+{
+  "price_features": [
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
+    "month_sin",
+    "month_cos",
+    "weekend",
+    "daily",
+    "weekly",
+    "spread",
+    "origin_price",
+    "origin_lag1",
+    "origin_lag24",
+    "origin_lag168",
+    "mean24",
+    "std24",
+    "min24",
+    "max24",
+    "mean168",
+    "std168",
+    "change24",
+    "days_ahead"
+  ],
+  "connection_features": [
+    "connection_hour",
+    "window_hours",
+    "hours_from_connect",
+    "required_hours",
+    "known_window_rank",
+    "window_profile_gap",
+    "window_weekly_rank"
+  ],
+  "total_connection_features": 29,
+  "folds": [
+    {
+      "name": "spring2025",
+      "train_end": "2024-12-31",
+      "cal_start": "2025-01-01",
+      "cal_end": "2025-03-31",
+      "start": "2025-04-01",
+      "end": "2025-06-30"
+    },
+    {
+      "name": "winter2025",
+      "train_end": "2025-06-30",
+      "cal_start": "2025-07-01",
+      "cal_end": "2025-09-30",
+      "start": "2025-10-01",
+      "end": "2025-12-31"
+    }
+  ],
+  "external_groups_used": [],
+  "seed": 42,
+  "score_units": "Classifier/rank scores are priorities, not SMP prices"
+}
