@@ -33,6 +33,8 @@ class V16Tests(unittest.TestCase):
         records=[dict(**common,document_id='a',capacity_mw=100,posted_at='2025-04-01T12:00:00+09:00'),dict(**common,document_id='b',capacity_mw=9999,posted_at='2025-04-02T12:00:00+09:00')]
         checks=[dict(document_id=x,parsed_rows=1,ambiguous_rows=0,period_start='2025-04-01',period_end='2025-04-08') for x in ['a','b']]
         out=attach(f,records,checks);self.assertEqual(len(out),24);self.assertTrue((out.maintenance_total_mw==100).all());self.assertFalse(out.historical_vintage_certified.any())
+        invalid={**records[0],'planned_end':'2025-04-02 23:00'}
+        out=attach(f,[invalid],checks);self.assertEqual(len(out),0)  # exclude document; never reverse dates
     def test_information_oracles_explicitly_nonforecast_and_default_not_promoted(self):
         config=json.loads((HOME/'design_before_scores.json').read_text());self.assertFalse(config['operating_model_replaced'])
         path=HOME/'information/audit.csv'

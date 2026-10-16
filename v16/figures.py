@@ -23,7 +23,7 @@ def run():
     for file in files:
         f=csv(file);f.timestamp=pd.to_datetime(f.timestamp,utc=True).dt.tz_convert('Asia/Seoul');f['gain']=abs(f.price_only_common-f.actual_smp)-abs(f.price_plus_maintenance-f.actual_smp);gain=f.groupby('target_date').gain.mean();days=[gain.idxmax(),gain.idxmin()]
         fig,axes=plt.subplots(1,2,figsize=(12,4))
-        for ax,day,label in zip(axes,days,['Largest historical error reduction','Largest historical error increase']):
+        for ax,day,label in zip(axes,days,['Largest daily MAE reduction','Largest daily MAE increase']):
             g=f[f.target_date==day]
             for c in ['actual_smp','price_only_common','price_plus_maintenance']:ax.plot(g.timestamp.dt.hour,g[c],label=c)
             ax.set(title=day+' / '+label,xlabel='KST hour',ylabel='SMP KRW/kWh');ax.legend(fontsize=7)

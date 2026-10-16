@@ -1,0 +1,44 @@
+{
+  "at": "2026-10-16T13:43:25.697810+00:00",
+  "tests": {
+    "passed": 86,
+    "total": 86,
+    "failed": 0,
+    "skipped": 0,
+    "log": "artifacts/v16/full_tests_final.log"
+  },
+  "http_health": "passed",
+  "buttons": [
+    "existing EV optimize",
+    "V16 break-even recommendation"
+  ],
+  "legacy_source_changed": false,
+  "operating_model_replaced": false,
+  "default_policy": "G2V",
+  "preservation": {
+    "at": "2026-10-16T13:42:58.523152+00:00",
+    "checked": 650,
+    "changed": 0,
+    "unchanged": true
+  },
+  "monitor_task": {
+    "name": "GradprojectV16Audit",
+    "multiple_instances": "IgnoreNew",
+    "interval_minutes": 15,
+    "old_tasks_preserved": true,
+    "test_exit_code": 0
+  },
+  "new_model_fits": 8,
+  "final_comparison_fits": 4,
+  "superseded_quality_correction_fits": 4,
+  "qualified_operating_models": 0,
+  "sensitivity_parameter_days": 7371,
+  "information_oracle_days": 1365,
+  "forward": {
+    "independent_days": 1,
+    "official_price_comparison_days": 1,
+    "elapsed_days": 0,
+    "spike_days": 0,
+    "new_V16_predictions": 0
+  }
+}

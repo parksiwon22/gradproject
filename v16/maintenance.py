@@ -1,5 +1,5 @@
 """Announced-plan research ablation; current attachment vintage is unverified."""
-import json
+import json,hashlib,shutil
 import joblib,numpy as np,pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor
 from v11.features import FEATURES
@@ -18,10 +18,11 @@ def register():
 def attach(frame,records,checks):
     rows=pd.DataFrame(records)
     for name in ['planned_start','planned_end']:rows[name]=pd.to_datetime(rows[name]).dt.tz_localize('Asia/Seoul')
+    invalid=set(rows.loc[(rows.planned_end<=rows.planned_start)|~np.isfinite(rows.capacity_mw)|(rows.capacity_mw<=0),'document_id'].astype(str))
     good={str(c['document_id']) for c in checks if c['parsed_rows']>0 and c['ambiguous_rows']==0 and c.get('period_start') and c.get('period_end')}
     docs={}
     for ident,g in rows.groupby('document_id'):
-        if str(ident) not in good or not g.posted_at.iloc[0]:continue
+        if str(ident) not in good or str(ident) in invalid or not g.posted_at.iloc[0]:continue
         issue=pd.Timestamp(g.posted_at.iloc[0]);start=pd.Timestamp(g.plan_period_start.iloc[0],tz='Asia/Seoul');end=pd.Timestamp(g.plan_period_end.iloc[0],tz='Asia/Seoul')+pd.Timedelta(days=1)
         if issue.tzinfo is None or not 0<(end-start).days<=14:continue
         docs[str(ident)]=(issue,start,end,g)
@@ -53,12 +54,17 @@ def run():
         if len(train)<365*24 or len(val)<.8*expected*24:
             qual.append(dict(fold=fold['name'],status='skipped_inadequate_complete_document_coverage',train_days=len(train)//24,validation_days=len(val)//24,expected_days=expected));continue
         out=val[['timestamp','target_date','actual_smp','previous_actual_smp','daily','maintenance_document','maintenance_posted_at','source_first_seen']].copy();foldscores={}
+        fingerprint=hashlib.sha256(train[['target_date','actual_smp']+FEATURES+EXTRA].to_csv(index=False).encode()).hexdigest()
         for name,cols in [('price_only_common',FEATURES),('price_plus_maintenance',FEATURES+EXTRA)]:
             path=folder/(fold['name']+'_'+name+'.joblib')
-            if path.exists():model=joblib.load(path)['model']
+            cached=joblib.load(path) if path.exists() else None
+            if cached and cached.get('training_sha256')==fingerprint:model=cached['model']
             else:
+                if path.exists():
+                    backup=folder/'superseded_before_interval_QC';backup.mkdir(exist_ok=True);dest=backup/path.name
+                    if not dest.exists():shutil.copy2(path,dest)
                 model=HistGradientBoostingRegressor(max_iter=250,max_leaf_nodes=31,learning_rate=.05,early_stopping=False,random_state=42);model.fit(train[cols],train.actual_smp-train.daily)
-                joblib.dump(dict(model=model,features=cols,trained_through=fold['train_end'],kind='RETROSPECTIVE_UNVERIFIED_ATTACHMENT_VINTAGE_NOT_OPERATIONAL'),path)
+                joblib.dump(dict(model=model,features=cols,trained_through=fold['train_end'],training_sha256=fingerprint,kind='RETROSPECTIVE_UNVERIFIED_ATTACHMENT_VINTAGE_NOT_OPERATIONAL'),path)
             p=val.daily.to_numpy()+model.predict(val[cols]);out[name]=p;ev,daily=ev_metrics(val,p);daily.to_csv(folder/(fold['name']+'_'+name+'_ev.csv'),index=False)
             result=dict(fold=fold['name'],model=name,train_days=len(train)//24,validation_days=len(val)//24,operational_candidate=False,**scored(val,p,float(train.actual_smp.quantile(.95))),**ev);scores.append(result);foldscores[name]=result
             pd.DataFrame(scores).to_csv(ROOT/'docs/V16_MAINTENANCE_ABLATION.csv',index=False);print(fold['name'],name,'MAE',result['MAE'],'peak',result['peak_MAE'],flush=True)

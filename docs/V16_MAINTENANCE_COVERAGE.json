@@ -1,0 +1,11 @@
+{
+  "rows": 31224,
+  "years": {
+    "2023": 7824,
+    "2024": 8328,
+    "2025": 8208,
+    "2026": 6864
+  },
+  "source": "Forecasted planned maintenance, not actual outage or full generation availability",
+  "operationally_certified": false
+}

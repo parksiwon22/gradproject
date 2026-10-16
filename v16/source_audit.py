@@ -22,6 +22,11 @@ def run():
         counts={}
         for r in archive['records']:counts[r['posted_date'][:4]]=counts.get(r['posted_date'][:4],0)+1
         summary=dict(at=now(),documents=len(archive['records']),year_documents=counts,files=sum(len(r['files']) for r in archive['records']),structured_rows=sum(r['parsed_rows'] for r in checks),ambiguous_rows=sum(r['ambiguous_rows'] for r in checks),original_historical_vintage_verified=False,posted_timestamp_available=sum(bool(r['posted_at']) for r in archive['records']),first_receipt_is_current=True,source='https://www.kpx.or.kr/board.es?bid=0018&mid=a10109030500',raw_redistribution='excluded; current archive license/history not established',model_use='retrospective pilot only, issue-event filter, never live-certified')
+        extracted=HOME/'outages/extracted_rows.json'
+        if extracted.exists():
+            f=pd.DataFrame(json.loads(extracted.read_text(encoding='utf-8')))
+            invalid=pd.to_datetime(f.planned_end,format='mixed')<=pd.to_datetime(f.planned_start,format='mixed')
+            summary.update(invalid_interval_rows=int(invalid.sum()),invalid_interval_documents=int(f.loc[invalid,'document_id'].nunique()),invalid_interval_action='Entire document excluded; raw value preserved, no arbitrary repair')
         write(ROOT/'docs/V16_MAINTENANCE_SOURCE.json',summary)
         rows=[r for r in rows if r['name']!='weekly_maintenance_archive']+[dict(name='weekly_maintenance_archive',source=summary['source'],kind='announced_forecast_document',rows=summary['structured_rows'],issued_at='per-document posted timestamp, exact original attachment version unknown',D2_eligible=False,reason='Retrospective-only archive; current files cannot certify historical first receipt',documents=summary['documents'])]
     inventory['rows']=rows;write(HOME/'sources/inventory.json',inventory)

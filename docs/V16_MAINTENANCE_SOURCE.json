@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-16T13:41:57.982551+00:00",
+  "documents": 198,
+  "year_documents": {
+    "2026": 42,
+    "2025": 52,
+    "2024": 52,
+    "2023": 52
+  },
+  "files": 199,
+  "structured_rows": 22356,
+  "ambiguous_rows": 131,
+  "original_historical_vintage_verified": false,
+  "posted_timestamp_available": 198,
+  "first_receipt_is_current": true,
+  "source": "https://www.kpx.or.kr/board.es?bid=0018&mid=a10109030500",
+  "raw_redistribution": "excluded; current archive license/history not established",
+  "model_use": "retrospective pilot only, issue-event filter, never live-certified",
+  "invalid_interval_rows": 1,
+  "invalid_interval_documents": 1,
+  "invalid_interval_action": "Entire document excluded; raw value preserved, no arbitrary repair"
+}

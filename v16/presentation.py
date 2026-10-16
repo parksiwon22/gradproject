@@ -9,9 +9,13 @@ def render(official,chart):
     st.caption('150원 이상은 가격 수준, 알려진 가격 대비20원 상승은 예측하기 어려운 일간 변화, ramp는 연속 시간 변화, 일중 상위6시간은 상대적인 회피 대상입니다. 학습 구간에서 정한 ramp 임계값을 검증에 적용합니다.')
     path=ROOT/'docs/V16_DEFINITION_SCORES.csv'
     if path.exists():
-        data=csv(path);fold=st.selectbox('V16 시간순 구간',data.fold.unique());model=st.selectbox('V16 정의 비교 모델',data.model.unique())
+        data=csv(path)
+        extra=ROOT/'docs/V16_MAINTENANCE_DEFINITIONS.csv'
+        if extra.exists():data=pd.concat([data,csv(extra)],ignore_index=True)
+        fold=st.selectbox('V16 시간순 구간',data.fold.unique());model=st.selectbox('V16 정의 비교 모델',data[data.fold==fold].model.unique())
         g=data[(data.fold==fold)&(data.model==model)]
         st.dataframe(g[['definition','actual_event_hours','event_MAE','event_bias','precision','recall','F1','false_alarm_hours']].rename(columns={'definition':'급등 정의','actual_event_hours':'실제 해당 시간','event_MAE':'해당 MAE','event_bias':'Bias','false_alarm_hours':'허위 경보 시간'}),hide_index=True)
+        st.caption('price_only_common과 price_plus_maintenance는 정비계획이 있는 동일 학습일의 별도 후향 비교입니다. 다른 V15 모델과 학습행이 달라 직접 개선율을 비교하지 않습니다.')
     st.subheader('새 공식 공급 정보 · 당시 발표본 여부')
     inv=ROOT/'docs/V16_SOURCE_AVAILABILITY.json'
     if inv.exists():st.dataframe(pd.DataFrame(json.loads(inv.read_text(encoding='utf-8'))),hide_index=True)
