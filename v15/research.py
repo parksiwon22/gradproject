@@ -65,7 +65,7 @@ def run():
     manifest=folder/'design_before_scores.json'
     if not manifest.exists(): write(manifest,design)
     matrix=folder/'frozen_matrix.csv'
-    if matrix.exists(): f=pd.read_csv(matrix); f.timestamp=pd.to_datetime(f.timestamp,utc=True).dt.tz_convert('Asia/Seoul'); cols=json.loads((folder/'features.json').read_text())
+    if matrix.exists(): f=pd.read_csv(matrix, float_precision='round_trip'); f.timestamp=pd.to_datetime(f.timestamp,utc=True).dt.tz_convert('Asia/Seoul'); cols=json.loads((folder/'features.json').read_text())
     else:
         db=connect(); raw=latest(db,'land'); db.close(); f,cols=build(raw); f.to_csv(matrix,index=False); write(folder/'features.json',cols)
     rows=[]

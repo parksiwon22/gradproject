@@ -15,7 +15,7 @@ def run():
     folder=HOME/'policy_study'; folder.mkdir(exist_ok=True)
     design=dict(at=now(),models=['V12_hgb_baseline','shape_level_blend'],calibration=['2025-07-01','2025-09-30'],selection=['2025-10-01','2025-12-31'],audit=['2026-01-01','2026-06-30'],policies=POLICIES,scenario_source='Point plus6 calibration residual cluster centers and2 extreme complete-day residuals; equal stress weights, not calibrated probabilities',qualification='Selection mean actual gain vs same-model G2V >=10virtual KRW/day AND mean export >=.5kWh/day AND loss frequency no higher than general AND >=10active days; choose maximum gain; else G2V. Never select by2026 audit.',EV=EV(degradation=5).__dict__,common_terminal_SOC=True,scenario_parameters=dict(CVaR_alpha=.8,risk_weights=[.25,1],finite_scenario_cap=50,profit_gate=100),historical_not_independent=True)
     if not (folder/'design_before_scores.json').exists(): write(folder/'design_before_scores.json',design)
-    f=pd.read_csv(HOME/'model_study/frozen_matrix.csv'); f.timestamp=pd.to_datetime(f.timestamp,utc=True).dt.tz_convert('Asia/Seoul')
+    f=pd.read_csv(HOME/'model_study/frozen_matrix.csv', float_precision='round_trip'); f.timestamp=pd.to_datetime(f.timestamp,utc=True).dt.tz_convert('Asia/Seoul')
     cal=f[(f.target_date>='2025-07-01')&(f.target_date<='2025-09-30')].reset_index(drop=True); ev=EV(degradation=5)
     models={name:joblib.load(ROOT/'artifacts/v14/study'/(name+'.joblib')) for name in design['models']}
     templates={}; frames={}; predictions={}
@@ -27,7 +27,7 @@ def run():
         for name,b in models.items():
             p=oldpredict(b,data)
             for policy in POLICIES:
-                dest=folder/(cohort+'_'+name+'_'+policy+'.csv'); rows=pd.read_csv(dest).to_dict('records') if dest.exists() else []; done={r['day'] for r in rows}
+                dest=folder/(cohort+'_'+name+'_'+policy+'.csv'); rows=pd.read_csv(dest, float_precision='round_trip').to_dict('records') if dest.exists() else []; done={r['day'] for r in rows}
                 for day,ids in data.groupby('target_date',sort=True).indices.items():
                     if day in done: continue
                     g=data.iloc[ids]; times=pd.DatetimeIndex(g.timestamp); point=p[ids]; actual=g.actual_smp.to_numpy(); temp=templates[name]; scenarios=point[None,:]+temp
