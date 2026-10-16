@@ -1,0 +1,33 @@
+{
+  "at": "2026-10-16T23:57:38.821472+00:00",
+  "sources": [
+    {
+      "name": "KPX public mainland hourly",
+      "url": "https://www.kpx.or.kr/smpInland.es?mid=a10404080100",
+      "access": "unauthenticated"
+    },
+    {
+      "name": "KPX official SMP/demand API",
+      "url": "https://apis.data.go.kr/B552115/SmpWithForecastDemand/getSmpWithForecastDemand",
+      "access": "public-service API key, not member trading login"
+    },
+    {
+      "name": "EPSIS hourly SMP",
+      "url": "https://epsis.kpx.or.kr/epsisnew/selectEkgeGepGscGrid.do?menuId=040202",
+      "access": "unauthenticated"
+    },
+    {
+      "name": "KPX navigation alias",
+      "url": "https://www.kpx.or.kr/menu.es?mid=a10404080100",
+      "result": "Official navigation redirects to same smpInland backend; not an independent publication clock"
+    },
+    {
+      "name": "Official price determination explanation",
+      "url": "https://www.kpx.or.kr/menu.es?mid=a10401040000",
+      "result": "Market price determination is distinct from a measured public API release timestamp"
+    }
+  ],
+  "failed_empty_ambiguous_not_treated_as_release_absence": true,
+  "original_history_directory": "artifacts/v18/publication",
+  "raw_data_published": false
+}

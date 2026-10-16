@@ -1,0 +1,11 @@
+{
+  "registered_at": "2026-10-16T23:38:10.428700+00:00",
+  "model": "V12_hgb_none_preserved",
+  "model_relative_path": "artifacts\\v12\\forward_model.joblib",
+  "model_sha256": "e3b962b7c3e4949eee61e1227fde3d60ffe4b290acdaab63c3a3b6baed3b3b48",
+  "trained_through": "2025-06-30",
+  "horizon_days": 2,
+  "new_training": false,
+  "operating_model_replaced": false,
+  "late_threshold_seconds": 60
+}

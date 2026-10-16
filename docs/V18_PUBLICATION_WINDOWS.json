@@ -1,0 +1,331 @@
+[
+  {
+    "target_date": "2026-10-15",
+    "source": "general_public",
+    "market": "land",
+    "first_normal_receipt": "2026-10-15T13:04:34.395350+00:00",
+    "last_legacy_normal_nonobservation": null,
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": false,
+    "first_before_D1_23": false,
+    "counts": {
+      "official_acquired": 7
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-16",
+    "source": "epsis",
+    "market": "jeju",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-15T14:56:37.055560+00:00",
+    "last_strict_normal_nonobservation": "2026-10-15T14:56:37.055560+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "not_observed": 3
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-16",
+    "source": "epsis",
+    "market": "land",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-15T14:56:37.017997+00:00",
+    "last_strict_normal_nonobservation": "2026-10-15T14:56:37.017997+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "not_observed": 3
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-16",
+    "source": "general_public",
+    "market": "land",
+    "first_normal_receipt": "2026-10-15T13:04:34.751718+00:00",
+    "last_legacy_normal_nonobservation": null,
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": false,
+    "first_before_D1_23": true,
+    "counts": {
+      "official_acquired": 30
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-17",
+    "source": "epsis",
+    "market": "jeju",
+    "first_normal_receipt": "2026-10-16T23:35:53.652574+00:00",
+    "last_legacy_normal_nonobservation": "2026-10-16T14:41:36.162888+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T14:41:36.162888+00:00",
+    "first_before_D2_23": false,
+    "first_before_D1_23": false,
+    "counts": {
+      "not_observed": 79,
+      "official_acquired": 2
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-17",
+    "source": "epsis",
+    "market": "land",
+    "first_normal_receipt": "2026-10-16T23:35:53.579714+00:00",
+    "last_legacy_normal_nonobservation": "2026-10-16T14:41:36.127545+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T14:41:36.127545+00:00",
+    "first_before_D2_23": false,
+    "first_before_D1_23": false,
+    "counts": {
+      "not_observed": 79,
+      "official_acquired": 2
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-17",
+    "source": "general_public",
+    "market": "land",
+    "first_normal_receipt": "2026-10-16T10:11:36.164606+00:00",
+    "last_legacy_normal_nonobservation": "2026-10-16T09:56:37.267987+00:00",
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": false,
+    "first_before_D1_23": true,
+    "counts": {
+      "not_observed": 82,
+      "official_acquired": 27
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-17",
+    "source": "kpx_api",
+    "market": "land",
+    "first_normal_receipt": "2026-10-16T23:43:06.801978+00:00",
+    "last_legacy_normal_nonobservation": null,
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": false,
+    "first_before_D1_23": false,
+    "counts": {
+      "failed": 2,
+      "official_acquired": 1
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-18",
+    "source": "epsis",
+    "market": "jeju",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:43:17.756553+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T23:43:17.756553+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "not_observed": 81
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-18",
+    "source": "epsis",
+    "market": "land",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:43:17.715996+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T23:43:17.715996+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "not_observed": 82
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-18",
+    "source": "general_public",
+    "market": "land",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:26:36.415956+00:00",
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "failed": 1,
+      "not_observed": 101,
+      "unverified_all_zero": 1
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-18",
+    "source": "kpx_api",
+    "market": "land",
+    "first_normal_receipt": "2026-10-16T23:11:20.241302+00:00",
+    "last_legacy_normal_nonobservation": null,
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": false,
+    "first_before_D1_23": true,
+    "counts": {
+      "official_acquired": 3
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-19",
+    "source": "epsis",
+    "market": "jeju",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:43:26.346427+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T23:43:26.346427+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "not_observed": 5
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-19",
+    "source": "epsis",
+    "market": "land",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:43:26.317230+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T23:43:26.317230+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "not_observed": 7
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-19",
+    "source": "general_public",
+    "market": "land",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:26:36.906172+00:00",
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "failed": 2,
+      "not_observed": 5,
+      "unverified_all_zero": 1
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-19",
+    "source": "kpx_api",
+    "market": "land",
+    "first_normal_receipt": "2026-10-16T23:11:24.423188+00:00",
+    "last_legacy_normal_nonobservation": null,
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": true,
+    "first_before_D1_23": true,
+    "counts": {
+      "official_acquired": 3
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-20",
+    "source": "epsis",
+    "market": "jeju",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:43:26.905710+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T23:43:26.905710+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "not_observed": 2
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-20",
+    "source": "epsis",
+    "market": "land",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:43:26.870502+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T23:43:26.870502+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "not_observed": 2
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-20",
+    "source": "general_public",
+    "market": "land",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": null,
+    "last_strict_normal_nonobservation": null,
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "unverified_all_zero": 2
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  },
+  {
+    "target_date": "2026-10-20",
+    "source": "kpx_api",
+    "market": "land",
+    "first_normal_receipt": null,
+    "last_legacy_normal_nonobservation": "2026-10-16T23:43:26.496162+00:00",
+    "last_strict_normal_nonobservation": "2026-10-16T23:43:26.496162+00:00",
+    "first_before_D2_23": null,
+    "first_before_D1_23": null,
+    "counts": {
+      "empty_response": 1,
+      "normal_no_data": 1
+    },
+    "exact_first_publication": "unverified",
+    "final_corrected_statistics": "unverified",
+    "membership_notice_time": "not inferred from public receipts"
+  }
+]

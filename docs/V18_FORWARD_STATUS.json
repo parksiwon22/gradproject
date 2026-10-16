@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-16T23:57:21.693309+00:00",
+  "forecast_files": 14,
+  "independent_reference_origins": 2,
+  "independent_primary_target_days": 2,
+  "primary_dates": [
+    "2026-10-17",
+    "2026-10-18"
+  ],
+  "official_price_comparison_complete_days": 2,
+  "target_day_elapsed_days": 0,
+  "final_corrected_statistics_verified_days": 0,
+  "spike_target_days": 0,
+  "awaiting_official_target_days": 0,
+  "on_time_forecast_records": 0,
+  "late_forecast_records": 14,
+  "strict_on_time_eligible_records": 0,
+  "official_known_by_issue_records": 0,
+  "unknown_model_lock_records": 13,
+  "reference_conflicts": [],
+  "operating_model_changed": false,
+  "research_purpose": "Prepublication immutable AI, later official comparison and EV regret; unchanged",
+  "on_time_reference_origins": 0,
+  "late_reference_origins": 2,
+  "strict_eligible_reference_origins": 0
+}

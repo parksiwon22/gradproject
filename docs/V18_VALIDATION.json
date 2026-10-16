@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-16T23:57:38.830822+00:00",
+  "tests": 112,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "test_log": "artifacts/v18/tests_all_112_after_fix.log",
+  "test_log_sha256": "b6442f53ba141cc01faeff302d12949611762efab1fc2942fb2493c658417e51",
+  "preservation": {
+    "at": "2026-10-16T23:57:31.876484+00:00",
+    "checked": 824,
+    "changed": 0,
+    "unchanged": true
+  },
+  "existing_source_unchanged": true,
+  "HTTP_health": 200,
+  "scheduler_three_migrated_jobs_exit0": true,
+  "old_V11_exogenous_stage": "ineligible inputs; preserved failure, SMP and ASOS collection succeeded",
+  "service_final_stages_success": true,
+  "new_AI_records": 0,
+  "reason": "Official prices already acquired; prior AI comparisons retained",
+  "model_training_runs": 0,
+  "operating_model_replaced": false,
+  "public_web_deployed": false,
+  "github_verified_account": "parksiwon22"
+}
