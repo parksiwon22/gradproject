@@ -12,7 +12,7 @@ def fresh_continuation(initial,current):
     if origin(initial)!=origin(current):raise ValueError('Reference origin crossed during I/O; retry with actual clock')
     return current
 
-def run():
+def run(reconcile=True):
     # Isolated import: no monkey patch to v15.forward, no source modification.
     spec=importlib.util.spec_from_file_location('_v17_v15_live_adapter',ROOT/'v15/forward.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);original=module._issue
     def continuation(initial):
@@ -29,6 +29,13 @@ def run():
         # Fresh timestamp is actual invocation time, never substituted historical23h.
         return original(pd.Timestamp.now(tz='Asia/Seoul'))
     module._issue=continuation
-    result=module.issue();module.reconcile();return result
+    result=module.issue()
+    if reconcile:module.reconcile()
+    return result
+
+def monitor(allow_issue=True):
+    spec=importlib.util.spec_from_file_location('_v17_v15_monitor_adapter',ROOT/'v15/monitor.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    module.issue=(lambda:run(False)) if allow_issue else (lambda:dict(status='skipped',reason='Official API receipt validation failed; retain existing forecasts'))
+    return module.run()
 
 if __name__=='__main__':run()

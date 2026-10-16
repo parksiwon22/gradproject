@@ -44,7 +44,10 @@ class V14Tests(unittest.TestCase):
     def test_streamlit_tabs_and_ev_button(self):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file('app_v14.py').run(timeout=45); self.assertFalse(app.exception); self.assertEqual(len(app.tabs),4)
-        app.button[0].click().run(timeout=60); self.assertFalse(app.exception); self.assertFalse(app.error)
+        # Pin this regression fixture instead of racing a newly appended live day.
+        target=next(s for s in app.selectbox if s.label=='예측 대상일')
+        target.set_value(sorted(target.options)[0]).run(timeout=45)
+        app.button[0].click().run(timeout=60); self.assertFalse(app.exception); self.assertFalse(app.error,msg=[e.value for e in app.error])
         # Explicit overnight dates must also work when all official hours exist.
         from datetime import timedelta,time
         next(r for r in app.radio if r.label=='계획에 쓸 가격').set_value('확보된 공식가격')
