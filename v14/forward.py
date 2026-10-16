@@ -14,6 +14,7 @@ def issue(clock=None):
     if clock<origin: origin-=pd.Timedelta(days=1)
     target=origin.normalize()+pd.Timedelta(days=2); times=pd.date_range(target,periods=24,freq='h')
     run=dict(at=now(),reference_origin=origin.isoformat(),target_date=target.strftime('%Y-%m-%d'),status='skipped',reason=None)
+    run['actual_delay_minutes']=(clock-origin).total_seconds()/60
     selection=HOME/'study/selection_before_audit.json'
     if not selection.exists(): run['reason']='candidate_selection_not_complete'
     else:
@@ -40,6 +41,7 @@ def issue(clock=None):
                     snapshot=past[past.timestamp>=origin-pd.Timedelta(days=8)]
                     record=dict(schema=14,issued_at=clock.isoformat(),reference_origin=origin.isoformat(),target_date=target.strftime('%Y-%m-%d'),model=name,model_sha256=digest,trained_through='2025-06-30',official_smp_known_at_issue=False,publication_claim='not acquired on checked local source; universal prepublication not certified',mode='candidate_forward_not_operating_model',weather_forecast_used=False,demand_forecast_used=False,input_first_seen_max=snapshot.first_seen.max(),source_prices=snapshot[['timestamp','smp','first_seen','snapshot']].to_dict('records'),uncertainty='Point candidate only; historical validation residuals are not calibrated future coverage. Spike warning unvalidated.',rows=rows)
                     record.update(uncertainty='Symmetric2025Q3 absolute residual90% range; no guaranteed future conditional coverage or calibrated spike probability',calibration=dict(start='2025-07-01',end='2025-09-30',rows=len(calibration),radius90=radius))
+                    record.update(actual_delay_minutes=(clock-origin).total_seconds()/60,model_selection_through='2025-12-31',exact_23h_execution=abs((clock-origin).total_seconds())<60)
                     record['decisions']={}
                     for label,flag in [('G2V',False),('V2G',True)]:
                         plan=optimize(p,times,EV(degradation=5),v2g=flag)

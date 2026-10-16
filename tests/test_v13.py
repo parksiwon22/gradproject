@@ -51,6 +51,10 @@ class V13Tests(unittest.TestCase):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file(str(Path(__file__).resolve().parents[1]/'app_v13.py')).run(timeout=30)
         self.assertEqual(len(app.exception),0)
+        # Keep the legacy application untouched; choose a covered test window.
+        from datetime import time
+        app.date_input[1].set_value(app.date_input[0].value)
+        app.time_input[1].set_value(time(23,59))
         app.button[0].click().run(timeout=30)
         self.assertEqual(len(app.exception),0)
         self.assertEqual(len(app.error),0)

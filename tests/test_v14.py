@@ -45,8 +45,17 @@ class V14Tests(unittest.TestCase):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file('app_v14.py').run(timeout=45); self.assertFalse(app.exception); self.assertEqual(len(app.tabs),4)
         app.button[0].click().run(timeout=60); self.assertFalse(app.exception); self.assertFalse(app.error)
+        # Explicit overnight dates must also work when all official hours exist.
+        from datetime import timedelta,time
+        next(r for r in app.radio if r.label=='계획에 쓸 가격').set_value('확보된 공식가격')
+        app.checkbox[0].set_value(False)
+        app.date_input[0].set_value(app.date_input[1].value-timedelta(days=1))
+        next(t for t in app.time_input if t.label=='연결 종료').set_value(time(8))
+        app.button[0].click().run(timeout=60); self.assertFalse(app.exception); self.assertFalse(app.error)
         next(r for r in app.radio if r.label=='자료 모드').set_value('과거 검증 시연').run(timeout=45)
         self.assertFalse(app.exception)
+        app.checkbox[0].set_value(True)
+        next(r for r in app.radio if r.label=='계획에 쓸 가격').set_value('저장 예측으로 모델 비교')
         app.button[0].click().run(timeout=60); self.assertFalse(app.exception); self.assertFalse(app.error)
 
 if __name__=='__main__': unittest.main()

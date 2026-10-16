@@ -1,0 +1,27 @@
+name,MAE_improved,peak_MAE_improved,G2V_improved,V2G_improved,F1_improved,explanation
+shape_level_blend,False,False,True,True,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_recent730,False,True,True,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_relative_shape,False,False,True,True,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+hgb_recent730,True,False,True,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+V12_hgb_baseline,False,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+rank_level_blend,False,False,False,True,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_downturn_weight,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+et_relative_shape,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+hgb_level_regime,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+hgb_lag_demand,False,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_lag_combined,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+hgb_lag_weather,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_recency365,False,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_lag_demand,False,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_lag_supply,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_scaled_quantile_0.1,True,False,True,True,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_lag_weather,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_scaled_quantile_0.5,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+xgb_pseudohuber,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+hgb_recent365,False,False,False,False,True,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_recency180,False,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_scaled_quantile_0.9,False,True,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+cat_mae_recent,True,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+lgb_hour_rank,False,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+gru_daily_shape_pilot,False,False,False,False,False,Tradeoffs retained; no promotion based on retrospectively inspected labels
+gru_chronological7day_pilot,False,False,False,False,False,Chronological GRU failed validation; no2026 audit or promotion

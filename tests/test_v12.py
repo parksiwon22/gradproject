@@ -93,6 +93,11 @@ class IntegrationTests(unittest.TestCase):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file('app_v12.py').run(timeout=30)
         self.assertEqual(len(app.exception),0)
+        # New official-price dates advance independently of available next-day
+        # forecasts. Exercise a fully covered window rather than invent prices.
+        from datetime import time
+        app.date_input[1].set_value(app.date_input[0].value)
+        app.time_input[1].set_value(time(23,59))
         app.button[0].click().run(timeout=30)
         self.assertEqual(len(app.exception),0); self.assertEqual(len(app.error),0)
         self.assertGreaterEqual(len(app.dataframe),4)

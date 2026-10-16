@@ -156,7 +156,12 @@ def run():
     design=dict(seed=42,origin='D-2 23:00 KST',train=['2023-01-01','2025-06-30'],calibration=['2025-07-01','2025-09-30'],selection=['2025-10-01','2025-12-31'],audit=['2026-01-01','2026-06-30'],not_unseen=True,known_october_not_used_for_selection=True,operating_model_promoted=False,specifications=specifications(),features=groups,external_provenance=provenance,selection_rule='Mean normalized actual G2V/V2G regret, MAE and peakMAE; price and EV improvements shown separately. Select once on2025Q4 before any2026 audit. No deployment promotion.',max_threads=4,source_sha256=hashlib.sha256(prices[['timestamp','smp']].to_csv(index=False).encode()).hexdigest())
     manifest=folder/'design_before_scores.json'
     if manifest.exists():
-        old=json.loads(manifest.read_text()); assert old['source_sha256']==design['source_sha256'],'source changed; do not silently resume on new labels'
+        old=json.loads(manifest.read_text())
+        snapshot=folder/'frozen_design_matrix.csv'; snapshot_meta=folder/'frozen_snapshot.json'
+        if snapshot.exists() and snapshot_meta.exists():
+            metadata=json.loads(snapshot_meta.read_text()); assert hashlib.file_digest(snapshot.open('rb'),'sha256').hexdigest()==metadata['sha256'],'frozen matrix changed'
+            data=pd.read_csv(snapshot); data.timestamp=pd.to_datetime(data.timestamp,utc=True).dt.tz_convert('Asia/Seoul'); data.origin_timestamp=pd.to_datetime(data.origin_timestamp,utc=True).dt.tz_convert('Asia/Seoul'); groups=old['features']; design=old
+        else: assert old['source_sha256']==design['source_sha256'],'source changed; do not silently resume on new labels'
     else: write(manifest,design)
     def period(key):
         a,b=design[key]; return data[(data.target_date>=a)&(data.target_date<=b)].reset_index(drop=True)

@@ -83,7 +83,7 @@ with tabs[0]:
     if not followmetrics.empty: table=pd.concat([table,followmetrics],ignore_index=True)
     if not table.empty:
         st.caption('아래 표는 동일 D-2 입력 기준·2025Q4 검증 조건입니다. V5 D-1 결과와 직접 순위를 매기지 않습니다. 외생변수 후보는 과거 수신 판본이 미확인인 후향 연구입니다.')
-        st.dataframe(table[[c for c in ['name','operational_candidate','MAE','peak_MAE','peak_F1','G2V_regret','V2G_regret','reversal_count'] if c in table]],hide_index=True)
+        st.dataframe(table[[c for c in ['name','operational_candidate','MAE','peak_MAE','peak_F1','G2V_regret','V2G_regret','reversal_count'] if c in table]].rename(columns={'name':'후보','operational_candidate':'가격 전용 입력 적격','MAE':'MAE(원/kWh)','peak_MAE':'고가 MAE(원/kWh)','peak_F1':'고가 F1','G2V_regret':'G2V regret(가상 원/일)','V2G_regret':'V2G regret(가상 원/일)','reversal_count':'반전일 수'}),hide_index=True)
     st.caption('전향 평가가 적고 급등 위험 확률은 검증되지 않았습니다. 가격범위·위험 표시는 보장이 아닙니다.')
 with tabs[1]:
     st.subheader('급등 추종과 과소예측')
@@ -101,10 +101,12 @@ with tabs[1]:
 with tabs[2]:
     st.subheader('EV 조건과 모델별 의사결정')
     st.caption('SMP 연동 가상 비용입니다. 국내 소매요금·실증 V2G 판매수익이 아닙니다.')
+    st.caption('현재 입력으로 계획을 재계산합니다. 공식가격 공개 전에 불변 저장된 원 EV 계획과 구분하며, 이 화면의 사후 시연을 새 전향 성과로 계산하지 않습니다.')
     c1,c2,c3=st.columns(3)
     capacity=c1.number_input('배터리 용량(kWh)',10.,200.,60.); initial=c2.number_input('초기 SOC(%)',0.,100.,30.); target=c3.number_input('목표 SOC(%)',0.,100.,80.)
     with st.expander('연결시간·전력·효율·SOC 한계·열화 비용',expanded=False):
         full=st.checkbox('선택 날짜 전체 24시간 연결(연구 조건)',value=True)
+        begin_date=st.date_input('연결 시작일',pd.Timestamp(day).date()); end_date=st.date_input('연결 종료일',pd.Timestamp(day).date())
         begin_time=st.time_input('연결 시작',time(18)); end_time=st.time_input('연결 종료',time(23,59))
         charge=st.number_input('충전전력(kW)',.1,100.,7.); discharge=st.number_input('방전전력(kW)',0.,100.,7.)
         eff=st.number_input('충전효율(%)',1.,100.,90.); deff=st.number_input('방전효율(%)',1.,100.,90.)
@@ -114,12 +116,23 @@ with tabs[2]:
     price_mode=st.radio('계획에 쓸 가격',['저장 예측으로 모델 비교','확보된 공식가격'],horizontal=True)
     if st.button('모델별 G2V · 가상 V2G 비교',type='primary'):
         try:
-            times=pd.DatetimeIndex(data.timestamp); start=times[0] if full else pd.Timestamp(datetime.combine(pd.Timestamp(day).date(),begin_time),tz='Asia/Seoul'); end=times[-1]+pd.Timedelta(hours=1) if full else pd.Timestamp(datetime.combine(pd.Timestamp(day).date(),end_time),tz='Asia/Seoul')
+            start=pd.Timestamp(data.timestamp.iloc[0]) if full else pd.Timestamp(datetime.combine(begin_date,begin_time),tz='Asia/Seoul'); end=pd.Timestamp(data.timestamp.iloc[-1])+pd.Timedelta(hours=1) if full else pd.Timestamp(datetime.combine(end_date,end_time),tz='Asia/Seoul')
+            if end<=start: raise ValueError('연결 종료시각은 시작 이후여야 합니다. 밤을 넘기면 종료일도 다음 날로 설정하세요.')
+            times=pd.date_range(start.floor('h'),end.ceil('h')-pd.Timedelta(hours=1),freq='h')
+            actual_plan=official.set_index('timestamp').smp.reindex(times)
             ev=EV(capacity,initial,target,charge,discharge,eff/100,deff/100,minimum,maximum,wear,1)
-            costs=[]; power=[]; soc=[]; saved={}
+            costs=[]; power=[]; soc=[]; saved={}; used_prices={}
             for name in chosen:
-                p=data.actual_smp.to_numpy() if price_mode=='확보된 공식가격' else data[name].to_numpy()
+                if price_mode=='확보된 공식가격': p=actual_plan.to_numpy()
+                elif mode=='과거 검증 시연': p=pool.set_index('timestamp')[name].reindex(times).to_numpy()
+                else:
+                    parts=[]
+                    for prefix,path,record in forward:
+                        if prefix+':'+record['model']==name:
+                            part=pd.DataFrame(record['rows']); part.timestamp=pd.to_datetime(part.timestamp,utc=True).dt.tz_convert('Asia/Seoul'); parts.append(part[['timestamp','predicted_smp']])
+                    p=pd.concat(parts).drop_duplicates('timestamp').set_index('timestamp').predicted_smp.reindex(times).to_numpy()
                 if not np.isfinite(p).all(): raise ValueError('선택한 연결시간의 가격이 미확보입니다. 예측 모드나 다른 날짜를 선택하세요.')
+                used_prices[name]=[dict(timestamp=t.isoformat(),value=float(value)) for t,value in zip(times,p)]
                 g=optimize(p,times,ev,start,end); planner=EV(**{**ev.__dict__,'sell_ratio':.85 if policy.startswith('방전') else 1}); v=optimize(p,times,planner,start,end,True)
                 if policy.startswith('예상') and g['net_cost']-v['net_cost']<100: v=g
                 plans=[('즉시충전',baseline(p,times,ev,start,end)),('균등충전',baseline(p,times,ev,start,end,True)),('G2V',g),('가상 V2G',v)]
@@ -128,15 +141,16 @@ with tabs[2]:
                     if 'schedule' in plan:
                         f=plan['schedule']; expected=score(p,f.charge_kw.to_numpy(),f.discharge_kw.to_numpy(),f.connected_hours.to_numpy(),ev)['net_cost']
                         q=f.copy(); q['계열']=name+' / '+label; power.append(q[['timestamp','계열','charge_kw','discharge_kw']]); soc.append(q[['timestamp','계열','soc_end']])
-                        if data.actual_smp.notna().all():
-                            r=regret(plan,data.actual_smp,times,ev,start,end,label=='가상 V2G'); actual=r['realized_cost']; regret_value=r['regret']
+                        if actual_plan.notna().all():
+                            r=regret(plan,actual_plan,times,ev,start,end,label=='가상 V2G'); actual=r['realized_cost']; regret_value=r['regret']
                         saved[name+'_'+label]={**{k:value for k,value in plan.items() if k!='schedule'},'schedule':f.to_dict('records')}
-                    elif data.actual_smp.notna().all(): actual=baseline(data.actual_smp,times,ev,start,end,label=='균등충전')['net_cost']
+                    elif actual_plan.notna().all(): actual=baseline(actual_plan,times,ev,start,end,label=='균등충전')['net_cost']
                     costs.append(dict(모델=name,방식=label,예상순비용=expected,실제순비용=actual,regret=regret_value,종료SOC=plan.get('ending_soc',max(initial,target))))
+            st.caption('금액은 선택 연결기간 합계의 가상 원입니다. regret은 각 G2V/V2G 제약에 맞는 사후 최적 비용과의 차이입니다.')
             st.dataframe(pd.DataFrame(costs),hide_index=True)
             st.line_chart(pd.concat(soc).pivot(index='timestamp',columns='계열',values='soc_end'),y_label='SOC(%)')
             pp=pd.concat(power); pp['순충전전력(kW)']=pp.charge_kw-pp.discharge_kw; st.line_chart(pp.pivot(index='timestamp',columns='계열',values='순충전전력(kW)'),y_label='kW')
-            folder=HOME/'interactive_decisions'; file=folder/(pd.Timestamp.now(tz='UTC').strftime('%Y%m%dT%H%M%S%f')+'.json'); write_once(file,dict(at=pd.Timestamp.now(tz='UTC').isoformat(),mode=mode,price_mode=price_mode,target_date=day,start=start.isoformat(),end=end.isoformat(),policy=policy,settlement_assumptions=ev.__dict__,source_prices_sha256=hashlib.sha256(data.to_csv(index=False).encode()).hexdigest(),official_prices_complete=data.actual_smp.notna().all().item(),plans=saved))
+            folder=HOME/'interactive_decisions'; file=folder/(pd.Timestamp.now(tz='UTC').strftime('%Y%m%dT%H%M%S%f')+'.json'); write_once(file,dict(at=pd.Timestamp.now(tz='UTC').isoformat(),mode=mode,price_mode=price_mode,target_date=day,start=start.isoformat(),end=end.isoformat(),policy=policy,settlement_assumptions=ev.__dict__,source_prices_sha256=hashlib.sha256(json.dumps(used_prices,sort_keys=True).encode()).hexdigest(),plan_price_inputs=used_prices,official_prices_complete=bool(actual_plan.notna().all()),plans=saved))
             st.caption('사용자 계획은 V14 로컬에 별도 불변 저장했습니다. 실제가격 미확보 시 regret은 평가 대기입니다. 보수적 정책은 보장을 뜻하지 않습니다.')
         except (ValueError,RuntimeError) as exc: st.error(str(exc))
 with tabs[3]:
