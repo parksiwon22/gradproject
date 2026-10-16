@@ -55,8 +55,9 @@ def ev_metrics(f,p,policy='nominal'):
             if key not in ORACLES: ORACLES[key]=optimize(a,times,ev,v2g=v2g)['net_cost']
             regrets[name]=realized[name]-ORACLES[key]
         immediate=baseline(a,times,ev)['net_cost']
-        rows.append(dict(day=day,G2V_expected=estimated['G2V'],V2G_expected=estimated['V2G'],G2V_actual=realized['G2V'],V2G_actual=realized['V2G'],G2V_regret=regrets['G2V'],V2G_regret=regrets['V2G'],actual_saving_vs_immediate_G2V=immediate-realized['G2V'],actual_saving_vs_immediate_V2G=immediate-realized['V2G'],wrong_charge_kwh=float(np.sum(gplan['schedule'].charge_kw.to_numpy()[a>np.quantile(a,.75)])),reversal=estimated['G2V']-estimated['V2G']>1e-6 and realized['G2V']-realized['V2G']< -1e-6))
+        rows.append(dict(day=day,G2V_expected=estimated['G2V'],V2G_expected=estimated['V2G'],G2V_actual=realized['G2V'],V2G_actual=realized['V2G'],G2V_regret=regrets['G2V'],V2G_regret=regrets['V2G'],actual_saving_vs_immediate_G2V=immediate-realized['G2V'],actual_saving_vs_immediate_V2G=immediate-realized['V2G'],V2G_export_kwh=float((vplan['schedule'].discharge_kw*vplan['schedule'].connected_hours).sum()),expected_benefit=estimated['G2V']-estimated['V2G']>1e-6,wrong_charge_kwh=float(np.sum(gplan['schedule'].charge_kw.to_numpy()[a>np.quantile(a,.75)])),reversal=estimated['G2V']-estimated['V2G']>1e-6 and realized['G2V']-realized['V2G']< -1e-6))
     result=pd.DataFrame(rows); summary=result.drop(columns='day').mean().to_dict(); summary['reversal_count']=int(result.reversal.sum()); summary['independent_days']=len(result)
+    summary['expected_benefit_days']=int(result.expected_benefit.sum()); summary['conditional_reversal_rate']=float(result.reversal.sum()/max(1,result.expected_benefit.sum()))
     return summary,result
 ORACLES={}
 

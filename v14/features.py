@@ -6,8 +6,8 @@ from v11.store import ROOT
 
 PRICE_EXTRA=['profile_mean','profile_std','profile_rank','relative_level','recent_range','recent_cv','weekly_gap','hourly_shape_change','origin_downtrend','origin_week_change','past_negative_fraction','past_high_fraction']
 
-def augment(prices,external=True):
-    f=build(prices,days_ahead=2); s=prices.set_index('timestamp').smp.sort_index()
+def augment(prices,external=True,targets=None,include_labels=True):
+    f=build(prices,days_ahead=2,targets=targets,include_labels=include_labels); s=prices.set_index('timestamp').smp.sort_index()
     profiles=f.groupby('target_date').daily
     f['profile_mean']=profiles.transform('mean'); f['profile_std']=profiles.transform('std')
     f['profile_rank']=profiles.rank(pct=True); f['relative_level']=f.daily-f.profile_mean
@@ -18,6 +18,8 @@ def augment(prices,external=True):
     f['origin_downtrend']=(f.change24<0).astype(int); f['origin_week_change']=f.origin_price-f.origin_lag168
     for name,condition in [('past_negative_fraction',s<0),('past_high_fraction',s>=150)]:
         f[name]=condition.rolling(168,min_periods=168).mean().reindex(origin).to_numpy()
+    for lag in range(6,-1,-1):
+        f['sequence_origin_lag'+str(lag*24)]=s.reindex(origin-pd.Timedelta(hours=lag*24)).to_numpy()
     groups={'price':FEATURES+PRICE_EXTRA}; provenance=[]
     if external:
         base=ROOT/'artifacts/v11'; demand=pd.read_csv(base/'exogenous/demand_hourly_all.csv')
