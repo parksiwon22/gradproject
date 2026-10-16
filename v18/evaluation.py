@@ -6,7 +6,7 @@ from v11.store import connect,latest
 from v12.ev import EV,score,baseline
 from v15.policies import dispatch
 from v17.charging import priority_plan,require_prices
-from v18.common import HOME,ROOT,read,write,write_once,sha,now
+from v18.common import HOME,ROOT,read,write,write_once,write_csv,sha,now
 from v18.publication import all_rows,POSITIVE
 
 EV_DEFAULT=EV(degradation=5)
@@ -92,7 +92,7 @@ def evaluate():
             frozen.append(row)
         own=[x for x in rows if x['file']==path.name];own_frozen=[x for x in frozen if x['forecast']==path.name];version=hashlib.sha256(json.dumps(dict(rows=own,frozen=own_frozen,reference=reference_columns),sort_keys=True,default=str).encode()).hexdigest();dest=HOME/'evaluations'/(path.stem+'_'+version[:16]+'.json')
         if not dest.exists():write_once(dest,dict(schema=18,at=now(),forecast_sha256=sha(path),rows=own,frozen_decisions=own_frozen,reference_version=version))
-    pd.DataFrame(rows).to_csv(HOME/'comparison_index.csv',index=False);pd.DataFrame(frozen).to_csv(HOME/'frozen_decision_index.csv',index=False)
+    write_csv(HOME/'comparison_index.csv',pd.DataFrame(rows));write_csv(HOME/'frozen_decision_index.csv',pd.DataFrame(frozen))
     primary=[r for r in rows if not r['auxiliary_target']];done={r['target_date'] for r in primary if r['status']=='official_price_comparison_complete'};targets={r['primary_target_date'] for r in primary}
     status=dict(at=now(),forecast_files=len(items),independent_reference_origins=len({r['reference_origin'] for r in primary}),independent_primary_target_days=len(targets),primary_dates=sorted(targets),official_price_comparison_complete_days=len(done),target_day_elapsed_days=len({r['target_date'] for r in primary if r['target_day_elapsed'] and r['target_date'] in done}),final_corrected_statistics_verified_days=0,spike_target_days=len({r['target_date'] for r in primary if r.get('peak_hours',0)>0}),awaiting_official_target_days=len(targets-done),on_time_forecast_records=sum(m['timing']=='on_time_within_60s' for _,_,_,m in items),late_forecast_records=sum(m['timing']=='late' for _,_,_,m in items),strict_on_time_eligible_records=sum(m['strict_on_time_eligible'] for _,_,_,m in items),official_known_by_issue_records=sum(m['official_positive_observed_by_issue'] for _,_,_,m in items),unknown_model_lock_records=sum(m['model_locked_before_origin'] is None for _,_,_,m in items),reference_conflicts=conflicts,operating_model_changed=False,research_purpose='Prepublication immutable AI, later official comparison and EV regret; unchanged')
     status.update(on_time_reference_origins=len({m['reference_origin'] for _,_,_,m in items if m['timing']=='on_time_within_60s'}),late_reference_origins=len({m['reference_origin'] for _,_,_,m in items if m['timing']=='late'}),strict_eligible_reference_origins=len({m['reference_origin'] for _,_,_,m in items if m['strict_on_time_eligible']}))

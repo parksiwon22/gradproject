@@ -1,9 +1,15 @@
-import json
+import json,os,uuid
 from pathlib import Path
 from v11.store import ROOT,now
 from v17.common import write,sha,csv
 from v12.records import write_once
 HOME=ROOT/'artifacts/v18'
+
+def write_csv(path,frame):
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True);temporary=path.with_name('.'+path.name+'.'+uuid.uuid4().hex+'.tmp')
+    try:frame.to_csv(temporary,index=False);os.replace(temporary,path)
+    finally:
+        if temporary.exists():temporary.unlink()
 
 def read(path,default=None):
     return json.loads(Path(path).read_text(encoding='utf-8-sig')) if Path(path).exists() else default

@@ -20,15 +20,15 @@ def lock():
 def run():
     started=pd.Timestamp.now(tz='UTC');stages=[]
     with lock():
-        from v18.publication import probe
+        from v18.publication import probe,share_new_official_days
         from v18.forward import issue
         from v18.evaluation import evaluate
         from v18.legacy import run as legacy
-        for name,fn in [('publication',probe),('forward',issue),('legacy_V12_evaluation',lambda:legacy('v12')),('integrated_evaluation',evaluate)]:
+        for name,fn in [('publication',probe),('shared_new_official_days',share_new_official_days),('forward',issue),('legacy_V12_evaluation',lambda:legacy('v12')),('integrated_evaluation',evaluate)]:
             try:
                 value=fn()
                 if name=='publication':
-                    counts={s:sum(r['status']==s for r in value) for s in {r['status'] for r in value}};bad=sum(counts.get(s,0) for s in ['failed','api_error','partial_response']);stages.append(dict(stage=name,status='partial_failure' if bad else 'success',result=counts,retry='Next scheduled tick for stale failed sources; failed or empty never certifies absence'))
+                    counts={s:sum(r['status']==s for r in value) for s in {r['status'] for r in value}};bad=sum(counts.get(s,0) for s in ['failed','api_error','partial_response','deferred_budget','empty_response']);stages.append(dict(stage=name,status='partial_failure' if bad else 'success',result=counts,retry='Next scheduled tick for stale failed sources; failed or empty never certifies absence'))
                 else:stages.append(dict(stage=name,status='success',result=value if name=='forward' else None))
             except Exception as exc:stages.append(dict(stage=name,status='failed',reason=type(exc).__name__,retry='Next scheduled tick; preserve prior data, no synthetic success'))
         previous=sorted((HOME/'service_runs').glob('*.json'));gap=None

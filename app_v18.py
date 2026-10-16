@@ -14,7 +14,7 @@ from v18.evaluation import reference,inventory,compare_ev
 st.set_page_config(page_title='전력예보 V18 · 충전 추천',page_icon='⚡',layout='wide')
 st.markdown('<style>.block-container{max-width:1250px;padding-top:1.5rem}div[data-testid="stMetric"]{background:#eef5fa;padding:12px;border-radius:10px}</style>',unsafe_allow_html=True)
 st.title('⚡ 전력예보 · 충전 시간 추천')
-st.caption('공개 전 저장한 AI 예측과 공개 후 공식 SMP를 비교합니다. 금액은 가상 SMP 연동 정산이며 실제 국내 충전요금·실증 V2G 판매수익이 아닙니다.')
+st.caption('육지 SMP · 한국시간(KST), 시간 시작 기준. 저장된 AI 예측과 이후 수신한 공식 SMP를 비교합니다. 금액은 가상 SMP 연동 정산이며 실제 국내 충전요금·실증 V2G 판매수익이 아닙니다.')
 
 @st.cache_data(ttl=30)
 def load():return reference(),inventory()
@@ -56,6 +56,7 @@ if page=='충전 추천':
             except ValueError:
                 found=False
                 for path,r,f,m in sorted(records,key=lambda x:x[3]['issued_at'],reverse=True):
+                    if m['version']!=18:continue
                     if m['official_positive_observed_by_issue'] or not m['input_receipts_eligible'] or m['model_locked_before_origin'] is not True:continue
                     try:source=require_prices(f[['timestamp','predicted_smp']].rename(columns={'predicted_smp':'price'}),start,end);record=r;meta=m;found=True;break
                     except ValueError:continue

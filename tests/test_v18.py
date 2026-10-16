@@ -53,6 +53,19 @@ class V18Tests(unittest.TestCase):
             with lock():
                 with self.assertRaises(RuntimeError):
                     with lock():pass
+    def test_exhausted_probe_budget_is_deferred_not_false_absence(self):
+        import v18.publication as publication
+        with tempfile.TemporaryDirectory() as t,patch.object(publication,'HOME',Path(t)),patch.object(publication,'all_rows',return_value=[]),patch.object(publication,'call') as network:
+            rows=publication.probe(['2026-10-20'],force=True,budget_seconds=0);self.assertEqual(len(rows),4);self.assertTrue(all(r['status']=='deferred_budget' for r in rows));network.assert_not_called();self.assertFalse(publication.gate(rows,'2026-10-20',pd.Timestamp.now(tz='UTC'))[0])
+    def test_new_official_day_shared_without_replaying_existing_corrections(self):
+        import hashlib
+        import v18.publication as publication
+        import v11.store as store
+        with tempfile.TemporaryDirectory() as t:
+            home=Path(t);folder=home/'publication/raw';folder.mkdir(parents=True);payload=b'official synthetic test';digest=hashlib.sha256(payload).hexdigest();(folder/(digest+'.raw')).write_bytes(payload)
+            times=pd.date_range('2026-10-20',periods=24,freq='h',tz='Asia/Seoul');row=dict(target_date='2026-10-20',market='land',source='kpx_api',source_url='https://official.example/test',status='official_acquired',checked_at='2026-10-17T02:00:00Z',sha256=digest,prices=[dict(timestamp=x.isoformat(),smp=100.) for x in times]);original_connect=store.connect
+            with patch.object(publication,'HOME',home),patch.object(publication,'all_rows',return_value=[row]),patch.object(store,'connect',side_effect=lambda:original_connect(home/'db')):
+                self.assertEqual(len(publication.share_new_official_days()),1);db=original_connect(home/'db');f=store.latest(db,'land');f['smp']=120.;store.ingest(db,'land',f,b'new correction','official',home=home/'db');db.close();self.assertEqual(publication.share_new_official_days(),[]);db=original_connect(home/'db');self.assertTrue(store.latest(db,'land').smp.eq(120).all());db.close()
     def test_web_auto_recommendation_archive_verification_status_and_save(self):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file('app_v18.py').run(timeout=60);self.assertFalse(app.exception);self.assertFalse(app.error);self.assertTrue(any(m.label=='추천 종료 SOC' for m in app.metric))

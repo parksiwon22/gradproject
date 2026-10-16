@@ -1,5 +1,6 @@
 """Separate receipt evidence per public source; no inferred universal release clock."""
-import argparse,hashlib,json,re,urllib.request
+import argparse,hashlib,json,re,urllib.request,time
+from pathlib import Path
 import numpy as np,pandas as pd
 from v11.authenticated_data import key,call,KPX
 from v11.collect import request as epsis_request
@@ -63,6 +64,7 @@ def inspect_public(payload,day):
     if all(float(c)==0 for c in cells):return 'unverified_all_zero',None
     f=parse_public(text,day)
     if f is None:raise ValueError('Unrecognized numeric public grid')
+    validate(f)
     return POSITIVE,f
 
 def inherited():
@@ -91,14 +93,36 @@ def all_rows():
     for p in (HOME/'publication/events').glob('*.json'):rows.extend(read(p,[]))
     return rows
 
-def probe(days=None,force=False):
-    clock=pd.Timestamp.now(tz='Asia/Seoul');days=days or [(clock.normalize()+pd.Timedelta(days=i)).strftime('%Y-%m-%d') for i in [0,1,2,3]];old=all_rows();events=[]
+def share_new_official_days():
+    """Tell legacy collectors a new day is already known, without replaying corrections."""
+    from v11.store import connect,latest,ingest
+    candidates={}
+    for row in all_rows():
+        if row['status']==POSITIVE and row.get('prices'):candidates.setdefault((row['target_date'],row['market']),[]).append(row)
+    db=connect();added=[]
+    try:
+        for (day,market),rows in sorted(candidates.items()):
+            known=latest(db,market)
+            # Existing vintages remain the existing collector's responsibility.
+            if not known.empty and known.timestamp.dt.strftime('%Y-%m-%d').eq(day).any():continue
+            rank={'general_public':3,'epsis':2,'kpx_api':1};r=max(rows,key=lambda x:(rank.get(x['source'],0),pd.Timestamp(x['checked_at'])))
+            f=pd.DataFrame(r['prices']);f.timestamp=pd.to_datetime(f.timestamp,utc=True,format='mixed').dt.tz_convert('Asia/Seoul');payload=(HOME/'publication/raw'/(r['sha256']+'.raw')).read_bytes()
+            if hashlib.sha256(payload).hexdigest()!=r['sha256']:raise ValueError('Official source hash mismatch')
+            store_home=Path(db.execute('PRAGMA database_list').fetchone()[2]).parent
+            ingest(db,market,f,payload,r.get('source_url',KPX),home=store_home,retrieved=r['checked_at']);added.append(dict(day=day,market=market,first_seen=r['checked_at']))
+    finally:db.close()
+    return added
+
+def probe(days=None,force=False,budget_seconds=240):
+    clock=pd.Timestamp.now(tz='Asia/Seoul');days=days or [(clock.normalize()+pd.Timedelta(days=i)).strftime('%Y-%m-%d') for i in [0,1,2,3]];old=all_rows();events=[];deadline=time.monotonic()+budget_seconds
     for day in days:
         for source,market in [('kpx_api','land'),('general_public','land'),('epsis','land'),('epsis','jeju')]:
             prior=[r for r in old if r['target_date']==day and r['source']==source and r['market']==market]
             recent=max(prior,key=lambda r:pd.Timestamp(r['checked_at'])) if prior else None
             if not force and recent and (pd.Timestamp.now(tz='UTC')-pd.Timestamp(recent['checked_at'])).total_seconds()<900:continue
             entry=dict(target_date=day,source=source,market=market,started_at=now(),access='public API key' if source=='kpx_api' else 'unauthenticated public',release_time_certified=False)
+            if time.monotonic()>=deadline:
+                entry.update(status='deferred_budget',checked_at=now(),reason='No request attempted; total probe budget exhausted; retry next tick');events.append(entry);continue
             try:
                 if source=='kpx_api':
                     credential=key('KPX_SERVICE_KEY')
