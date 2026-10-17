@@ -1,0 +1,16 @@
+target_date,model,D2_count,D3_count,paired_actual_records
+2026-10-17,V12_HGB,1,0,False
+2026-10-17,V12_LightGBM_peak,1,0,False
+2026-10-17,extra_trees_peak,1,0,False
+2026-10-17,validation_ensemble,1,0,False
+2026-10-18,V12_HGB,1,0,False
+2026-10-18,V12_LightGBM_peak,1,0,False
+2026-10-18,V14_shape_level_blend,1,0,False
+2026-10-18,V15_two_stage_025,1,0,False
+2026-10-18,V15_two_stage_05,1,0,False
+2026-10-18,V17_joint,1,0,False
+2026-10-18,extra_trees_peak,1,0,False
+2026-10-18,lgb_recent730,1,0,False
+2026-10-18,lgb_relative_shape,1,0,False
+2026-10-18,validation_ensemble,1,0,False
+2026-10-19,V17_joint,0,1,False

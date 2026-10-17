@@ -1,0 +1,172 @@
+{
+  "at": "2026-10-17T03:39:50.486133+00:00",
+  "actual_record_files": 14,
+  "V19_new_actual_records": 0,
+  "V19_new_target_dates": [],
+  "independent_origins": 2,
+  "independent_primary_target_days": 2,
+  "paired_same_model_actual_target_count": 0,
+  "V19_on_time_eligible": 0,
+  "V19_late_records": 0,
+  "official_comparison_target_dates": [
+    "2026-10-17",
+    "2026-10-18",
+    "2026-10-19"
+  ],
+  "final_corrected_statistics_verified_days": 0,
+  "spike_target_days": 0,
+  "target_day_elapsed_days": 0,
+  "reference_conflicts": [],
+  "operating_model_replaced": false,
+  "report_at": "2026-10-17T03:41:22.765311+00:00",
+  "reference_origin": "2026-10-17T23:00:00+09:00",
+  "unissued_preparations": [
+    {
+      "target_date": "2026-10-19",
+      "horizon": 2,
+      "status": "official_already_known"
+    },
+    {
+      "model": "V17_joint",
+      "horizon": 3,
+      "target_date": "2026-10-20",
+      "status": "prepared_not_issued",
+      "inference_seconds": 0.0988738000014564,
+      "EV_seconds": 0.01865689999249298
+    },
+    {
+      "model": "V19_D3_HGB",
+      "horizon": 3,
+      "target_date": "2026-10-20",
+      "status": "prepared_not_issued",
+      "inference_seconds": 0.05977609999536071,
+      "EV_seconds": 0.01804219999758061
+    }
+  ],
+  "readiness": {
+    "2026-10-19": {
+      "horizon": 2,
+      "official_ever_acquired": true,
+      "latest_source_states": {
+        "general_public": {
+          "status": "unverified_all_zero",
+          "checked_at": "2026-10-17T03:34:55.770049+00:00",
+          "legacy_parser": null
+        },
+        "epsis": {
+          "status": "not_observed",
+          "checked_at": "2026-10-17T03:34:55.806599+00:00",
+          "legacy_parser": null
+        },
+        "kpx_api": {
+          "status": "official_acquired",
+          "checked_at": "2026-10-17T03:34:55.449371+00:00",
+          "legacy_parser": null
+        }
+      }
+    },
+    "2026-10-20": {
+      "horizon": 3,
+      "official_ever_acquired": false,
+      "latest_source_states": {
+        "kpx_api": {
+          "status": "normal_no_data",
+          "checked_at": "2026-10-17T03:34:48.670882+00:00",
+          "legacy_parser": null
+        },
+        "general_public": {
+          "status": "unverified_all_zero",
+          "checked_at": "2026-10-17T03:34:49.027359+00:00",
+          "legacy_parser": null
+        },
+        "epsis": {
+          "status": "not_observed",
+          "checked_at": "2026-10-17T03:34:49.088125+00:00",
+          "legacy_parser": null
+        }
+      }
+    }
+  },
+  "publication_requirement": "Every sampled source verified negative within 180s; all-zero homepage is unknown and blocks issuance",
+  "actual_23h_issuance_test": "WAITING_FOR_REAL_TIME_NOT_A_SIMULATED_SUCCESS",
+  "source_coverage": "Sampled official routes; not a proof of universal first release",
+  "observer_last_run": {
+    "started_at": "2026-10-17T12:39:36.818505+09:00",
+    "completed_at": "2026-10-17T12:39:50.495616+09:00",
+    "stages": [
+      {
+        "stage": "collection_and_publication",
+        "status": "success",
+        "seconds": 3.7913824999995995,
+        "result": {
+          "probes": 0,
+          "statuses": {}
+        }
+      },
+      {
+        "stage": "inference_and_EV_preparation",
+        "status": "success",
+        "seconds": 2.2369541999942157,
+        "result": null
+      },
+      {
+        "stage": "post_publication_evaluation",
+        "status": "success",
+        "seconds": 7.593495599998278,
+        "result": null
+      }
+    ],
+    "gap": null,
+    "issues_forecasts": false
+  },
+  "scheduler_last_snapshot": [
+    {
+      "TaskName": "GradprojectV11Local",
+      "Arguments": "-m v11.pipeline",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV12ForwardEV",
+      "Arguments": "-m v19.observer",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV13Audit",
+      "Arguments": "-m v13.service",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV14Candidates",
+      "Arguments": "-m v18.legacy v14",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV15Candidates",
+      "Arguments": "-m v18.legacy v17",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV16Audit",
+      "Arguments": "-m v16.monitor",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV19Publish",
+      "Arguments": "-m v19.publisher --warm",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    }
+  ],
+  "preservation": {
+    "at": "2026-10-17T03:41:28.889247+00:00",
+    "checked": 840,
+    "changed": 0,
+    "unchanged": true
+  }
+}

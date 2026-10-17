@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-17T03:41:41.645029+00:00",
+  "regression_tests": 124,
+  "regression_seconds": 114.61,
+  "regression_result": "OK",
+  "regression_log_sha256": "a71ff55a2b73efe49f1d90d636dc44c5fddfef9cbbd97e57af0623b6a890b9e3",
+  "preservation": {
+    "at": "2026-10-17T03:41:28.889247+00:00",
+    "checked": 840,
+    "changed": 0,
+    "unchanged": true
+  },
+  "new_actual_forecasts": 0,
+  "HTTP_health": "200 ok at 127.0.0.1:8509",
+  "simulations_are_not_actual_forecasts": true,
+  "model_promoted": false
+}
