@@ -111,15 +111,19 @@ def grid_evidence(payload,day):
 
 def slots(clock=None):
     """Past scheduled times are not successes without actual worker evidence."""
-    clock=pd.Timestamp.now(tz='Asia/Seoul') if clock is None else pd.Timestamp(clock)
-    origin=clock.normalize()+pd.Timedelta(hours=23);records=[]
+    clock=pd.Timestamp.now(tz='Asia/Seoul') if clock is None else pd.Timestamp(clock).tz_convert('Asia/Seoul')
+    registry=read(ROOT/'artifacts/v19/model_registry.json',{})
+    enabled=pd.Timestamp(registry.get('locked_at',clock)).tz_convert('Asia/Seoul').normalize()
+    records=[]
     runs=[read(p) for p in (ROOT/'artifacts/v19/observer_runs').glob('*.json')]
     attempts=[read(p) for p in (ROOT/'artifacts/v19/worker_attempts').glob('*_started.json')]
-    for label,offset,evidence in [('22:50 준비',-10,runs),('22:58 준비',-2,runs),('23:00 발급',0,attempts)]:
-        due=origin+pd.Timedelta(minutes=offset)
-        matches=[r for r in evidence if due-pd.Timedelta(seconds=45)<=pd.Timestamp(r['started_at'])<=due+pd.Timedelta(minutes=3)]
-        state='not_due' if clock<due else 'worker_observed_NOT_issuance_success' if matches else 'awaiting_grace' if clock<=due+pd.Timedelta(minutes=3) else 'missing_unverified_sleep_or_failure'
-        records.append(dict(slot=label,due=due.isoformat(),status=state,worker_observations=len(matches)))
+    for date in pd.date_range(min(enabled,clock.normalize()),clock.normalize(),freq='D'):
+        origin=date+pd.Timedelta(hours=23)
+        for label,offset,evidence in [('22:50 준비',-10,runs),('22:58 준비',-2,runs),('23:00 발급',0,attempts)]:
+            due=origin+pd.Timedelta(minutes=offset)
+            matches=[r for r in evidence if due-pd.Timedelta(seconds=45)<=pd.Timestamp(r['started_at'])<=due+pd.Timedelta(minutes=3)]
+            state='not_due' if clock<due else 'worker_observed_NOT_issuance_success' if matches else 'awaiting_grace' if clock<=due+pd.Timedelta(minutes=3) else 'missing_unverified_sleep_or_failure'
+            records.append(dict(slot=label,due=due.isoformat(),status=state,worker_observations=len(matches)))
     return records
 
 

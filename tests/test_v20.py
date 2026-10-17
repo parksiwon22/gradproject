@@ -54,14 +54,20 @@ class V20Tests(unittest.TestCase):
         self.assertTrue(r.zero_conflicts_with_already_acquired_other_source);self.assertTrue(r.zero_followed_by_numeric_receipt);self.assertEqual(r.zero_response_count,1)
     def test_slots_before23_are_not_due_not_success(self):
         self.assertTrue(all(r['status']=='not_due' for r in slots(pd.Timestamp('2026-10-17T13:00+09:00'))))
+        from unittest.mock import patch
+        with patch('v20.core.Path.glob',return_value=[]):later=slots(pd.Timestamp('2026-10-18T01:00+09:00'))
+        yesterday=[r for r in later if r['due'].startswith('2026-10-17')]
+        self.assertEqual(len(yesterday),3)
+        self.assertTrue(all(r['status']=='missing_unverified_sleep_or_failure' for r in yesterday))
     def test_preserved_files_unchanged(self):self.assertEqual(preserve()['changed'],0)
     def test_web_comparison_ev_routing_status_and_save(self):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file('app_v20.py').run(timeout=60);self.assertFalse(app.exception);self.assertFalse(app.error)
         next(b for b in app.button if b.label=='비교 시뮬레이션 로컬 저장').click().run(timeout=60);self.assertFalse(app.exception)
         nav=next(r for r in app.radio if r.label=='화면');nav.set_value('EV 충전 추천').run(timeout=60);self.assertFalse(app.exception);self.assertFalse(app.error)
-        next(w for w in app.date_input if w.label=='연결 시작일').set_value(pd.Timestamp('2026-10-20').date())
-        next(w for w in app.date_input if w.label=='출발일').set_value(pd.Timestamp('2026-10-21').date());app.run(timeout=60)
+        unavailable=pd.Timestamp.now(tz='Asia/Seoul').normalize()+pd.DateOffset(years=5)
+        next(w for w in app.date_input if w.label=='연결 시작일').set_value(unavailable.date())
+        next(w for w in app.date_input if w.label=='출발일').set_value((unavailable+pd.Timedelta(days=1)).date());app.run(timeout=60)
         self.assertFalse(app.exception);self.assertTrue(any('수신 대기' in w.value for w in app.warning))
         next(r for r in app.radio if r.label=='화면').set_value('연구 결과·시스템 상태').run(timeout=60);self.assertFalse(app.exception);self.assertFalse(app.error)
         next(b for b in app.button if b.label=='저장 자료 새로 고침').click().run(timeout=60);self.assertFalse(app.exception)

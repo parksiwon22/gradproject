@@ -1,0 +1,144 @@
+{
+  "at": "2026-10-17T03:57:57.491989+00:00",
+  "status": "OBSERVATION_PENDING_REAL23H",
+  "actual_record_files": 14,
+  "V19_new_actual_records": 0,
+  "V19_new_target_dates": [],
+  "independent_origins": 2,
+  "independent_primary_target_days": 2,
+  "paired_same_model_actual_target_count": 0,
+  "V19_on_time_eligible": 0,
+  "V19_late_records": 0,
+  "official_comparison_target_dates": [
+    "2026-10-17",
+    "2026-10-18",
+    "2026-10-19"
+  ],
+  "final_corrected_statistics_verified_days": 0,
+  "spike_target_days": 0,
+  "target_day_elapsed_days": 0,
+  "reference_conflicts": [],
+  "operating_model_replaced": false,
+  "readiness": [
+    {
+      "target_date": "2026-10-19",
+      "horizon": 2,
+      "eligible_now": false,
+      "reason": "official_price_already_observed",
+      "notes": "Current check is not a future23h issuance result"
+    },
+    {
+      "target_date": "2026-10-20",
+      "horizon": 3,
+      "eligible_now": false,
+      "reason": "publication_check_not_fresh_kpx_api",
+      "notes": "Current check is not a future23h issuance result"
+    }
+  ],
+  "scheduled_slots": [
+    {
+      "slot": "22:50 준비",
+      "due": "2026-10-17T22:50:00+09:00",
+      "status": "not_due",
+      "worker_observations": 0
+    },
+    {
+      "slot": "22:58 준비",
+      "due": "2026-10-17T22:58:00+09:00",
+      "status": "not_due",
+      "worker_observations": 0
+    },
+    {
+      "slot": "23:00 발급",
+      "due": "2026-10-17T23:00:00+09:00",
+      "status": "not_due",
+      "worker_observations": 0
+    }
+  ],
+  "observer": {
+    "started_at": "2026-10-17T12:57:29.289850+09:00",
+    "completed_at": "2026-10-17T12:57:46.885242+09:00",
+    "stages": [
+      {
+        "stage": "collection_and_publication",
+        "status": "success",
+        "seconds": 6.5531073000020115,
+        "result": {
+          "probes": 0,
+          "statuses": {}
+        }
+      },
+      {
+        "stage": "inference_and_EV_preparation",
+        "status": "success",
+        "seconds": 3.0795323999918764,
+        "result": null
+      },
+      {
+        "stage": "post_publication_evaluation",
+        "status": "success",
+        "seconds": 7.88169320000452,
+        "result": null
+      }
+    ],
+    "gap": null,
+    "issues_forecasts": false
+  },
+  "publisher": {
+    "at": "2026-10-17T03:50:27.798742+00:00",
+    "status": "skipped",
+    "reason": "Outside final60s prewarm or first5min after origin; no hours-long wait or backfill"
+  },
+  "new_V20_models": 0,
+  "architecture": "V19 unchanged issuer and collector reused; V20 read-only audit and EV routing",
+  "default_recommendation": "G2V",
+  "preservation": {
+    "at": "2026-10-17T03:58:51.263961+00:00",
+    "checked": 848,
+    "changed": 0
+  },
+  "scheduler_snapshot": [
+    {
+      "TaskName": "GradprojectV11Local",
+      "Arguments": "-m v11.pipeline",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV12ForwardEV",
+      "Arguments": "-m v20.service",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV13Audit",
+      "Arguments": "-m v13.service",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV14Candidates",
+      "Arguments": "-m v18.legacy v14",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV15Candidates",
+      "Arguments": "-m v18.legacy v17",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV16Audit",
+      "Arguments": "-m v16.monitor",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    },
+    {
+      "TaskName": "GradprojectV19Publish",
+      "Arguments": "-m v19.publisher --warm",
+      "LastTaskResult": 0,
+      "State": "Ready"
+    }
+  ]
+}

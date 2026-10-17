@@ -1,0 +1,552 @@
+{
+  "at": "2026-10-17T03:57:57.483758+00:00",
+  "rows": [
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-16T23:35:53.513140+00:00",
+      "response_sha256": "b712b0063fcb05056e17206dc5b5bd01dfb205d72b4f71ee00fb1329c82cf197",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-16T23:36:08.806530+00:00",
+      "response_sha256": "5b7756088ae544212344c31c59ebc594abb9b656613f73ed0d47af21e461b3eb",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-16T23:43:07.193930+00:00",
+      "response_sha256": "d9ad29e996859e21a52faa021ac409ef4fd055c3e25d25f25797301ba1adf76a",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-16T23:43:17.674906+00:00",
+      "response_sha256": "31abd47e5b8746d6bf53c63ff319ed7b4d95d502c36e5d0035123b4910e13978",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-16T23:43:26.284342+00:00",
+      "response_sha256": "d2115f643c5b597cc5fb1a6e9f232f42d0e22c5361c76c105dcaabce0b99d460",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-16T23:43:26.811579+00:00",
+      "response_sha256": "b2280fe0249c27e2f39a75be6a4988c0508a90666812c29f74ac8b6a798fdf79",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-17T00:10:14.284405+00:00",
+      "response_sha256": "d6949e5b2cb952dd973f11e88cb921a298f0f2d43c355c35f61564e62dd34bfd",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-17T00:10:17.893580+00:00",
+      "response_sha256": "99d60d891cc268f81d363f9864b5a133d0cc3d3bd0ca78141161f275a03035b2",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T00:10:22.332018+00:00",
+      "response_sha256": "267eb1745e6416c205b606bba2020fd977548c5657d66633defd95a126d20444",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T00:10:26.635844+00:00",
+      "response_sha256": "057d9b1b1eee329de0a9a6ce2e844af47f2d3f7647ca9369411ba3e9f1fe53f3",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-17T00:40:17.691052+00:00",
+      "response_sha256": "48779393c7596137a94c77717081f09704b9b7df3dad5d4c04b62a2a8902f1bf",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-17T00:40:22.618663+00:00",
+      "response_sha256": "462f53afb8923b951fe56ff79cc106035df17b41672e7b9d110ef0d46de56618",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T00:40:29.638821+00:00",
+      "response_sha256": "262056293c23b3b29b737a9589c7a4f714f612fce384cc9b6795a717caa60790",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T00:40:31.302802+00:00",
+      "response_sha256": "c10ece644bf2b62aa554b2778f4d196a7def521ace64123f94ee12f175d6a295",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-17T01:10:19.608037+00:00",
+      "response_sha256": "79c297650998f832e023469d6e3da07fcf130d2c040c855e9b2fd47866408521",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-17T01:10:26.106769+00:00",
+      "response_sha256": "a4c0312aaa79f47c2f0431d727726176520b219fb1fde77cce3e7abd08e7e2f7",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T01:10:29.688798+00:00",
+      "response_sha256": "bd0b6ad7866b60d8794ef97ae6341968dc4658a4423d227649e9072b015ffb67",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T01:10:30.318710+00:00",
+      "response_sha256": "9735e2c05b988bd8ea97455b916487e9114c2b88c0e945340474e54ac263c884",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-17T01:40:17.408876+00:00",
+      "response_sha256": "85214f55925855ffe9529f248c0ae2c144d40d74ca7491f90daaf9011d25c3f7",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-17T01:40:25.142624+00:00",
+      "response_sha256": "e8ea7a029de505a114d74bbb5c31582f5f6a0f4e058e13eec57a5f6ba95817ce",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T01:40:29.041327+00:00",
+      "response_sha256": "52f6c06ac14fda51476567733caf8a6b56e14d1f0d244992a2619aec78c2ef40",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T01:40:33.475418+00:00",
+      "response_sha256": "d3ab5f387f69650a729cf5031c8a8b393f55f84dd2e3f26dfc645c620d4ef916",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-17T02:10:11.336407+00:00",
+      "response_sha256": "ed4917dc90bcc0f660c065f99533853cb4247bfdca3e2f69732d219fb5a91af2",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-17T02:10:23.714006+00:00",
+      "response_sha256": "8fef809fc3bd27dd65b23d18e5576fe10cdede0d6e260bbad18be04838c84c25",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T02:10:26.396839+00:00",
+      "response_sha256": "dedf981460cad90c51dc08543cf476a5177385637115f19d191bdbecd258bd5f",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T02:10:30.293084+00:00",
+      "response_sha256": "382c94027ba6e6e1fd0f8dbe22b75591ca7256ec73d36ae37efb7054286551cd",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-17T02:40:08.241211+00:00",
+      "response_sha256": "011a88e5ea06ae0305a11e83db6b916a78d89375431a11e482dd874c6f4364bf",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-17T02:40:18.173518+00:00",
+      "response_sha256": "ef72f86a9b4341f9fe6bdae1a70cfd59f45d60c6b2dd2ef8221d07d4c3aa66a9",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T02:40:27.620977+00:00",
+      "response_sha256": "9df98bd2373129b08cd0d18d371b615db167e3618ad068e664cf6e9e1fd8c30d",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T02:40:38.178144+00:00",
+      "response_sha256": "e2de1b761d053a936b4d5a41054e928ee1895e054e77034a9ebfc2a6c1fe825d",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-17",
+      "checked_at": "2026-10-17T02:55:10.232953+00:00",
+      "response_sha256": "1ad208a3eb14765e7e8144c08bfd67fdba862d96e2ac9491f91ec1b6cd367c14",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-17T03:10:13.157424+00:00",
+      "response_sha256": "6636cdf64d12db6bbf01ff83755c6b462ad7b0cb100b089f589f4a790fe3a5c9",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T03:10:15.388600+00:00",
+      "response_sha256": "c7a891f9a318bcba8317165729d180e11684d9ce4aa06960438615c5ee1e5c1f",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T03:10:24.317563+00:00",
+      "response_sha256": "34a042a89e5f6a032757a17347874d60e3face523ebd6aa27306eb92056fbf5a",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T03:34:49.027359+00:00",
+      "response_sha256": "031d4b1ed214e5f2cb0b662fcf3dfda7d1ab6a1810ce594da4645b281d96b9e4",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T03:34:55.770049+00:00",
+      "response_sha256": "bbc22b0a86f92f15d939cb089b0b0073ff9a9e9a86752f412f87d05ab68b0967",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-17T03:47:47.577821+00:00",
+      "response_sha256": "22cd090f4dd14f408ac939e7cbb7cd1e1202d11780143c739a643caaca0f154e",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-17T03:47:58.703841+00:00",
+      "response_sha256": "07c6a54e7ab0fd9750cb77af1ce039c447c96500193ad10288613fdd6132ef10",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-18",
+      "checked_at": "2026-10-17T03:48:07.660026+00:00",
+      "response_sha256": "ace966fe3e0d7394656075aa35601188c458f53de430e2759f19933e7b2d0632",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    }
+  ],
+  "interpretation": "All-zero numeric column independently confirmed; publication meaning remains unverified"
+}

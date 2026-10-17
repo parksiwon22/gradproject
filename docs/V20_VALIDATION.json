@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-17T03:58:51.544366+00:00",
+  "tests": 136,
+  "seconds": 117.087,
+  "result": "OK",
+  "log_sha256": "16289f1d5bb28714031bc55b8e7912828ff916682de540a232446f2f3195a6b1",
+  "focused_tests": 12,
+  "focused_log_sha256": "2300dc5746ab34fe35a91da986bb72ef5a6580a37cf79471fb8c2de5896ef44a",
+  "preservation": {
+    "at": "2026-10-17T03:58:51.263961+00:00",
+    "checked": 848,
+    "changed": 0
+  },
+  "new_actual_forecasts": 0,
+  "actual23h_issuance": "Pending actual clock; not simulated success",
+  "operating_model_replaced": false
+}
