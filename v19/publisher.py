@@ -36,8 +36,76 @@ def check_stage(stage,registry,bound):
         if pd.Timestamp(r['first_seen'])>cutoff or pd.Timestamp(r['timestamp'])>bound:return False,'future_source_in_packet'
     return True,'prepared_before_origin'
 
-def publish_once():
-    started=pd.Timestamp.now(tz='Asia/Seoul');bound=origin(started);run=dict(started_at=started.isoformat(),reference_origin=bound.isoformat(),mode='LIVE_LOCAL_PUBLISH_CHECK',records=[],network_calls=0,model_inference_in_hot_path=False,EV_optimization_in_hot_path=False);tick=time.perf_counter()
+def retry_refresh_due(clock,bound):
+    """Only the configured post-origin fallback window refreshes the public ledger."""
+    seconds=(pd.Timestamp(clock)-pd.Timestamp(bound)).total_seconds()
+    return 90<=seconds<=180
+
+def refresh_gate(refresh,day):
+    """A 23:02 retry may only use a completed, positive eligibility audit."""
+    if refresh is None:return True,None
+    if refresh.get('status')!='probe_completed':return False,'publication_refresh_not_completed'
+    decision=next((d for d in refresh.get('decisions',[]) if d.get('target_date')==day),None)
+    if not decision:return False,'publication_refresh_decision_missing'
+    if not decision.get('eligible'):return False,decision.get('reason') or 'publication_refresh_ineligible'
+    return True,None
+
+def refresh_publication(bound,probe_fn=None,ledger_fn=None,clock_fn=None):
+    """Refresh the official publication evidence immediately before the 23:02 retry.
+
+    The existing rule still requires fresh, unambiguous negative checks from every
+    land-market source. All-zero responses, API errors, and expired checks remain
+    ineligible. Raw responses are stored by the existing V18 collector as hashes.
+    """
+    from v18.publication import probe as default_probe
+    from v19.observer import ledger as default_ledger
+    probe_fn=probe_fn or default_probe;ledger_fn=ledger_fn or default_ledger
+    clock_fn=clock_fn or (lambda:pd.Timestamp.now(tz='Asia/Seoul'))
+    started=clock_fn();days=[(pd.Timestamp(bound).normalize()+pd.Timedelta(days=h)).strftime('%Y-%m-%d') for h in (2,3)]
+    record=dict(started_at=pd.Timestamp(started).isoformat(),reference_origin=pd.Timestamp(bound).isoformat(),
+                targets=days,mode='LIVE_PUBLICATION_REFRESH_BEFORE_RETRY',freshness_limit_seconds=180,
+                checks=[],decisions=[],probe_budget_seconds=45)
+    try:
+        # Probe all land-market routes for both horizons so no stale non-KPX
+        # sample can accidentally satisfy the unchanged all-source gate.
+        rows=probe_fn(days=days,force=True,budget_seconds=45)
+        refreshed=ledger_fn();decided_at=pd.Timestamp(clock_fn())
+        record['probe_count']=len(rows);record['network_calls']=sum(r.get('status')!='deferred_budget' for r in rows)
+        record['checks']=[dict(target_date=r.get('target_date'),source=r.get('source'),market=r.get('market'),
+                               started_at=r.get('started_at'),checked_at=r.get('checked_at'),status=r.get('status'),
+                               response_summary=r.get('response_summary'),response_sha256=r.get('sha256'),
+                               response_error=r.get('response_error'),reason=r.get('reason')) for r in rows]
+        for day in days:
+            entry=refreshed.get('days',{}).get(day,{})
+            latest=entry.get('latest',{})
+            freshness=[]
+            for source in ('kpx_api','general_public','epsis'):
+                sample=latest.get(source)
+                if not sample:
+                    freshness.append(dict(source=source,status='missing',age_seconds=None,fresh=False));continue
+                age=(decided_at-pd.Timestamp(sample['checked_at'])).total_seconds()
+                freshness.append(dict(source=source,status=sample.get('status'),checked_at=sample.get('checked_at'),
+                                      age_seconds=age,fresh=0<=age<=180,legacy_parser=sample.get('legacy_parser',False),
+                                      response_sha256=sample.get('sha256')))
+            eligible,reason=check_ledger(refreshed,day,decided_at)
+            record['decisions'].append(dict(target_date=day,decided_at=decided_at.isoformat(),
+                                            official_price_previously_observed=bool(entry.get('ever_positive')),
+                                            eligible=eligible,reason=reason,freshness=freshness))
+    except Exception as exc:
+        record.update(probe_count=0,network_calls=0,refresh_error_type=type(exc).__name__,refresh_error='Details suppressed')
+        decided_at=pd.Timestamp(clock_fn())
+        for day in days:record['decisions'].append(dict(target_date=day,decided_at=decided_at.isoformat(),eligible=False,reason='publication_refresh_failed'))
+    record['completed_at']=pd.Timestamp(clock_fn()).isoformat()
+    record['status']='refresh_failed' if record.get('refresh_error_type') else 'probe_completed' if record.get('network_calls',0) else 'no_network_probes_completed'
+    path=HOME/'preflight_checks'/(pd.Timestamp(record['completed_at']).tz_convert('UTC').strftime('%Y%m%dT%H%M%S%f')+'.json')
+    from v20.core import write_audit_once
+    write_audit_once(path,record);record['record_file']=str(path.relative_to(ROOT));record['record_sha256']=sha(path)
+    return record
+
+def publish_once(publication_refresh=None):
+    started=pd.Timestamp.now(tz='Asia/Seoul');bound=origin(started);run=dict(started_at=started.isoformat(),reference_origin=bound.isoformat(),mode='LIVE_LOCAL_PUBLISH_CHECK',records=[],network_calls=(publication_refresh or {}).get('network_calls',0),model_inference_in_hot_path=False,EV_optimization_in_hot_path=False)
+    if publication_refresh is not None:run['publication_refresh']=publication_refresh
+    tick=time.perf_counter()
     registry=read(HOME/'model_registry.json');pointer=read(HOME/'ready'/(bound.strftime('%Y%m%dT%H%M')+'.json'))
     if not registry or not pointer:run['reason']='No packet prepared before this actual origin; no backfill'
     else:
@@ -52,6 +120,8 @@ def publish_once():
                 if dest.exists():entry.update(status='existing_immutable_record',file=dest.name)
                 else:
                     clock=pd.Timestamp.now(tz='Asia/Seoul');eligible,why=check_ledger(read(HOME/'publication_ledger.json',{}),day,clock)
+                    refreshed,refresh_reason=refresh_gate(publication_refresh,day)
+                    if not refreshed:eligible=False;why=refresh_reason
                     if local_known(day):eligible=False;why='official_price_already_in_local_store'
                     if origin(clock)!=bound:eligible=False;why='origin_changed'
                     meta=registry['entries'][name]
@@ -73,7 +143,10 @@ def run(warm=False):
         with lock('publisher'):
             if warm:
                 clock=pd.Timestamp.now(tz='Asia/Seoul');previous=origin(clock)
-                if (clock-previous).total_seconds()<=300:return publish_once()
+                elapsed=(clock-previous).total_seconds()
+                if elapsed<=300:
+                    refreshed=refresh_publication(previous) if retry_refresh_due(clock,previous) else None
+                    return publish_once(publication_refresh=refreshed)
                 bound=next_origin(clock);wait=(bound-clock).total_seconds()
                 if wait>60:
                     r=dict(at=now(),status='skipped',reason='Outside final60s prewarm or first5min after origin; no hours-long wait or backfill');write_once(HOME/'worker_attempts'/(attempt+'_skipped.json'),r);write(HOME/'publish_status.json',r);return r

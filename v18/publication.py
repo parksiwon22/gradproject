@@ -137,10 +137,19 @@ def probe(days=None,force=False,budget_seconds=240):
                     if frame is not None and set(frame.timestamp.dt.strftime('%Y-%m-%d'))!={day}:raise ValueError('EPSIS target date mismatch')
                 digest=hashlib.sha256(payload).hexdigest();raw=HOME/'publication/raw'/(digest+'.raw');raw.parent.mkdir(parents=True,exist_ok=True)
                 if not raw.exists():raw.write_bytes(payload)
-                entry.update(status=state,sha256=digest,source_url=url)
+                summary={'payload_bytes':len(payload),'parsed_status':state}
+                if source=='kpx_api':
+                    response=data.get('response',{});body=response.get('body',{});items=body.get('items',{})
+                    items=items.get('item',[]) if isinstance(items,dict) else items
+                    summary.update(api_result_code=str(response.get('header',{}).get('resultCode','missing')),
+                                   api_total_count=body.get('totalCount'),api_item_count=len(items) if isinstance(items,list) else None)
+                entry.update(status=state,sha256=digest,source_url=url,response_summary=summary)
                 if state==POSITIVE:
                     entry['prices']=[dict(timestamp=t.isoformat(),smp=float(p)) for t,p in zip(frame.timestamp,frame.smp)]
-            except Exception as exc:entry.update(status='failed',reason=type(exc).__name__)
+            except Exception as exc:
+                safe_detail=str(exc) if source=='kpx_api' and isinstance(exc,RuntimeError) else ''
+                if not re.fullmatch(r'API HTTP \d{3}|API transport failure: [A-Za-z0-9_]+|API returned non-JSON response; content suppressed|Dedicated key unavailable',safe_detail):safe_detail=''
+                entry.update(status='failed',reason=type(exc).__name__,response_error=safe_detail or 'Details suppressed')
             entry['checked_at']=now();events.append(entry)
     if events:write_once(HOME/'publication/events'/(pd.Timestamp.now(tz='UTC').strftime('%Y%m%dT%H%M%S%f')+'.json'),events)
     summarize();print('V18 source probes:',[(r['target_date'],r['source'],r['market'],r['status']) for r in events]);return events

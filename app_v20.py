@@ -10,7 +10,7 @@ from v17.forward import pack
 from v18.evaluation import reference,compare_ev
 from v19.evaluation import inventory
 from v19.common import HOME,ROOT,read,write_once,sha,csv,now
-from v20.core import HOME as OUTPUT,select_auto
+from v20.core import HOME as OUTPUT,select_auto,write_audit_once
 OUTPUT.mkdir(parents=True,exist_ok=True)
 
 st.set_page_config(page_title='전력예보 V20 · D-3/D-2 검증',page_icon='⚡',layout='wide')
@@ -20,7 +20,7 @@ page=st.sidebar.radio('화면',['SMP 예측·공식가격 비교','EV 충전 추
 
 @st.cache_data(ttl=20)
 def load():return inventory(),reference()[0].rename(columns={'smp':'price'})
-items,official=load();status=read(OUTPUT/'status.json',{});a,b,c=st.columns(3);a.metric('독립 기준시각',status.get('independent_origins',0));b.metric('독립 기본 대상일',status.get('independent_primary_target_days',0));c.metric('저장 시스템 정시 적격 기록',status.get('V19_on_time_eligible',0))
+items,official=load();status=read(OUTPUT/'status.json',{});publisher_status=read(HOME/'publish_status.json',{});preparation_status=read(HOME/'preparation_status.json',{});a,b,c=st.columns(3);a.metric('독립 기준시각',status.get('independent_origins',0));b.metric('독립 기본 대상일',status.get('independent_primary_target_days',0));c.metric('저장 시스템 정시 적격 기록',status.get('V19_on_time_eligible',0))
 if st.sidebar.button('저장 자료 새로 고침'):load.clear();st.rerun()
 
 def line(frame,cols,title,unit):
@@ -66,7 +66,7 @@ def show_plans(sources,ev,start,end):
             f=pd.concat(data);chart=alt.Chart(f).mark_line(point=True).encode(x=alt.X('timestamp:T',title='KST'),y=alt.Y(value+':Q',title=unit),color='계열:N',tooltip=['timestamp:T','계열:N',value+':Q']).properties(title=title,height=265);st.altair_chart(chart,width='stretch')
         st.warning('기본 권장 G2V 유지. 화면에서 다시 계산한 계획은 현재 조건의 시뮬레이션이며 원래 사전 계획을 수정하지 않습니다. 공식 제공가격과 최종 정정통계도 구분합니다.')
         if st.button('비교 시뮬레이션 로컬 저장'):
-            write_once(OUTPUT/'interactive_decisions'/(pd.Timestamp.now(tz='UTC').strftime('%Y%m%dT%H%M%S%f')+'.json'),dict(at=now(),mode='RETROSPECTIVE_INTERACTIVE_NOT_NEW_FORWARD',EV=ev.__dict__,start=start.isoformat(),end=end.isoformat(),plans=saved,costs=costs));st.success('로컬 시뮬레이션으로 저장했습니다. 새 사전 예측 수에는 포함하지 않습니다.')
+            write_audit_once(OUTPUT/'interactive_decisions'/(pd.Timestamp.now(tz='UTC').strftime('%Y%m%dT%H%M%S%f')+'.json'),dict(at=now(),mode='RETROSPECTIVE_INTERACTIVE_NOT_NEW_FORWARD',EV=ev.__dict__,start=start.isoformat(),end=end.isoformat(),plans=saved,costs=costs));st.success('로컬 시뮬레이션으로 저장했습니다. 새 사전 예측 수에는 포함하지 않습니다.')
 
 def select_forecast(day,horizon):
     choices=[x for x in items if day in set(x[2].timestamp.dt.strftime('%Y-%m-%d')) and (pd.Timestamp(day).date()-pd.Timestamp(x[3]['reference_origin']).date()).days==horizon]
@@ -107,6 +107,7 @@ elif page=='EV 충전 추천':
         if selected['records']:st.dataframe(pd.DataFrame(selected['records']),hide_index=True)
         st.caption('저장된 연구 예측을 활용한 충전 시뮬레이션이며 운영 모델 교체가 아닙니다. G2V 기본 권장.')
         show_plans({selected['label']:selected['prices']},ev,start,end)
+
 else:
     st.subheader('실제 전향 검증 · 과거 재생과 구분')
     a,b,c=st.columns(3);a.metric('공식 제공가격 비교 대상일',len(status.get('official_comparison_target_dates',[])));b.metric('대상일 경과 완료',status.get('target_day_elapsed_days',0));c.metric('급등 발생 대상일',status.get('spike_target_days',0))
@@ -122,10 +123,25 @@ else:
         f=f[f.target_date.isin(readiness_days|set(recent_days))]
         st.dataframe(f.rename(columns={'target_date':'대상일','source':'공식 경로','market':'시장','latest_state':'최근 응답 상태','latest_check':'실제 수신시각','first_normal_receipt':'최초 정상가격 수신','last_strict_normal_nonobservation':'마지막 정상 미관측','zero_response_count':'0원 응답 수','zero_conflicts_with_already_acquired_other_source':'다른 경로 기확보와 불일치'}),hide_index=True)
     st.subheader('정시 준비·발급과 최근 수집 상태')
+    prep_records=preparation_status.get('records',[]);prep_ok=sum(r.get('status')=='prepared_not_issued' for r in prep_records);prep_failed=sum(r.get('status')=='failed' for r in prep_records)
+    publish_records=publisher_status.get('records',[]);publish_created=sum(r.get('status')=='created' for r in publish_records);publish_skipped=sum(r.get('status')=='skipped' for r in publish_records)
+    x,y,z=st.columns(3);x.metric('최근 준비본',f"준비 {prep_ok} · 실패 {prep_failed}");y.metric('최근 발급 확인',f"발급 {publish_created} · 보류 {publish_skipped}");z.metric('발급 확인 완료시각',publisher_status.get('completed_at','미실행'))
+    if preparation_status:
+        st.caption(f"준비 상태: {preparation_status.get('mode','미확보')} · 기준시각 {preparation_status.get('reference_origin','미확보')} · 준비본과 실제 발급 예측은 별도입니다.")
+    if publisher_status:
+        st.caption(f"발급 작업: {publisher_status.get('mode','미확보')} · 기준시각 {publisher_status.get('reference_origin','미확보')} · 실제 생성 파일 {publish_created} · 네트워크 조회 {publisher_status.get('network_calls',0)}회")
+        if publisher_status.get('publication_refresh'):
+            refresh=publisher_status['publication_refresh'];st.write('발급 직전 공개상태 재확인:',refresh.get('status'),refresh.get('record_file','기록 경로 미확보'))
+            decisions=refresh.get('decisions',[])
+            if decisions:st.dataframe(pd.DataFrame([dict(대상일=d.get('target_date'),결정시각=d.get('decided_at'),발급적격=d.get('eligible'),판정근거=d.get('reason')) for d in decisions]),hide_index=True)
+            checks=refresh.get('checks',[])
+            if checks:st.dataframe(pd.DataFrame([dict(대상일=r.get('target_date'),경로=r.get('source'),시장=r.get('market'),요청시작=r.get('started_at'),응답수신=r.get('checked_at'),응답=r.get('status'),요약=r.get('response_summary'),오류=r.get('response_error')) for r in checks]),hide_index=True)
+        elif publisher_status.get('mode')=='LIVE_LOCAL_PUBLISH_CHECK':
+            st.info('이번 발급 확인은 새 공개상태 재조회 없이 기존 표본만 사용했습니다. 다음 23:02 경로에서 KPX와 필수 육지 경로를 재조회하도록 설정합니다.')
     if status.get('scheduled_slots'):
         f=pd.DataFrame(status['scheduled_slots']);f['status']=f.status.replace({'not_due':'실제 시각 도래 전','worker_observed_NOT_issuance_success':'실행 관측 · 발급 성공과 별도','awaiting_grace':'실행 확인 대기','missing_unverified_sleep_or_failure':'누락 · 종료/절전/오류 원인 미확정'});st.dataframe(f.rename(columns={'slot':'단계','due':'예정시각','status':'확인 상태','worker_observations':'실행 관측 수'}),hide_index=True)
     observer=status.get('observer',{});st.caption('최근 수집 시작: '+str(observer.get('started_at','미확보'))+' / 완료: '+str(observer.get('completed_at','미확보')))
     if observer.get('stages'):st.dataframe(pd.DataFrame(observer['stages']).rename(columns={'stage':'단계','status':'결과','seconds':'소요시간(초)','reason':'실패 사유'}),hide_index=True)
     st.warning('23시 실제 발급 여부는 원기록으로 확인하며 실행 관측과 성공을 구분합니다. 노트북 종료·절전에서는 실행을 보장하지 않습니다. 충분한 신규 독립 전향 표본이 없으므로 모델 우위를 확정하지 않습니다. G2V 기본 권장, V2G는 가상 정산 연구입니다.')
     with st.expander('준비본·발급 결과·시스템 상세 기록'):
-        st.write('준비본은 정식 발급 예측이 아닙니다.');st.json(read(HOME/'preparation_status.json',{}));st.json(read(HOME/'publish_status.json',{}));st.json(status)
+        st.write('준비본은 정식 발급 예측이 아닙니다.');st.json(preparation_status);st.json(publisher_status);st.json(status)
