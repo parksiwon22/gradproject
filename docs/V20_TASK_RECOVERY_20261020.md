@@ -11,14 +11,16 @@
 
 ## 변경 및 백업
 
-실제 XML을 먼저 백업한 뒤 기존 두 작업의 액션만 `python.exe -u -m v20.task_runner` 경유로 바꿨다. 준비된 실제 XML 백업은 로컬 ignored 경로 `artifacts/v20/scheduler/GradprojectV12ForwardEV_before_20261020T223027142.xml`, `artifacts/v20/scheduler/GradprojectV19Publish_before_20261020T223032753.xml`에 있다. 작업 이름/개수와 트리거는 유지했다. 변경 후 다시 조회해 두 작업 모두 Python 경로, 인수, 저장소 시작 폴더, 트리거 3개, `WakeToRun=True`, `StartWhenAvailable=True`, idle 종료 시 중단 안 함을 확인했다. 기존 전역 AC/DC 절전 설정은 바꾸지 않았다.
+실제 XML을 수정 전에 백업했다. 처음 적용 전 백업은 로컬 ignored 경로 `artifacts/v20/scheduler/GradprojectV12ForwardEV_before_20261020T223027142.xml`, `artifacts/v20/scheduler/GradprojectV19Publish_before_20261020T223032753.xml`이고, pythonw 모드로 전환 직전 백업은 `GradprojectV12ForwardEV_before_20261020T225253763.xml`, `GradprojectV19Publish_before_20261020T225255459.xml`이다. 작업 이름/개수와 트리거는 유지했다. 변경 후 두 작업 모두 Python 경로, 인수, 저장소 시작 폴더, 3개 trigger, `WakeToRun=True`, `StartWhenAvailable=True`, idle 종료 시 중단 안 함을 확인했다. 기존 전역 AC/DC 절전 설정은 바꾸지 않았다.
 
 새 `v20.task_runner`는 모듈 실행 시작/완료 시각, Python 경로, 작업 폴더, 종료코드, stderr/stdout, 예외를 `artifacts/v20/task_runs`에 별도 불변 JSON 두 개로 기록한다. 환경변수 이름이 KEY/TOKEN/SECRET/PASSWORD/CREDENTIAL인 값과 URL 인증 파라미터는 로그에서 가린다. 모듈 import 실패와 모듈 실행 실패를 구분한다. publisher 내부의 준비본 없음, 공개상태 보류, 공식가격 기확보 등의 상세 사유는 publisher 자체 `publish_runs`와 함께 확인한다.
 
 22:39:39의 첫 스케줄 실행은 시작 JSON을 남겼지만 완료 JSON 없이 종료했고 LastTaskResult는 `0xC000013A`였다. 같은 실행을 포그라운드에서 재현했을 때 V20 service 완료 로그를 쓰는 V19 공용 writer가 Windows `os.link`에서 `PermissionError: [WinError 5] Access is denied`를 냈다. `v20.task_runner`가 실행 중인 프로세스에서만 V12/V18/V19 공용 `write_once` 함수를 create-only rename fallback으로 바꾸도록 했다. 기존 버전 소스와 불변 기록 writer는 수정하지 않았다.
 
+이후 콘솔 모드 `python.exe`를 사용하는 Task Scheduler 실행도 22:50:02에 시작됐지만 완료 기록 없이 `0xC000013A`로 끝났다. 파일 로그가 stdout에 의존하지 않도록 되어 있어 기존에 성공했던 비콘솔 Python 모드 `pythonw.exe`로 두 작업을 다시 설정했다. 22:53:02에 기존 collector를 Task Scheduler에서 수동 시작한 비교 실행은 22:53:44에 종료됐고 Task Scheduler 결과 0, wrapper 시작/완료 파일, observer 및 service 로그를 모두 남겼다. 현재 확인으로는 `python.exe` 콘솔 모드와 종료가 연관되며, Operational 이벤트가 비활성화되어 OS가 해당 프로세스를 중단한 세부 이유는 여전히 미확정이다. `pythonw.exe`+파일 로그 조합은 Task Scheduler 경로에서 한 번 성공했다. 이 수동 시험은 22:50 정시 예약 실행이 아니다.
+
 Task Scheduler Operational 로그 활성화는 Windows가 Access denied를 반환해 완료되지 않았다. 따라서 Python이 시작하기 전의 실패는 아직 worker 로그에 남지 않으며, 그 구간은 관리자 세션에서 이벤트 로그를 켜야 확인할 수 있다. 배터리 wake timer는 배터리 소모 때문에 그대로 두었다. 절전 중 실행이 필요하면 AC 전원 연결을 권장한다.
 
 ## 오늘의 발급 관측
 
-22:42:09에 실행한 명시적 수동 smoke run은 22:42:51에 종료했다. KPX API 정상 무자료 2건, 일반 공개 0원 미검증 2건, EPSIS 미관측 4건을 새로 기록했고 V19 observer, V20 감사, D-2(22일)/D-3(23일) 준비, 사후평가가 모두 성공했다. 준비본은 `UNISSUED_PREPARATION_NOT_LIVE_FORECAST`이며 실제 AI 발급 수는 0이다. 복구 후 실제 다음 트리거는 10월 20일 22:50, 22:58, 22:59:30, 23:00, 23:02다. 기준은 10월 22일 D-2, 10월 23일 D-3이며, 기존 공식가격 공개 gate와 모델/입력 시각 gate를 유지한다. 준비 워커 시작은 예측 발급 성공과 별도로 평가한다.
+22:42:09 수동 smoke run은 22:42:51에 종료했다. KPX API 정상 무자료 2건, 일반 공개 0원 미검증 2건, EPSIS 미관측 4건을 기록했고 V19 observer, V20 감사, D-2(22일)/D-3(23일) 준비, 사후평가가 성공했다. 22:50 트리거는 `python.exe` 액션이었을 때 실패했다. 이후 `pythonw.exe`로 전환한 22:53 Task Scheduler 수동 비교 실행은 성공했으며, 22:58의 실제 준비 트리거와 22:59:30/23:00/23:02 발급 시도는 별도 관측을 기다린다. 준비본은 `UNISSUED_PREPARATION_NOT_LIVE_FORECAST`이며 실제 AI 발급 수는 여전히 0이다. 기준은 10월 22일 D-2, 10월 23일 D-3이고 기존 공식가격 공개 gate와 모델/입력 시각 gate를 유지한다.

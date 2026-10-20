@@ -4,7 +4,9 @@ $v20Root=Split-Path $PSScriptRoot -Parent
 if ($Install) {
  $v20Folder=Join-Path $v20Root 'artifacts\v20\scheduler'
  New-Item -ItemType Directory -Path $v20Folder -Force | Out-Null
- $v20Python=Join-Path (Split-Path $v20Root -Parent) '.venv\Scripts\python.exe'
+ # Keep the previously working Task Scheduler process mode. The wrapper
+ # persists stdout/stderr, so it no longer depends on a visible console.
+ $v20Python=Join-Path (Split-Path $v20Root -Parent) '.venv\Scripts\pythonw.exe'
  $specs=@(
   @{Name='GradprojectV12ForwardEV';Expected=@('-m v19.observer','-m v20.service');Arguments='-u -m v20.task_runner --module v20.service'},
   @{Name='GradprojectV19Publish';Expected=@('-m v19.publisher --warm');Arguments='-u -m v20.task_runner --module v19.publisher -- --warm'}
@@ -36,4 +38,4 @@ if ($Install) {
  }
  # Global AC/DC sleep timers are intentionally left unchanged.
  Write-Output ('Updated the two existing tasks only. XML backups are in artifacts/v20/scheduler. WakeToRun is enabled; Operational log enabled='+$v20EventsEnabled+'; global AC/DC sleep policy was not changed.')
-} else {Write-Output 'Use -Install after reviewing existing task XML: backs up and updates only the existing observer and single publisher. Uses python.exe with redacted start/end logs; enables WakeToRun and Operational history; no extra triggers or tasks.'}
+} else {Write-Output 'Use -Install after reviewing existing task XML: backs up and updates only the existing observer and single publisher. Uses pythonw.exe with redacted file start/end logs; enables WakeToRun and Operational history; no extra triggers or tasks.'}
