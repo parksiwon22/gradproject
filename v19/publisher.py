@@ -105,6 +105,13 @@ def refresh_publication(bound,probe_fn=None,ledger_fn=None,clock_fn=None):
 def publish_once(publication_refresh=None):
     started=pd.Timestamp.now(tz='Asia/Seoul');bound=origin(started);run=dict(started_at=started.isoformat(),reference_origin=bound.isoformat(),mode='LIVE_LOCAL_PUBLISH_CHECK',records=[],network_calls=(publication_refresh or {}).get('network_calls',0),model_inference_in_hot_path=False,EV_optimization_in_hot_path=False)
     if publication_refresh is not None:run['publication_refresh']=publication_refresh
+    # Research forecasts are preserved independently before the official gate.
+    # A research error is recorded but cannot change the existing issue decision.
+    try:
+        from v20.research import generate as generate_research
+        run['research_forecast']=generate_research(bound, clock=started)
+    except Exception as exc:
+        run['research_forecast']={'status':'failed','reason':type(exc).__name__}
     tick=time.perf_counter()
     registry=read(HOME/'model_registry.json');pointer=read(HOME/'ready'/(bound.strftime('%Y%m%dT%H%M')+'.json'))
     if not registry or not pointer:run['reason']='No packet prepared before this actual origin; no backfill'

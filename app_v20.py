@@ -16,7 +16,7 @@ OUTPUT.mkdir(parents=True,exist_ok=True)
 st.set_page_config(page_title='전력예보 V20 · D-3/D-2 검증',page_icon='⚡',layout='wide')
 st.title('⚡ 전력예보 V20 · 예측과 충전비용 검증')
 st.caption('육지 SMP · KST. 저장된 AI와 이후 수신한 공식가격을 비교합니다. 가상 SMP 정산이며 실제 충전요금·실증 V2G 수익이 아닙니다.')
-page=st.sidebar.radio('화면',['SMP 예측·공식가격 비교','EV 충전 추천','연구 결과·시스템 상태'])
+page=st.sidebar.radio('화면',['SMP 예측·공식가격 비교','EV 충전 추천','연구 예측 정확도','연구 결과·시스템 상태'])
 
 @st.cache_data(ttl=20)
 def load():return inventory(),reference()[0].rename(columns={'smp':'price'})
@@ -25,6 +25,11 @@ if st.sidebar.button('저장 자료 새로 고침'):load.clear();st.rerun()
 
 def line(frame,cols,title,unit):
     f=frame.melt('timestamp',value_vars=cols,var_name='항목',value_name='값');chart=alt.Chart(f).mark_line(point=True).encode(x=alt.X('timestamp:T',title='한국시간'),y=alt.Y('값:Q',title=unit),color='항목:N',tooltip=['timestamp:T','항목:N',alt.Tooltip('값:Q',format='.2f')]).properties(title=title,height=270);st.altair_chart(chart,width='stretch')
+
+def research_csv(path):
+    if not path.exists() or path.stat().st_size<=2:return None
+    try:return csv(path)
+    except pd.errors.EmptyDataError:return None
 
 def conditions(prefix,day,overnight=False):
     a,b,c,d=st.columns(4);cap=a.number_input('배터리 용량(kWh)',1.,300.,60.,key=prefix+'cap');initial=b.number_input('초기 SOC(%)',0.,100.,30.,key=prefix+'initial');target=c.number_input('목표 SOC(%)',0.,100.,80.,key=prefix+'target');power=d.number_input('충전전력(kW)',.1,350.,7.,key=prefix+'power')
@@ -107,7 +112,36 @@ elif page=='EV 충전 추천':
         if selected['records']:st.dataframe(pd.DataFrame(selected['records']),hide_index=True)
         st.caption('저장된 연구 예측을 활용한 충전 시뮬레이션이며 운영 모델 교체가 아닙니다. G2V 기본 권장.')
         show_plans({selected['label']:selected['prices']},ev,start,end)
-
+elif page=='연구 예측 정확도':
+    research=OUTPUT/'research'
+    st.subheader('실제 운영 연구 예측')
+    st.caption('정식 발급 gate와 독립적으로 저장한 예측만 집계합니다. 실제 공식 SMP 24시간 확보 전에는 점수 계산을 보류합니다.')
+    op=research_csv(research/'operational_metrics.csv')
+    op=op if op is not None else pd.DataFrame()
+    if len(op):
+        st.dataframe(op.rename(columns={'model':'모델','horizon_days':'예측기간(D+)','target_date':'대상일','status':'상태','MAE':'MAE(원/kWh)','RMSE':'RMSE(원/kWh)','G2V_regret':'G2V regret(원)','V2G_regret':'가상 V2G regret(원)','official_hours':'실제 SMP 확보시간'}),hide_index=True)
+    else:st.info('아직 연구 예측 기록이 없습니다. 다음 실제 발급 시각에 gate 결과와 별도로 생성됩니다.')
+    actual_hourly=research_csv(research/'operational_hourly_summary.csv')
+    if actual_hourly is not None and len(actual_hourly):
+        c=alt.Chart(actual_hourly).mark_line(point=True).encode(x=alt.X('hour:O',title='대상일 시간(KST)'),y=alt.Y('MAE:Q',title='시간대별 MAE(원/kWh)'),color='model:N',detail='horizon_days:N',tooltip=['model','horizon_days','hour','samples','MAE','bias']).properties(title='실제 운영 연구 예측 · 시간대별 오차',height=280)
+        st.altair_chart(c,width='stretch')
+    else:st.caption('실제 운영 표본이 모이면 모델·D+기간별 시간대 오차 그래프가 표시됩니다.')
+    st.subheader('과거 시점 재현 백테스트')
+    bt=research_csv(research/'backtest_summary.csv')
+    if bt is not None and len(bt):
+        st.dataframe(bt.rename(columns={'model':'모델','horizon_days':'예측기간(D+)','days':'평가일수','MAE':'일평균 MAE(원/kWh)','RMSE':'일평균 RMSE(원/kWh)','G2V_regret':'G2V regret 평균(원)','V2G_regret':'가상 V2G regret 평균(원)'}),hide_index=True)
+        plot=alt.Chart(bt).mark_bar().encode(x=alt.X('horizon_days:O',title='예측기간(D+)'),y=alt.Y('MAE:Q',title='일평균 MAE(원/kWh)'),color='model:N',xOffset='model:N',tooltip=['model','horizon_days','days','MAE','RMSE','G2V_regret','V2G_regret']).properties(title='과거 재현 · 모델 및 예측기간별 가격 오차',height=300)
+        st.altair_chart(plot,width='stretch')
+        bh=research_csv(research/'backtest_hourly_errors.csv')
+        if bh is not None and len(bh):
+            bh=bh.groupby(['model','horizon_days','hour'],as_index=False).agg(samples=('absolute_error','count'),MAE=('absolute_error','mean'),bias=('error','mean'))
+            c=alt.Chart(bh).mark_line().encode(x=alt.X('hour:O',title='대상일 시간(KST)'),y=alt.Y('MAE:Q',title='시간대별 MAE(원/kWh)'),color='model:N',detail='horizon_days:N',tooltip=['model','horizon_days','hour','samples','MAE','bias']).properties(title='과거 재현 · 시간대별 오차',height=280)
+            st.altair_chart(c,width='stretch')
+        st.caption('백테스트 입력은 현재 보존된 과거 SMP로 시점을 재구성했습니다. 당시 원본 데이터 vintage/수신시각은 완전히 검증되지 않아 실제 운영 표본과 합산하지 않습니다. D+1은 전일 동시간 기준선, D+2/D+3은 보존 V17 공동모델과 기준선을 비교합니다.')
+    else:st.info('백테스트 결과가 아직 생성되지 않았습니다.')
+    status_eval=read(research/'evaluation_status.json',{})
+    st.caption(f"평가 갱신 {status_eval.get('at','미확보')} · 실제 운영 평가 {status_eval.get('operational_evaluated',0)}건 · 백테스트 평가일 {status_eval.get('historical_backtest_days',0)}일")
+    st.info('V5의 기존 결과와 원본 예측 파일은 보존합니다. 평가 기간과 정보 조건이 다른 결과를 직접적인 성능 개선으로 해석하지 않습니다.')
 else:
     st.subheader('실제 전향 검증 · 과거 재생과 구분')
     a,b,c=st.columns(3);a.metric('공식 제공가격 비교 대상일',len(status.get('official_comparison_target_dates',[])));b.metric('대상일 경과 완료',status.get('target_day_elapsed_days',0));c.metric('급등 발생 대상일',status.get('spike_target_days',0))
