@@ -3,6 +3,7 @@ from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 import json
+import importlib
 import os
 import re
 import runpy
@@ -49,7 +50,14 @@ def run(module, args, home=HOME, launch=runpy.run_module):
     stdout, stderr = StringIO(), StringIO()
     exit_code, error_type, error_text = 0, None, None
     prior_argv = sys.argv[:]
+    patched_writers = []
     try:
+        # V19 imports a shared hardlink-only writer. In restricted Windows
+        # folders os.link may be denied although same-directory rename works.
+        for name in ('v12.records', 'v18.common', 'v19.common'):
+            target = importlib.import_module(name)
+            patched_writers.append((target, target.write_once))
+            target.write_once = write_once
         sys.argv = [module, *args]
         with redirect_stdout(stdout), redirect_stderr(stderr):
             launch(module, run_name='__main__')
@@ -63,6 +71,8 @@ def run(module, args, home=HOME, launch=runpy.run_module):
         error_type, error_text = type(exc).__name__, ''.join(traceback.format_exception(exc))
     finally:
         sys.argv = prior_argv
+        for target, original in reversed(patched_writers):
+            target.write_once = original
     output = redact(stdout.getvalue())
     errors = redact(stderr.getvalue())
     classification = ('success' if exit_code == 0 else 'module_import_failure' if error_type in ('ModuleNotFoundError', 'ImportError') or 'ModuleNotFoundError' in errors or 'ImportError' in errors else 'python_module_failure')

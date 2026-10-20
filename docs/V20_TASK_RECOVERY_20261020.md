@@ -15,8 +15,10 @@
 
 새 `v20.task_runner`는 모듈 실행 시작/완료 시각, Python 경로, 작업 폴더, 종료코드, stderr/stdout, 예외를 `artifacts/v20/task_runs`에 별도 불변 JSON 두 개로 기록한다. 환경변수 이름이 KEY/TOKEN/SECRET/PASSWORD/CREDENTIAL인 값과 URL 인증 파라미터는 로그에서 가린다. 모듈 import 실패와 모듈 실행 실패를 구분한다. publisher 내부의 준비본 없음, 공개상태 보류, 공식가격 기확보 등의 상세 사유는 publisher 자체 `publish_runs`와 함께 확인한다.
 
+22:39:39의 첫 스케줄 실행은 시작 JSON을 남겼지만 완료 JSON 없이 종료했고 LastTaskResult는 `0xC000013A`였다. 같은 실행을 포그라운드에서 재현했을 때 V20 service 완료 로그를 쓰는 V19 공용 writer가 Windows `os.link`에서 `PermissionError: [WinError 5] Access is denied`를 냈다. `v20.task_runner`가 실행 중인 프로세스에서만 V12/V18/V19 공용 `write_once` 함수를 create-only rename fallback으로 바꾸도록 했다. 기존 버전 소스와 불변 기록 writer는 수정하지 않았다.
+
 Task Scheduler Operational 로그 활성화는 Windows가 Access denied를 반환해 완료되지 않았다. 따라서 Python이 시작하기 전의 실패는 아직 worker 로그에 남지 않으며, 그 구간은 관리자 세션에서 이벤트 로그를 켜야 확인할 수 있다. 배터리 wake timer는 배터리 소모 때문에 그대로 두었다. 절전 중 실행이 필요하면 AC 전원 연결을 권장한다.
 
 ## 오늘의 발급 관측
 
-복구 후 실제 다음 트리거는 10월 20일 22:50, 22:58, 22:59:30, 23:00, 23:02다. 감사 시각 기준 아직 해당 트리거가 도래하지 않아 이번 발급을 성공/실패로 판정하지 않았다. 기준은 10월 22일 D-2, 10월 23일 D-3이며, 기존 공식가격 공개 gate와 모델/입력 시각 gate를 유지한다. 준비 워커 시작은 예측 발급 성공과 별도로 평가한다.
+22:42:09에 실행한 명시적 수동 smoke run은 22:42:51에 종료했다. KPX API 정상 무자료 2건, 일반 공개 0원 미검증 2건, EPSIS 미관측 4건을 새로 기록했고 V19 observer, V20 감사, D-2(22일)/D-3(23일) 준비, 사후평가가 모두 성공했다. 준비본은 `UNISSUED_PREPARATION_NOT_LIVE_FORECAST`이며 실제 AI 발급 수는 0이다. 복구 후 실제 다음 트리거는 10월 20일 22:50, 22:58, 22:59:30, 23:00, 23:02다. 기준은 10월 22일 D-2, 10월 23일 D-3이며, 기존 공식가격 공개 gate와 모델/입력 시각 gate를 유지한다. 준비 워커 시작은 예측 발급 성공과 별도로 평가한다.

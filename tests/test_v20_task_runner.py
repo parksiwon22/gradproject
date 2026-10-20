@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from v19.common import ROOT
-from v20.task_runner import redact, run
+from v20.task_runner import redact, run, write_once
 
 
 class V20TaskRunnerTests(unittest.TestCase):
@@ -16,6 +16,22 @@ class V20TaskRunnerTests(unittest.TestCase):
         self.assertNotIn('private-test-credential', result)
         self.assertNotIn('anotherSecret', result)
         self.assertIn('[REDACTED]', result)
+
+    def test_write_once_falls_back_when_windows_hardlink_is_denied(self):
+        temp = ROOT / 'artifacts/v20' / ('test_task_write_' + uuid.uuid4().hex)
+        temp.mkdir(parents=True, exist_ok=False)
+        try:
+            target = temp / 'record.json'
+            with patch('v20.task_runner.os.link', side_effect=PermissionError('hardlink disabled')):
+                write_once(target, {'immutable': True})
+            self.assertEqual(json.loads(target.read_text(encoding='utf-8')), {'immutable': True})
+            with self.assertRaises(FileExistsError):
+                write_once(target, {'immutable': False})
+            self.assertEqual(json.loads(target.read_text(encoding='utf-8')), {'immutable': True})
+        finally:
+            for path in temp.iterdir():
+                path.unlink()
+            temp.rmdir()
 
     def test_start_and_end_records_capture_module_failure_without_secrets(self):
         temp = ROOT / 'artifacts/v20' / ('test_task_runner_' + uuid.uuid4().hex)
