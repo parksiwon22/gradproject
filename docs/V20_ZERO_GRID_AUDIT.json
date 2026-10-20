@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-17T03:57:57.483758+00:00",
+  "at": "2026-10-20T14:03:23.372473+00:00",
   "rows": [
     {
       "target_date": "2026-10-17",
@@ -537,6 +537,412 @@
       "target_date": "2026-10-18",
       "checked_at": "2026-10-17T03:48:07.660026+00:00",
       "response_sha256": "ace966fe3e0d7394656075aa35601188c458f53de430e2759f19933e7b2d0632",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-21",
+      "checked_at": "2026-10-18T05:40:16.548023+00:00",
+      "response_sha256": "bbd02ffbea910441ce6c5e8575e326fd05fc0c4f249fd3ce7c6a846e3343bcc6",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-18T05:40:24.196203+00:00",
+      "response_sha256": "f2009bff6e54faa8cd46cc4140bc8f5573426b6e67676b0f47d241acb3fca7af",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-21",
+      "checked_at": "2026-10-18T06:09:41.400174+00:00",
+      "response_sha256": "bb0c0e71ceae05d18e876f5df648b5c2e8f085fb11ebea549ca5f8f2e05a2d1b",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-18T06:09:45.644364+00:00",
+      "response_sha256": "8f1a697ce5fbff870ac840f59d05030c55430fde004bbbf8f270ff3edeaff302",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-21",
+      "checked_at": "2026-10-18T06:39:49.453295+00:00",
+      "response_sha256": "1138b919801ae40bf08c2e595951eccf7bcbb9b8024091ba3728a91a45722de9",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-18T06:39:52.343208+00:00",
+      "response_sha256": "75def84f39bb73c21feed009315812f97f8820afe6d67ee43dd6f83cfb89934c",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-21",
+      "checked_at": "2026-10-18T08:09:53.618154+00:00",
+      "response_sha256": "f3db41bde665ed900785c6c5567c47dc9291d6d1d94b204daac3701aa36b7f50",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-18T08:10:00.377295+00:00",
+      "response_sha256": "37a53180502f581c998df11e747adadfd82589b5dec1e19d4654f1e504e64129",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T11:32:19.667000+00:00",
+      "response_sha256": "a1583ded2199b1189ab371ed5d4299c902db2d2a0baad2f5c942a4d15f3dc804",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T11:32:21.276607+00:00",
+      "response_sha256": "a845e7d8b70ca55ce7cdbe7f3a1b587abc97a77b00b4ca31cdadc4ff2ebea8e8",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T11:54:54.065176+00:00",
+      "response_sha256": "a4b3a74b907c06e061f8429efb954245fc647522a32161094ebb2daeba25cca0",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T11:55:04.198460+00:00",
+      "response_sha256": "63fd6d62761e79171ab03046c61fb66f7e2c78cd8eafb62addcbe5ba5a0ccc83",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T12:24:43.122035+00:00",
+      "response_sha256": "2d1b6ff1563e2d6e0010e514aa17763b08869f8f1a519f189fef491abbbb414c",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T12:39:42.377015+00:00",
+      "response_sha256": "2470a7a87db0fa78068774b37555c6452a187910b08ca18e6010dc3c14702a79",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T12:54:48.259691+00:00",
+      "response_sha256": "360f119eb2c8e8dad844b4b05a2f78fa21d49bbc4ee9ee9fa873301631669bcc",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T12:54:54.782939+00:00",
+      "response_sha256": "fdb2d3e378b646bb64e203da2418274a911a1f31adad87108daeab48cfd1bc77",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-19",
+      "checked_at": "2026-10-20T13:07:58.332676+00:00",
+      "response_sha256": "59c85a24e202a34d9a0af9f3ae8cdb6024635cd32b4ed9a6bf4d6c6832bd0aa1",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-20",
+      "checked_at": "2026-10-20T13:08:04.449699+00:00",
+      "response_sha256": "971e5aac79efd783f5b0f2c227d5b81622e2653f8484ce418e3bc238b4ae1c1b",
+      "parser_status": "official_acquired",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": false
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T13:24:40.837461+00:00",
+      "response_sha256": "d28fcaf81ae8dedf46e8900960ac972b8198f919748454aad72753e09dc9d42b",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T13:42:14.328545+00:00",
+      "response_sha256": "2722a94b28c8412e49c87205971dffd28eed996a699994b91be3527d15e238af",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T13:42:26.079619+00:00",
+      "response_sha256": "a0697ef942abae3cd396a3600760d2a6c179476df2b2d9a415260cbbd2dad058",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T13:51:12.020744+00:00",
+      "response_sha256": "038f56bbaa124bf5adbcb94f07c0fdfa32b27c035fdbaaab93747278cf870044",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T13:51:19.277371+00:00",
+      "response_sha256": "78fb449eb2cb67b9deab28dbfaa72e250d3157343c256f6225763a047ea59f5f",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T13:53:11.615101+00:00",
+      "response_sha256": "84bd46317649c2cc786fed7cf7b0cac6c14fbd0f2d2f15a0af5fe43af723daca",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T13:53:18.158718+00:00",
+      "response_sha256": "04582766f6b2dae2a87f17ff8664e75eb844d6171b3ed1b743c99c66e6fbf085",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T13:54:41.379771+00:00",
+      "response_sha256": "470f7c4d23a78439f38840d23ec99ca4fe99789b8a12125994cf6be11ca7bfff",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T13:54:43.452215+00:00",
+      "response_sha256": "ae09f1310116ed1191943d087aad654ee46315ee182e23000398fea46239b038",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-23",
+      "checked_at": "2026-10-20T13:58:06.275204+00:00",
+      "response_sha256": "4209ff8fe878b721363f431207b5954d69ea8ff72d1a11e81fa7d0f91d6f54d8",
+      "parser_status": "unverified_all_zero",
+      "grids": [
+        {
+          "hourly_rows": 24,
+          "last_column_matches_target": true,
+          "numeric_cells": true,
+          "all_zero": true
+        }
+      ]
+    },
+    {
+      "target_date": "2026-10-22",
+      "checked_at": "2026-10-20T13:58:10.883675+00:00",
+      "response_sha256": "2bed04fc6340952749790f16fbd3dae6fd6eaf5f7e1ca8df95631b687fbc6ce9",
       "parser_status": "unverified_all_zero",
       "grids": [
         {

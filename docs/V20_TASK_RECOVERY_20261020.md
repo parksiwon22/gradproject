@@ -21,6 +21,18 @@
 
 Task Scheduler Operational 로그 활성화는 Windows가 Access denied를 반환해 완료되지 않았다. 따라서 Python이 시작하기 전의 실패는 아직 worker 로그에 남지 않으며, 그 구간은 관리자 세션에서 이벤트 로그를 켜야 확인할 수 있다. 배터리 wake timer는 배터리 소모 때문에 그대로 두었다. 절전 중 실행이 필요하면 AC 전원 연결을 권장한다.
 
-## 오늘의 발급 관측
+## 2026-10-20 실제 트리거 및 발급 감사
 
-22:42:09 수동 smoke run은 22:42:51에 종료했다. KPX API 정상 무자료 2건, 일반 공개 0원 미검증 2건, EPSIS 미관측 4건을 기록했고 V19 observer, V20 감사, D-2(22일)/D-3(23일) 준비, 사후평가가 성공했다. 22:50 트리거는 `python.exe` 액션이었을 때 실패했다. 이후 `pythonw.exe`로 전환한 22:53 Task Scheduler 수동 비교 실행은 성공했으며, 22:58의 실제 준비 트리거와 22:59:30/23:00/23:02 발급 시도는 별도 관측을 기다린다. 준비본은 `UNISSUED_PREPARATION_NOT_LIVE_FORECAST`이며 실제 AI 발급 수는 여전히 0이다. 기준은 10월 22일 D-2, 10월 23일 D-3이고 기존 공식가격 공개 gate와 모델/입력 시각 gate를 유지한다.
+22:42:09 수동 smoke run은 22:42:51에 종료했다. KPX API 정상 무자료 2건, 일반 공개 0원 미검증 2건, EPSIS 미관측 4건을 기록했고 V19 observer, V20 감사, D-2(22일)/D-3(23일) 준비 및 기존 예측 사후평가 단계가 성공했다. 이는 실제 정시 발급은 아니다.
+
+22:50 실제 트리거는 콘솔 `python.exe` 액션을 사용했고 작업 결과 `0xC000013A`, 완료 로그가 없는 실패로 남았다. 콘솔 액션 종료 원인은 Task Scheduler Operational 로그가 꺼져 있어 더 세분할 수 없다. 액션을 `pythonw.exe`로 되돌린 뒤 22:53 수동 Task Scheduler 비교 실행이 정상 종료했고, 22:58 실제 준비 트리거도 22:58:03~22:58:28에 정상 종료했다. 준비 단계는 관측 8건(KPX API `normal_no_data` 2건, 일반 공개 `unverified_all_zero` 2건, EPSIS `not_observed` 4건), 모델 추론/EV 준비 및 사후평가 단계를 모두 완료했다.
+
+준비 포인터 `artifacts/v19/ready/20261020T2300.json`은 22:58:21.630752 KST에 생성됐고 가리키는 패킷의 SHA-256은 `b1e79abda15192b7eebf193f9cb1ba5b8ad2471a9d1b5d90b7fb28cf14e6e34a`다. 입력 스냅샷은 22:58:18 KST, 패킷 내 최신 입력 최초 수신은 20:32:06 KST였다. 모델 registry는 10월 17일 12:20:13 KST에 잠겼으며 registry 및 각 모델 파일 해시는 준비 및 발급 검사에서 일치했다. 이 자료는 `UNISSUED_PREPARATION_NOT_LIVE_FORECAST` 준비본이다.
+
+22:59:30 warm 작업은 실제 시작해 23:00 경계까지 정상 종료했고, 23:00 발급 트리거와 23:02 재시도도 각각 실제 시작해 Task Scheduler 결과 0 및 시작/완료 로그를 남겼다. 발급 JSON은 23:00:00.137611, 23:00:02.342255, 23:02:02.422008 KST에 생성됐다. 처음 두 검사에서 9개 모델/대상 조합은 모두 `unverified_publication_general_public_unverified_all_zero`로 건너뛰었다. 일반 홈페이지의 숫자 0 응답은 미공개 증거로 판정하지 않았고, KPX의 `normal_no_data`만으로도 발급 조건을 통과시키지 않았다. 23:02 재시도 때는 최신 KPX API 표본이 180초 freshness 한도를 넘어 9개 조합 모두 `publication_check_not_fresh_kpx_api`로 건너뛰었다. publisher hot path의 `network_calls`는 모두 0이다. 이 시도의 공식 공개 상태는 “가격 확보 확인 없음, 미공개도 확정할 수 없음”이다.
+
+이날 publisher 작업들은 모두 정상 실행했지만 AI 예측 발급은 0건이다. `artifacts/v19/forecasts`와 `artifacts/v19/commits`에 이 발급 시도의 신규 파일은 없다. 기존 예상 기록/모델을 비교하거나 수정하지 않았고 과거 시각 발급도 만들지 않았다. 22:58 준비본, 예약작업 성공, 적격한 예측 발급은 각각 별개로 기록된다.
+
+23:02 직후 V20 읽기 전용 감사를 다시 실행해 `artifacts/v20/status.json` 및 `docs/V20_STATUS.json`, 공개 집계표/그래프를 갱신했다. 22:58 예약 collector가 갱신한 대상일별 홈페이지 0 응답 관측은 기존 0 응답 감사 그래프에 반영됐다. 독립 사전예측은 0, 공식가격 평가 추가 완료일도 0이다. 보존 감사는 848개 기존 파일에서 변경 0건이었다. 회귀검증은 기존 full suite와 V20 집중 테스트를 통과했다.
+
+다음 실행을 개선할 때는 23:02 fallback 직전에 publisher가 새 KPX 공개상태 표본을 받아 ledger freshness를 갱신할 수 있는 별도 짧은 준비 트리거가 필요하다. 단, 공식 공개 여부가 불확실한 홈페이지 0 응답을 정상 미관측으로 바꾸거나 발급 gate를 완화해서는 안 된다. Task Scheduler Operational 이벤트 로깅은 여전히 관리자 권한이 필요하므로 Python이 시작되기 전 실패 원인은 worker 파일 로그로 검출할 수 없다.

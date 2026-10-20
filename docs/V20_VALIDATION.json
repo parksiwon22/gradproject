@@ -1,5 +1,5 @@
 {
-  "at": "2026-10-17T03:58:51.544366+00:00",
+  "at": "2026-10-20T14:05:02.210114+00:00",
   "tests": 136,
   "seconds": 117.087,
   "result": "OK",
@@ -7,11 +7,17 @@
   "focused_tests": 12,
   "focused_log_sha256": "2300dc5746ab34fe35a91da986bb72ef5a6580a37cf79471fb8c2de5896ef44a",
   "preservation": {
-    "at": "2026-10-17T03:58:51.263961+00:00",
+    "at": "2026-10-20T14:05:01.762950+00:00",
     "checked": 848,
     "changed": 0
   },
   "new_actual_forecasts": 0,
-  "actual23h_issuance": "Pending actual clock; not simulated success",
+  "actual23h_issuance": {
+    "reference_origin": "2026-10-20T23:00:00+09:00",
+    "actual_publish_checks": 3,
+    "forecast_files_created": 0,
+    "status": "observed_no_forecast_issued",
+    "note": "Preparation and worker success are not forecast issuance; simulation is excluded."
+  },
   "operating_model_replaced": false
 }

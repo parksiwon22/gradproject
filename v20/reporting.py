@@ -30,7 +30,19 @@ def report():
     if not match or not re.search(r'(?m)^OK\s*$',log) or re.search(r'(?m)^FAILED',log):raise ValueError('Successful full regression required')
     focused=(HOME/'tests_targeted_final.log').read_text(encoding='utf-8-sig',errors='replace')
     if not re.search(r'(?m)^OK\s*$',focused) or re.search(r'(?m)^FAILED',focused):raise ValueError('Successful final V20 tests required')
-    write(docs/'V20_VALIDATION.json',dict(at=now(),tests=int(match[1]),seconds=float(match[2]),result='OK',log_sha256=sha(HOME/'tests_all.log'),focused_tests=12,focused_log_sha256=sha(HOME/'tests_targeted_final.log'),preservation=status['preservation'],new_actual_forecasts=status['V19_new_actual_records'],actual23h_issuance='Pending actual clock; not simulated success',operating_model_replaced=False))
+    origin=pd.Timestamp.now(tz='Asia/Seoul').normalize()+pd.Timedelta(hours=23)
+    observed=[]
+    for path in (ROOT/'artifacts/v19/publish_runs').glob('*.json'):
+        record=read(path)
+        if record.get('mode')=='LIVE_LOCAL_PUBLISH_CHECK' and record.get('reference_origin')==origin.isoformat():
+            observed.append(record)
+    created=sum(x.get('status')=='created' for run in observed for x in run.get('records',[]))
+    issuance=dict(reference_origin=origin.isoformat(),actual_publish_checks=len(observed),
+                  forecast_files_created=created,
+                  status='observed_no_forecast_issued' if observed and created==0 else
+                         'observed_forecast_issued' if created else 'not_observed_at_report_time',
+                  note='Preparation and worker success are not forecast issuance; simulation is excluded.')
+    write(docs/'V20_VALIDATION.json',dict(at=now(),tests=int(match[1]),seconds=float(match[2]),result='OK',log_sha256=sha(HOME/'tests_all.log'),focused_tests=12,focused_log_sha256=sha(HOME/'tests_targeted_final.log'),preservation=status['preservation'],new_actual_forecasts=status['V19_new_actual_records'],actual23h_issuance=issuance,operating_model_replaced=False))
     print('V20 aggregate exports and preservation verification completed.')
 
 

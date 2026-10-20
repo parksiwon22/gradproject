@@ -1,6 +1,6 @@
 {
-  "at": "2026-10-17T03:57:57.491989+00:00",
-  "status": "OBSERVATION_PENDING_REAL23H",
+  "at": "2026-10-20T14:03:23.381230+00:00",
+  "status": "CHECK_REAL_WORKER_RECORDS",
   "actual_record_files": 14,
   "V19_new_actual_records": 0,
   "V19_new_target_dates": [],
@@ -16,22 +16,22 @@
   ],
   "final_corrected_statistics_verified_days": 0,
   "spike_target_days": 0,
-  "target_day_elapsed_days": 0,
+  "target_day_elapsed_days": 3,
   "reference_conflicts": [],
   "operating_model_replaced": false,
   "readiness": [
     {
-      "target_date": "2026-10-19",
+      "target_date": "2026-10-23",
       "horizon": 2,
       "eligible_now": false,
-      "reason": "official_price_already_observed",
+      "reason": "publication_check_not_fresh_kpx_api",
       "notes": "Current check is not a future23h issuance result"
     },
     {
-      "target_date": "2026-10-20",
+      "target_date": "2026-10-24",
       "horizon": 3,
       "eligible_now": false,
-      "reason": "publication_check_not_fresh_kpx_api",
+      "reason": "missing_publication_check",
       "notes": "Current check is not a future23h issuance result"
     }
   ],
@@ -39,45 +39,103 @@
     {
       "slot": "22:50 준비",
       "due": "2026-10-17T22:50:00+09:00",
-      "status": "not_due",
+      "status": "missing_unverified_sleep_or_failure",
       "worker_observations": 0
     },
     {
       "slot": "22:58 준비",
       "due": "2026-10-17T22:58:00+09:00",
-      "status": "not_due",
+      "status": "missing_unverified_sleep_or_failure",
       "worker_observations": 0
     },
     {
       "slot": "23:00 발급",
       "due": "2026-10-17T23:00:00+09:00",
-      "status": "not_due",
+      "status": "missing_unverified_sleep_or_failure",
       "worker_observations": 0
+    },
+    {
+      "slot": "22:50 준비",
+      "due": "2026-10-18T22:50:00+09:00",
+      "status": "missing_unverified_sleep_or_failure",
+      "worker_observations": 0
+    },
+    {
+      "slot": "22:58 준비",
+      "due": "2026-10-18T22:58:00+09:00",
+      "status": "missing_unverified_sleep_or_failure",
+      "worker_observations": 0
+    },
+    {
+      "slot": "23:00 발급",
+      "due": "2026-10-18T23:00:00+09:00",
+      "status": "missing_unverified_sleep_or_failure",
+      "worker_observations": 0
+    },
+    {
+      "slot": "22:50 준비",
+      "due": "2026-10-19T22:50:00+09:00",
+      "status": "missing_unverified_sleep_or_failure",
+      "worker_observations": 0
+    },
+    {
+      "slot": "22:58 준비",
+      "due": "2026-10-19T22:58:00+09:00",
+      "status": "missing_unverified_sleep_or_failure",
+      "worker_observations": 0
+    },
+    {
+      "slot": "23:00 발급",
+      "due": "2026-10-19T23:00:00+09:00",
+      "status": "missing_unverified_sleep_or_failure",
+      "worker_observations": 0
+    },
+    {
+      "slot": "22:50 준비",
+      "due": "2026-10-20T22:50:00+09:00",
+      "status": "missing_unverified_sleep_or_failure",
+      "worker_observations": 0
+    },
+    {
+      "slot": "22:58 준비",
+      "due": "2026-10-20T22:58:00+09:00",
+      "status": "worker_observed_NOT_issuance_success",
+      "worker_observations": 1
+    },
+    {
+      "slot": "23:00 발급",
+      "due": "2026-10-20T23:00:00+09:00",
+      "status": "worker_observed_NOT_issuance_success",
+      "worker_observations": 3
     }
   ],
   "observer": {
-    "started_at": "2026-10-17T12:57:29.289850+09:00",
-    "completed_at": "2026-10-17T12:57:46.885242+09:00",
+    "started_at": "2026-10-20T22:58:03.183078+09:00",
+    "completed_at": "2026-10-20T22:58:28.818586+09:00",
     "stages": [
       {
         "stage": "collection_and_publication",
         "status": "success",
-        "seconds": 6.5531073000020115,
+        "seconds": 14.806592299999465,
         "result": {
-          "probes": 0,
-          "statuses": {}
+          "probes": 8,
+          "statuses": {
+            "unverified_all_zero": 2,
+            "normal_no_data": 2,
+            "not_observed": 4
+          }
         }
       },
       {
         "stage": "inference_and_EV_preparation",
         "status": "success",
-        "seconds": 3.0795323999918764,
+        "seconds": 3.680055100001482,
         "result": null
       },
       {
         "stage": "post_publication_evaluation",
         "status": "success",
-        "seconds": 7.88169320000452,
+        "seconds": 7.104939900000318,
         "result": null
       }
     ],
@@ -85,15 +143,85 @@
     "issues_forecasts": false
   },
   "publisher": {
-    "at": "2026-10-17T03:50:27.798742+00:00",
-    "status": "skipped",
-    "reason": "Outside final60s prewarm or first5min after origin; no hours-long wait or backfill"
+    "started_at": "2026-10-20T23:02:02.378750+09:00",
+    "reference_origin": "2026-10-20T23:00:00+09:00",
+    "mode": "LIVE_LOCAL_PUBLISH_CHECK",
+    "records": [
+      {
+        "model": "V12_HGB",
+        "target_date": "2026-10-22",
+        "horizon_days": 2,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      },
+      {
+        "model": "V12_LightGBM_peak",
+        "target_date": "2026-10-22",
+        "horizon_days": 2,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      },
+      {
+        "model": "V14_shape_level_blend",
+        "target_date": "2026-10-22",
+        "horizon_days": 2,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      },
+      {
+        "model": "V15_two_stage_025",
+        "target_date": "2026-10-22",
+        "horizon_days": 2,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      },
+      {
+        "model": "V15_two_stage_05",
+        "target_date": "2026-10-22",
+        "horizon_days": 2,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      },
+      {
+        "model": "V17_joint",
+        "target_date": "2026-10-22",
+        "horizon_days": 2,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      },
+      {
+        "model": "V17_charge_rank_blend",
+        "target_date": "2026-10-22",
+        "horizon_days": 2,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      },
+      {
+        "model": "V17_joint",
+        "target_date": "2026-10-23",
+        "horizon_days": 3,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      },
+      {
+        "model": "V19_D3_HGB",
+        "target_date": "2026-10-23",
+        "horizon_days": 3,
+        "status": "skipped",
+        "reason": "publication_check_not_fresh_kpx_api"
+      }
+    ],
+    "network_calls": 0,
+    "model_inference_in_hot_path": false,
+    "EV_optimization_in_hot_path": false,
+    "completed_at": "2026-10-20T23:02:02.422008+09:00",
+    "local_publish_seconds": 0.042663799998990726
   },
   "new_V20_models": 0,
   "architecture": "V19 unchanged issuer and collector reused; V20 read-only audit and EV routing",
   "default_recommendation": "G2V",
   "preservation": {
-    "at": "2026-10-17T03:58:51.263961+00:00",
+    "at": "2026-10-20T14:05:01.762950+00:00",
     "checked": 848,
     "changed": 0
   },
