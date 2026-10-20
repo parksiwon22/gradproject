@@ -63,6 +63,11 @@ class V20Tests(unittest.TestCase):
     def test_web_comparison_ev_routing_status_and_save(self):
         from streamlit.testing.v1 import AppTest
         app=AppTest.from_file('app_v20.py').run(timeout=60);self.assertFalse(app.exception);self.assertFalse(app.error)
+        dates=next(s for s in app.selectbox if s.label=='동일 비교 대상일')
+        self.assertIn('2026-10-20',[str(x) for x in dates.options])
+        dates.set_value('2026-10-20').run(timeout=60)
+        self.assertTrue(any('D-3 실제 저장 예측 미확보' in w.value for w in app.info))
+        self.assertFalse(app.exception)
         next(b for b in app.button if b.label=='비교 시뮬레이션 로컬 저장').click().run(timeout=60);self.assertFalse(app.exception)
         nav=next(r for r in app.radio if r.label=='화면');nav.set_value('EV 충전 추천').run(timeout=60);self.assertFalse(app.exception);self.assertFalse(app.error)
         unavailable=pd.Timestamp.now(tz='Asia/Seoul').normalize()+pd.DateOffset(years=5)

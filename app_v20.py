@@ -81,7 +81,7 @@ def select_forecast(day,horizon):
     return frame,m
 
 if page=='SMP 예측·공식가격 비교':
-    dates=sorted({d for _,_,f,_ in items for d in f.timestamp.dt.strftime('%Y-%m-%d')});default=dates.index('2026-10-18') if '2026-10-18' in dates else max(0,len(dates)-1);day=st.selectbox('동일 비교 대상일',dates,index=default);d3,m3=select_forecast(day,3);d2,m2=select_forecast(day,2)
+    dates=sorted({d for _,_,f,_ in items for d in f.timestamp.dt.strftime('%Y-%m-%d')} | set(official.timestamp.dt.strftime('%Y-%m-%d')));default=dates.index('2026-10-18') if '2026-10-18' in dates else max(0,len(dates)-1);day=st.selectbox('동일 비교 대상일',dates,index=default);d3,m3=select_forecast(day,3);d2,m2=select_forecast(day,2)
     for h,m in [(3,m3),(2,m2)]:
         if m:st.caption(f"D-{h} 기준 {m['reference_origin']} / 실제 발급 {m['issued_at']} / {m['timing']} / 모델 고정 확인 {m['model_locked_before_origin']}")
         else:st.info(f'D-{h} 실제 저장 예측 미확보 · 과거 발급을 새로 만들지 않습니다.')
@@ -117,7 +117,9 @@ else:
         reason=reasons.get(r['reason'],'공개상태 확인 필요 · '+r['reason']);st.warning(f"{r['target_date']} D-{r['horizon']}: {reason}")
     st.caption('시각이 오래된 조회·실패·모두 0원 응답은 정상 미공개 근거가 아닙니다. 안전검사를 해제하지 않습니다.')
     if (OUTPUT/'publication.csv').exists():
-        f=csv(OUTPUT/'publication.csv');days=[r['target_date'] for r in status.get('readiness',[])];f=f[f.target_date.isin(days)]
+        f=csv(OUTPUT/'publication.csv');readiness_days={r['target_date'] for r in status.get('readiness',[])}
+        recent_days=f.assign(_receipt=pd.to_datetime(f.latest_check,errors='coerce')).groupby('target_date')['_receipt'].max().nlargest(5).index
+        f=f[f.target_date.isin(readiness_days|set(recent_days))]
         st.dataframe(f.rename(columns={'target_date':'대상일','source':'공식 경로','market':'시장','latest_state':'최근 응답 상태','latest_check':'실제 수신시각','first_normal_receipt':'최초 정상가격 수신','last_strict_normal_nonobservation':'마지막 정상 미관측','zero_response_count':'0원 응답 수','zero_conflicts_with_already_acquired_other_source':'다른 경로 기확보와 불일치'}),hide_index=True)
     st.subheader('정시 준비·발급과 최근 수집 상태')
     if status.get('scheduled_slots'):

@@ -90,6 +90,24 @@ def publication_audit(rows):
     return pd.DataFrame(output)
 
 
+def write_audit_once(path,record):
+    """Create an immutable audit snapshot on Windows filesystems without hardlink support."""
+    import json,os,uuid
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
+    temporary=path.with_name('.'+path.name+'.'+uuid.uuid4().hex+'.tmp')
+    try:
+        with temporary.open('xb') as handle:
+            handle.write(json.dumps(record,ensure_ascii=False,indent=2,default=str).encode('utf-8'))
+            handle.flush();os.fsync(handle.fileno())
+        try:
+            os.link(temporary,path)
+        except (OSError,NotImplementedError):
+            # Path.rename is create-only on Windows: it raises if the audit name exists.
+            temporary.rename(path)
+    finally:
+        if temporary.exists():temporary.unlink()
+
+
 def grid_evidence(payload,day):
     """Independent column check; no interpretation of a numeric zero as absence."""
     text=payload.decode('utf-8',errors='replace');grids=[]
@@ -150,7 +168,7 @@ def audit():
         publisher=read(ROOT/'artifacts/v19/publish_status.json',{}),new_V20_models=0,
         architecture='V19 unchanged issuer and collector reused; V20 read-only audit and EV routing',
         default_recommendation='G2V')
-    write(HOME/'status.json',result);write_once(HOME/'audits'/(clock.strftime('%Y%m%dT%H%M%S%f')+'.json'),result)
+    write(HOME/'status.json',result);write_audit_once(HOME/'audits'/(clock.strftime('%Y%m%dT%H%M%S%f')+'.json'),result)
     return result
 
 
