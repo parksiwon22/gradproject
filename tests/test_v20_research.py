@@ -65,6 +65,55 @@ class V20ResearchTests(unittest.TestCase):
                     self.assertTrue(all(pd.Timestamp(x['baseline_source_timestamp']) <= issued for x in row['features']))
             self.assertEqual(horizons, {1, 2, 3})
 
+    def test_d1_same_hour_missing_at_issue_falls_back_to_nearest_prior_day(self):
+        issued = pd.Timestamp('2026-10-20 23:00', tz='Asia/Seoul')
+        ts = pd.date_range('2026-10-10', periods=24*11, freq='h', tz='Asia/Seoul')
+        # The prior-day 23:00 value is missing; the 48-hour-old value remains usable.
+        prices = pd.DataFrame({'timestamp': ts.delete(ts.get_loc(issued)),
+                               'smp': np.arange(len(ts)-1, dtype=float)})
+        target = pd.date_range('2026-10-21', periods=24, freq='h', tz='Asia/Seoul')
+        sources, values, lags = research.available_same_hour_baseline(prices, target)
+        self.assertEqual(sources[23], issued-pd.Timedelta(days=1))
+        self.assertEqual(lags[23], 2)
+        self.assertEqual(values[23], float(prices.set_index('timestamp').loc[sources[23], 'smp']))
+        self.assertTrue((sources <= issued).all())
+
+    def test_retry_is_excluded_and_known_target_is_not_scored(self):
+        temp_root = Path(__file__).resolve().parents[1] / 'artifacts/v20/test_temp'
+        temp_root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=temp_root) as folder:
+            root = Path(folder)
+            target = pd.date_range('2026-10-25', periods=24, freq='h', tz='Asia/Seoul')
+            records = []
+            for minute in (0, 2):
+                issue = pd.Timestamp(f'2026-10-24 23:{minute:02d}', tz='Asia/Seoul')
+                path = root / f'retry{minute}.json'
+                path.write_text(str(minute), encoding='utf-8')
+                record = dict(mode='RESEARCH_ONLY_NOT_OFFICIAL_ISSUANCE', target_date='2026-10-25',
+                    horizon_days=1, model='same_hour_previous_day_baseline', model_sha256='baseline',
+                    reference_origin=issue.isoformat(), issued_at=issue.isoformat(), input_cutoff=issue.isoformat(),
+                    target_prices_known_at_issue=True, future_input_rows=0, late_receipt_rows=0)
+                forecast = pd.DataFrame({'timestamp': target, 'predicted_smp': np.arange(24, dtype=float)})
+                records.append((path, record, forecast))
+            actual = pd.DataFrame({'timestamp': target, 'smp': np.arange(24, dtype=float),
+                                   'first_seen': target[0].isoformat(), 'snapshot': 'fixture'})
+            issue_prices = pd.DataFrame({'timestamp': pd.date_range('2026-10-24', periods=24, freq='h', tz='Asia/Seoul'),
+                                         'smp': np.arange(24, dtype=float)})
+            issue_prices.attrs['available_future_timestamp_counts'] = {'2026-10-25': 24}
+            with patch.object(research, 'RESEARCH', root/'research'), \
+                 patch.object(research, 'inventory', return_value=records), \
+                 patch.object(research, 'reference', return_value=(actual, [])), \
+                 patch.object(research, '_cutoff_prices', return_value=issue_prices):
+                result = research.evaluate(backtest=False)
+            evaluated = pd.read_csv(root/'research'/'operational_metrics.csv')
+            duplicates = pd.read_csv(root/'research'/'duplicate_forecasts.csv')
+            self.assertEqual(result['operational_unique_forecasts'], 1)
+            self.assertEqual(result['operational_duplicates_excluded'], 1)
+            self.assertEqual(len(evaluated), 1)
+            self.assertEqual(evaluated.iloc[0].status, 'excluded_target_prices_known_at_issue')
+            self.assertTrue(bool(duplicates.iloc[0].identical_prediction))
+            self.assertTrue(bool(duplicates.iloc[0].excluded_from_evaluation))
+
 
 if __name__ == '__main__':
     unittest.main()
