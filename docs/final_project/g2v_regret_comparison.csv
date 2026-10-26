@@ -12,11 +12,10 @@ saved_issue_forecasts,15,two_stage_shrink_0.25,2,1.0,96.8133333333335,96.8133333
 saved_issue_forecasts,15,two_stage_shrink_0.5,2,1.0,64.8133333333335,64.81333333333396
 saved_issue_forecasts,17,2026-10-18_07fe06d705ca,2,1.0,64.8133333333335,64.81333333333396
 saved_issue_forecasts,17,2026-10-18_07fe06d705ca,3,1.0,0.0,3.850166666664336
-saved_issue_forecasts,20,V17_joint,3,1.0,7.383333333333667,192.4614814814809
 saved_issue_forecasts,20,same_hour_previous_day_baseline,1,1.0,61.726666666666006,61.72666666666737
 saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,1,2.0,34.626666666666324,121.52030864197629
 saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,2,3.0,108.3733333333336,141.027827160494
-saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,3,2.0,37.3266666666666,39.25174999999899
+saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,3,1.0,0.0,3.850166666664336
 V5_saved_92day_test,5,V5_profile_hgb_blend,1,92.0,24.015905797101468,144.51956080246882
 V5_saved_92day_test,5,V5_daily_profile_baseline,1,92.0,128.73123188405802,339.25068925120786
 V20_42day_historical_replay,20,V17_joint,2,42.0,89.17325396825397,170.00689626690183

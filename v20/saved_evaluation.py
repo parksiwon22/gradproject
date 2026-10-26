@@ -62,6 +62,9 @@ def _baseline(prices, target, horizon):
 def build_saved_evaluation():
     """Create a new, separate analysis set from saved forecasts and prior scores."""
     RESEARCH.mkdir(parents=True, exist_ok=True)
+    # A price row for a future delivery day may be a published/indicative price,
+    # not a realized outcome. Only score fully completed delivery dates.
+    evaluation_cutoff_date = pd.Timestamp.now(tz='Asia/Seoul').normalize()
     actual, conflicts = reference()
     actual = actual[['timestamp', 'smp', 'source']].drop_duplicates('timestamp').sort_values('timestamp')
     actual_index = actual.set_index('timestamp').smp
@@ -123,6 +126,7 @@ def build_saved_evaluation():
                 source, baseline_pred = _baseline(issue_prices, target, horizon) if 1 <= horizon <= 3 else (pd.DatetimeIndex([]), np.array([]))
                 baseline_ready = len(baseline_pred) == 24 and np.isfinite(baseline_pred).all()
                 observed = actual_index.reindex(target).to_numpy(dtype=float)
+                delivery_completed = pd.Timestamp(day, tz='Asia/Seoul') < evaluation_cutoff_date
                 score = saved_scores.get((path.name, day))
                 dedup_key = (version, origin.strftime('%Y-%m-%d'), day, horizon, model)
                 duplicate_retry = dedup_key in seen_forecasts
@@ -133,6 +137,8 @@ def build_saved_evaluation():
                     status = 'malformed_or_partial_saved_forecast'
                 elif known_flag:
                     status = 'excluded_target_price_known_at_issue'
+                elif not delivery_completed:
+                    status = 'awaiting_completed_delivery_day'
                 elif not np.isfinite(observed).all():
                     status = 'awaiting_actual_price'
                 elif version == 20:

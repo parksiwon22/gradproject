@@ -12,11 +12,10 @@ saved_issue_forecasts,15,two_stage_shrink_0.25,2,1.0,6.063454243048972,7.6266672
 saved_issue_forecasts,15,two_stage_shrink_0.5,2,1.0,5.807932461125337,7.281746344556729,64.8133333333335,64.81333333333396,True,,,6.3742609833333335,,,,,,,
 saved_issue_forecasts,17,2026-10-18_07fe06d705ca,2,1.0,6.674337042849653,7.701636444909221,64.8133333333335,64.81333333333396,True,True,False,535.7070039666667,,,,,,,
 saved_issue_forecasts,17,2026-10-18_07fe06d705ca,3,1.0,9.832670181995402,11.561719202257,0.0,3.850166666664336,True,True,False,535.7070039666667,,,,,,,
-saved_issue_forecasts,20,V17_joint,3,1.0,13.753363083855694,17.14219873289448,7.383333333333667,192.4614814814809,True,,,0.0,,,,,,,
 saved_issue_forecasts,20,same_hour_previous_day_baseline,1,1.0,3.197916666666666,4.590518761534474,61.726666666666006,61.72666666666737,True,,,0.0,,,,,,,
 saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,1,2.0,3.8883333333333336,8.245542199675931,34.626666666666324,121.52030864197629,True,True,,,,,,,,,
 saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,2,3.0,8.28277777777778,11.347601272630245,108.3733333333336,141.027827160494,True,True,,,,,,,,,
-saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,3,2.0,4.80916666666667,6.8696235786753554,37.3266666666666,39.25174999999899,True,True,,,,,,,,,
+saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,3,1.0,4.956666666666671,7.357293433503024,0.0,3.850166666664336,True,True,,,,,,,,,
 V5_saved_92day_test,5,V5_profile_hgb_blend,1,92.0,11.093786148024114,13.808639024727148,24.015905797101468,144.51956080246882,False,,,,,,evaluated_reused_existing_summary,existing V5 test predictions,V5 saved actual SMP; final correction status unverified,,2023-10-01..2023-12-31; same 92 dates
 V5_saved_92day_test,5,V5_daily_profile_baseline,1,92.0,13.575801630434784,17.95055398798159,128.73123188405802,339.25068925120786,False,,,,,,evaluated_reused_existing_summary,existing V5 test predictions,V5 saved actual SMP; final correction status unverified,,2023-10-01..2023-12-31; same 92 dates
 V20_42day_historical_replay,20,V17_joint,2,42.0,11.355288573026137,14.420989899827134,89.17325396825397,170.00689626690183,False,False,,,,,evaluated_reused_existing_summary,existing V20 42-day replay,official price history; final correction status unverified,,2026-01-01..2026-10-15; same 42 weekly dates
