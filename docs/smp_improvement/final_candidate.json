@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "algorithm": "causal_rolling_calibrated_weekday_anchor_blend",
+  "forecast_origin": "nominal 23:00 Asia/Seoul; the caller must supply an as-of price snapshot",
+  "horizons": [
+    1,
+    2,
+    3
+  ],
+  "calibration": {
+    "window_days": 90,
+    "exclude_issue_date": true,
+    "anchors": {
+      "median2": [
+        7,
+        14
+      ],
+      "median4": [
+        7,
+        14,
+        21,
+        28
+      ],
+      "median8": [
+        7,
+        14,
+        21,
+        28,
+        35,
+        42,
+        49,
+        56
+      ],
+      "mean4": [
+        7,
+        14,
+        21,
+        28
+      ]
+    },
+    "weights": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "rule": "On the 90 completed target days ending before the issue date, select anchor and weight minimizing average daily MAE subject to both MAE and G2V regret not exceeding horizon persistence; ties by regret then RMSE. If no alternative qualifies, use persistence."
+  },
+  "actual_threshold_for_peak": 150.0,
+  "EV_conditions": {
+    "capacity_kwh": 60,
+    "initial_soc_percent": 30,
+    "target_soc_percent": 80,
+    "charge_kw": 7,
+    "efficiency": 0.9,
+    "degradation": 5,
+    "window": "full delivery day"
+  },
+  "input_policy": "Filter input snapshot to first_seen<=origin when receipt metadata exists and timestamp<=origin; all calibration labels end before issue date; every feature lag is checked <= the nominal 23:00 origin.",
+  "availability": "historical source first_seen timestamps are mainly 2026-10-15; original historical publication vintages cannot be verified",
+  "selection_note": "All historical ranges have prior project exposure; walk-forward results are repeated retrospective validation, not an independent final test; do not replace V20 automatically",
+  "folds": [
+    {
+      "name": "winter2024",
+      "calibration": [
+        "2024-07-01",
+        "2024-09-30"
+      ],
+      "validation": [
+        "2024-10-01",
+        "2024-12-31"
+      ]
+    },
+    {
+      "name": "spring2025",
+      "calibration": [
+        "2025-01-01",
+        "2025-03-31"
+      ],
+      "validation": [
+        "2025-04-01",
+        "2025-06-30"
+      ]
+    },
+    {
+      "name": "winter2025",
+      "calibration": [
+        "2025-07-01",
+        "2025-09-30"
+      ],
+      "validation": [
+        "2025-10-01",
+        "2025-12-31"
+      ]
+    }
+  ]
+}

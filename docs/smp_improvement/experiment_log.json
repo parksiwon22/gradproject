@@ -1,0 +1,14 @@
+{
+  "hypothesis_1": "Median of the previous four same-weekday hourly prices is a more robust seasonal anchor than one target-horizon lag when SMP levels shift.",
+  "hypothesis_2": "Calibrate one fixed horizon-lag/seasonal-anchor blend on the immediately preceding quarter using MAE and G2V regret constraints; anchor candidates are fixed before scoring.",
+  "hypothesis_3": "Reduce the seasonal-median weight on days when the recent profile sharply diverges from the seasonal median; threshold is the median divergence in calibration.",
+  "rejected_or_diagnostic": [
+    "2-week and 8-week medians",
+    "4-week mean",
+    "adaptive blend"
+  ],
+  "prior_experiments": "V14 recency and shape, V15 event and two-stage models, V17 joint/ranking, V19 separate D3 HGB reviewed; no retraining or prior artifact overwritten.",
+  "validation_caveat": "2024Q4, 2025Q2, 2025Q4 were previously examined; use as replayed folds only.",
+  "results_rows": 72,
+  "final_model_promoted": false
+}

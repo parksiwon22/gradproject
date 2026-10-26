@@ -1,0 +1,7 @@
+horizon_days,model,days,MAE,RMSE,G2V_regret,peak_MAE,vintage_verified,evaluation
+1,calibration_selected_anchor_blend,275,10.533342140151515,15.648584782637576,79.20695757575758,31.27315424575425,False,three known historical rolling validation folds
+1,persistence,275,12.14885909090909,18.933888351473414,160.91832727272728,30.941701759351762,False,three known historical rolling validation folds
+2,calibration_selected_anchor_blend,275,11.30144412878788,15.747361416132943,77.07964848484846,34.68729752469753,False,three known historical rolling validation folds
+2,persistence,275,16.017249999999997,22.98642887464451,200.62105454545454,38.26674291819293,False,three known historical rolling validation folds
+3,calibration_selected_anchor_blend,275,10.467424621212121,14.793534659395975,73.89356363636365,33.012979499667,False,three known historical rolling validation folds
+3,persistence,275,16.21921818181818,23.052214638235366,188.07477575757576,33.837566033966034,False,three known historical rolling validation folds

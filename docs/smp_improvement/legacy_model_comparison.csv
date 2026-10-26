@@ -1,0 +1,14 @@
+cohort,version,horizon,model,days,MAE,RMSE,G2V_regret,comparison_baseline,baseline_MAE,baseline_RMSE,baseline_G2V_regret,rmse_protocol,input_vintage_verified,note
+V5_saved_92day_test_2023Q4,5,1,profile_hgb_blend,92,11.093786,13.808639,24.015906,daily_profile_baseline,13.575802,17.950554,128.731232,hourly pooled,False,V5 same 92 dates; period distinct from 2026 studies
+V5_saved_92day_test_2023Q4,5,1,daily_profile_baseline,92,13.575802,17.950554,128.731232,daily_profile_baseline,13.575802,17.950554,128.731232,hourly pooled,False,V5 same 92 dates; period distinct from 2026 studies
+V11_training_test_2026Q3,11,1,fixed_profile,92,10.215053,18.247854,55.876,same_hour_horizon_lag,10.546,20.79,74.178,hourly pooled,False,Saved V11 Q3 test vectors; profile lowest MAE; not saved issue forecasts
+V11_training_test_2026Q3,11,1,through_2026Q1_hgb,92,10.721148,16.100727,41.486,same_hour_horizon_lag,10.546,20.79,74.178,hourly pooled,False,Saved V11 Q3 test vectors; mixed objective outcome
+V11_training_test_2026Q3,11,1,through_2026Q1_extra_trees,92,10.405617,16.209037,34.966,same_hour_horizon_lag,10.546,20.79,74.178,hourly pooled,False,Saved V11 Q3 test vectors; mixed objective outcome
+V15_three_validation_folds_2024Q4_2025Q2_2025Q4,15,2,event_features_lgb,275,10.185,14.18,74.849,baseline,10.731,14.628,75.11,hourly pooled,False,Aggregate over 3 previously viewed folds; winter2025 regret degraded vs baseline
+V15_three_validation_folds_2024Q4_2025Q2_2025Q4,15,2,relative_two_stage,275,11.337,15.214,71.755,baseline,10.731,14.628,75.11,hourly pooled,False,Aggregate over 3 previously viewed folds; error worsened
+D2_common_dates_2025Q4,12,2,validation_ensemble,92,12.398,16.668,81.952,same_day_horizon_lag,13.381,17.642,88.577,hourly pooled,False,2025Q4 was a model selection window; optimistic/post-selected
+D2_common_dates_2025Q4,14,2,shape_level_blend,92,13.415,17.564,70.788,same_day_horizon_lag,13.381,17.642,88.577,hourly pooled,False,2025Q4 previously viewed; vintage not established
+D2_common_dates_2025Q4,15,2,event_features_lgb,92,12.827,17.21,112.688,same_day_horizon_lag,13.381,17.642,88.577,hourly pooled,False,V15 event model on same 92 target days
+D2_common_dates_2025Q4,20,2,rolling_calibrated_anchor_shadow,92,12.925,17.866,121.689,same_day_horizon_lag,13.381,17.642,88.577,hourly pooled,False,Shadow candidate: worse than V12/V15 on this known period
+D3_common_validation_2025Q4,17,3,V17_joint,92,15.328,19.818,107.355,V19_D3_HGB,15.62,20.005,94.958,daily RMSE averaged,False,Values from preserved V19 study daily summary; not same aggregation as all rows
+D3_common_validation_2025Q4,19,3,V19_D3_HGB,92,15.62,20.005,94.958,V17_joint,15.328,19.818,107.355,daily RMSE averaged,False,"Separate D3 HGB; lower regret, higher price error than V17"
