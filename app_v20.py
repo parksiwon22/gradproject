@@ -16,10 +16,12 @@ OUTPUT.mkdir(parents=True,exist_ok=True)
 st.set_page_config(page_title='전력예보 V20 · D-3/D-2 검증',page_icon='⚡',layout='wide')
 st.title('⚡ 전력예보 V20 · 예측과 충전비용 검증')
 st.caption('육지 SMP · KST. 저장된 AI와 이후 수신한 공식가격을 비교합니다. 가상 SMP 정산이며 실제 충전요금·실증 V2G 수익이 아닙니다.')
-page=st.sidebar.radio('화면',['SMP 예측·공식가격 비교','EV 충전 추천','연구 예측 정확도','연구 결과·시스템 상태'])
+page=st.sidebar.radio('화면',['SMP 예측·공식가격 비교','과거 예측 시연','EV 충전 추천','연구 예측 정확도','연구 결과·시스템 상태'])
 
 @st.cache_data(ttl=20)
-def load():return inventory(),reference()[0].rename(columns={'smp':'price'})
+def load():
+    actual=reference()[0].sort_values(['timestamp','source','first_seen']).drop_duplicates('timestamp',keep='last')
+    return inventory(),actual.rename(columns={'smp':'price'})
 items,official=load();status=read(OUTPUT/'status.json',{});publisher_status=read(HOME/'publish_status.json',{});preparation_status=read(HOME/'preparation_status.json',{});a,b,c=st.columns(3);a.metric('독립 기준시각',status.get('independent_origins',0));b.metric('독립 기본 대상일',status.get('independent_primary_target_days',0));c.metric('저장 시스템 정시 적격 기록',status.get('V19_on_time_eligible',0))
 if st.sidebar.button('저장 자료 새로 고침'):load.clear();st.rerun()
 
@@ -112,8 +114,94 @@ elif page=='EV 충전 추천':
         if selected['records']:st.dataframe(pd.DataFrame(selected['records']),hide_index=True)
         st.caption('저장된 연구 예측을 활용한 충전 시뮬레이션이며 운영 모델 교체가 아닙니다. G2V 기본 권장.')
         show_plans({selected['label']:selected['prices']},ev,start,end)
+elif page=='과거 예측 시연':
+    research=OUTPUT/'research'
+    prices=research_csv(research/'final_saved_comparison_prices.csv')
+    if prices is None or prices.empty:
+        st.error('보존된 과거 예측 및 비교 가격 자료가 없습니다.')
+    else:
+        st.warning('과거 자료 시연입니다. 선택한 예측은 저장된 발급 예측 또는 과거 재현이며, 신규 실시간 발급·운영 권장은 아닙니다.')
+        cohort_labels={'saved_issue_forecasts':'실제 저장 예측 (V11–V20)','V5_saved_92day_test':'V5 보존 92일 테스트','V20_42day_historical_replay':'V20 42일 과거 재현'}
+        available=prices.demo_cohort.dropna().astype(str).unique().tolist()
+        options=[x for x in cohort_labels if x in available]
+        a,b=st.columns(2)
+        selected_cohort=a.selectbox('시연 자료 유형',options,format_func=lambda x:cohort_labels[x],key='demo_cohort')
+        cohort_data=prices[prices.demo_cohort.astype(str).eq(selected_cohort)]
+        horizons=sorted(int(x) for x in cohort_data.horizon_days.dropna().unique())
+        selected_horizon=b.selectbox('예측 기간',horizons,format_func=lambda x:f'D+{x}',key='demo_horizon')
+        cohort_data=cohort_data[cohort_data.horizon_days.eq(selected_horizon)]
+        days=sorted(cohort_data.target_date.astype(str).unique())
+        preferred_day='2026-10-18' if '2026-10-18' in days else ('2026-10-19' if '2026-10-19' in days else days[-1])
+        day=st.selectbox('예측 대상일',days,index=days.index(preferred_day),key='demo_day')
+        candidates=cohort_data[cohort_data.target_date.astype(str).eq(day)]
+        ids=sorted(candidates.forecast_id.astype(str).unique())
+        preferred_id=next((x for x in ids if 'lightgbm_peak' in x),next((x for x in ids if 'V17_joint' in x),ids[0]))
+        forecast_id=st.selectbox('예측 모델/발급 기록',ids,index=ids.index(preferred_id),key='demo_forecast')
+        selected=candidates[candidates.forecast_id.astype(str).eq(forecast_id)].copy()
+        st.caption(f"{cohort_labels[selected_cohort]} · D+{selected_horizon} · {day} · 자료 유형: {selected.evaluation_type.iloc[0]}")
+        chart=alt.Chart(selected).mark_line(point=True).encode(x=alt.X('hour:O',title='대상일 시간(KST)'),y=alt.Y('smp:Q',title='SMP(원/kWh)'),color=alt.Color('series:N',title='구분'),tooltip=[alt.Tooltip('hour:O',title='시각'),alt.Tooltip('smp:Q',title='SMP',format='.2f'),'series:N','evaluation_type:N']).properties(title=forecast_id,height=340)
+        st.altair_chart(chart,width='stretch')
+        if 'risk_level' in selected and selected.risk_level.notna().any():
+            st.dataframe(selected[selected.risk_level.notna()][['hour','risk_level']].rename(columns={'hour':'시각','risk_level':'저장된 위험도'}),hide_index=True)
+        elif 'spike_probability' in selected and selected.spike_probability.notna().any():
+            risk=selected[selected.spike_probability.notna()][['hour','spike_probability']].rename(columns={'hour':'시각','spike_probability':'급등 확률'})
+            st.dataframe(risk,hide_index=True)
+        else:
+            st.caption('선택 모델은 이 보존 예측에서 시간대별 가격 날씨/급등 위험도를 제공하지 않았습니다.')
+        if 'weather_forecast_used' in selected and selected.weather_forecast_used.notna().any():
+            st.caption('예측 기록의 기상 입력 사용 표기: '+', '.join(sorted(selected.weather_forecast_used.dropna().astype(str).unique())))
+        st.subheader('입력 조건에 따른 G2V 충전 추천 및 비용 재생')
+        ev,start,end=conditions('demo_'+selected_cohort+str(selected_horizon)+day,day)
+        predicted=selected[selected.series.eq('예측 SMP')][['timestamp','smp']].rename(columns={'smp':'price'}).copy()
+        if predicted.empty:
+            predicted=selected[selected.series.eq('기준선 SMP')][['timestamp','smp']].rename(columns={'smp':'price'}).copy()
+        predicted['timestamp']=pd.to_datetime(predicted.timestamp,format='mixed')
+        if predicted.timestamp.dt.tz is None:predicted.timestamp=predicted.timestamp.dt.tz_localize('Asia/Seoul')
+        else:predicted.timestamp=predicted.timestamp.dt.tz_convert('Asia/Seoul')
+        show_plans({'선택 예측 SMP':predicted},ev,start,end)
+        st.caption('표시되는 실제가격은 보존된 공식 제공 SMP입니다. 확정 정산/사후 정정 여부는 별도 확인되지 않아, 비용과 regret는 동일 EV 조건의 사후 가격 재생값입니다.')
 elif page=='연구 예측 정확도':
     research=OUTPUT/'research'
+    st.subheader('보존 예측 종합 비교 (V5–V20)')
+    saved_summary=research_csv(research/'final_saved_comparison_model_summary.csv')
+    if saved_summary is not None and len(saved_summary):
+        cols=[c for c in ['cohort','version','model','horizon_days','days','MAE','RMSE','G2V_regret','V2G_regret','input_vintage_verified','model_available_at_issue','model_available_at_reference_origin','issue_delay_minutes'] if c in saved_summary]
+        st.dataframe(saved_summary[cols].rename(columns={'cohort':'평가 구분','version':'버전','model':'모델','horizon_days':'예측기간(D+)','days':'평가일수','MAE':'MAE(원/kWh)','RMSE':'RMSE(원/kWh)','G2V_regret':'G2V regret(원)','V2G_regret':'가상 V2G regret(원)','input_vintage_verified':'입력 vintage 확인','model_available_at_issue':'발급 시 모델 가용','model_available_at_reference_origin':'기준 발급시 모델 가용','issue_delay_minutes':'기준시각 지연(분)'}),hide_index=True)
+        cohort_options=saved_summary.cohort.dropna().astype(str).unique().tolist()
+        if cohort_options:
+            selected_cohort=st.selectbox('regret 비교 집단',cohort_options,key='saved_eval_regret_cohort')
+            regret=saved_summary[saved_summary.cohort.astype(str)==selected_cohort]
+            regret=regret.dropna(subset=['G2V_regret'])
+            if len(regret):
+                c=alt.Chart(regret).mark_bar().encode(x=alt.X('model:N',title='모델',sort='-y'),y=alt.Y('G2V_regret:Q',title='평균 G2V regret(원)'),color='horizon_days:N',xOffset='horizon_days:N',tooltip=['version','model','horizon_days','days','G2V_regret']).properties(title='동일 평가집단의 모델·기간별 G2V regret',height=290)
+                st.altair_chart(c,width='stretch')
+    else:st.info('기존 저장 예측 비교 결과가 없습니다. 별도 분석을 실행하면 표시됩니다.')
+    paired=research_csv(research/'final_saved_comparison_shared_dates.csv')
+    if paired is not None and len(paired):
+        st.caption('아래 표는 저장 예측과 발급시점에 이용 가능했던 같은 시간대 기준선을 동일 대상일에서 비교합니다. AI 예측은 기존 저장 평가 점수를 재사용했습니다.')
+        cols=[c for c in ['version','model','horizon_days','target_date','MAE','RMSE','G2V_regret','input_vintage_verified','model_available_at_reference_origin','issue_delay_minutes'] if c in paired]
+        st.dataframe(paired[cols].rename(columns={'version':'버전','model':'모델','horizon_days':'예측기간(D+)','target_date':'대상일','MAE':'MAE(원/kWh)','RMSE':'RMSE(원/kWh)','G2V_regret':'G2V regret(원)','input_vintage_verified':'입력 vintage 확인','model_available_at_reference_origin':'기준 발급시 모델 가용','issue_delay_minutes':'기준시각 지연(분)'}),hide_index=True)
+    prices=research_csv(research/'final_saved_comparison_prices.csv')
+    if prices is not None and len(prices):
+        st.subheader('SMP 실제값과 예측값')
+        ids=sorted(prices.forecast_id.dropna().astype(str).unique())
+        preferred=next((i for i in ids if i.startswith('V12 · lightgbm_peak · D+2 · 2026-10-18')),
+                       next((i for i in ids if i.startswith('V5_profile_hgb_blend')),
+                            ids[0] if ids else None))
+        choice=st.selectbox('그래프로 볼 저장 예측·기간·대상일',ids,index=ids.index(preferred) if preferred in ids else 0,key='saved_eval_price_chart')
+        chart_data=prices[prices.forecast_id.astype(str)==choice]
+        chart=alt.Chart(chart_data).mark_line(point=True).encode(x=alt.X('hour:O',title='대상일 시간(KST)'),y=alt.Y('smp:Q',title='SMP(원/kWh)'),color=alt.Color('series:N',title='구분'),tooltip=['forecast_id','series','hour','smp','evaluation_type']).properties(title=choice,height=320)
+        st.altair_chart(chart,width='stretch')
+        st.caption('저장 예측·V5 테스트·V20 재현을 선택해 확인할 수 있습니다. 대상 가격은 보존된 공식 제공가격 또는 V5 저장 실적이며, 확정 정산가격/사후 정정 여부는 확인되지 않았습니다.')
+    else:st.info('저장 예측 시계열 데이터가 없습니다.')
+    manifest=research_csv(research/'final_saved_comparison_manifest.csv')
+    if manifest is not None and len(manifest):
+        excluded=int(manifest.status.eq('excluded_target_price_known_at_issue').sum())
+        retry=int(manifest.status.eq('duplicate_retry_excluded').sum())
+        st.caption(f'사전가격 기확보로 제외 {excluded}건 · 재시도 중복 제외 {retry}건 · 저장 이력 {len(manifest)}건. 모델/입력 vintage가 입증되지 않은 결과는 참고 비교로만 해석합니다.')
+        with st.expander('저장 예측별 발급·입력 검증 내역'):
+            cols=[c for c in ['version','file','model','target_date','horizon_days','issued_at','issue_delay_minutes','issue_known_target_rows','inputs_vintage_verified','model_available_at_reference_origin','status'] if c in manifest]
+            st.dataframe(manifest[cols].rename(columns={'version':'버전','file':'예측 파일','model':'모델','target_date':'대상일','horizon_days':'D+','issued_at':'저장 발급시각','issue_delay_minutes':'기준 지연(분)','issue_known_target_rows':'발급시 이미 알려진 대상일 SMP 행','inputs_vintage_verified':'입력 시각 확인','model_available_at_reference_origin':'기준시 모델 가용','status':'평가 상태'}),hide_index=True)
     st.subheader('실제 운영 연구 예측')
     st.caption('정식 발급 gate와 독립적으로 저장한 예측만 집계합니다. 실제 공식 SMP 24시간 확보 전에는 점수 계산을 보류합니다.')
     op=research_csv(research/'operational_metrics.csv')

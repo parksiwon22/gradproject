@@ -1,0 +1,26 @@
+cohort,version,model,horizon_days,days,MAE,RMSE,G2V_regret,V2G_regret,input_vintage_verified,model_available_at_issue,model_available_at_reference_origin,issue_delay_minutes,target_date,issued_at,status,evaluation_data,actual_basis,target_prices_known_at_issue,comparison_group
+saved_issue_forecasts,11,extra_trees,2,3.0,5.558193604536736,7.223960300703717,138.00000000000014,143.85449382715993,True,,,0.0,,,,,,,
+saved_issue_forecasts,11,hgb,1,1.0,3.4652614942202256,5.499235758710434,7.526666666666642,7.526666666666642,True,,,0.0,,,,,,,
+saved_issue_forecasts,12,extra_trees_peak,2,3.0,8.44169402162054,10.636068040842453,199.2755555555556,205.23004938271572,True,,,26.197436444444445,,,,,,,
+saved_issue_forecasts,12,hgb_none,2,3.0,8.534223447862283,10.33328297940165,138.23111111111135,163.01893827160453,True,,,26.197436444444445,,,,,,,
+saved_issue_forecasts,12,lightgbm_peak,2,3.0,6.286495547375604,7.573205158344506,76.92999999999999,101.71782716049375,True,,,26.197436444444445,,,,,,,
+saved_issue_forecasts,12,validation_ensemble,2,3.0,8.117080358730655,10.088174509430235,162.83888888888896,187.6267160493826,True,,,26.197436444444445,,,,,,,
+saved_issue_forecasts,14,lgb_recent730,2,1.0,5.363502574097946,6.82839663530374,96.8133333333335,96.8133333333335,True,,,13.39808845,,,,,,,
+saved_issue_forecasts,14,lgb_relative_shape,2,1.0,3.9934935237135183,4.618208406042681,9.07333333333372,9.07333333333372,True,,,13.39808845,,,,,,,
+saved_issue_forecasts,14,shape_level_blend,2,1.0,4.136930319528731,5.083934414729917,64.8133333333335,64.81333333333396,True,,,13.39808845,,,,,,,
+saved_issue_forecasts,15,two_stage_shrink_0.25,2,1.0,6.063454243048972,7.626667202316956,96.8133333333335,96.8133333333335,True,,,6.3742609833333335,,,,,,,
+saved_issue_forecasts,15,two_stage_shrink_0.5,2,1.0,5.807932461125337,7.281746344556729,64.8133333333335,64.81333333333396,True,,,6.3742609833333335,,,,,,,
+saved_issue_forecasts,17,2026-10-18_07fe06d705ca,2,1.0,6.674337042849653,7.701636444909221,64.8133333333335,64.81333333333396,True,True,False,535.7070039666667,,,,,,,
+saved_issue_forecasts,17,2026-10-18_07fe06d705ca,3,1.0,9.832670181995402,11.561719202257,0.0,3.850166666664336,True,True,False,535.7070039666667,,,,,,,
+saved_issue_forecasts,20,V17_joint,3,1.0,13.753363083855694,17.14219873289448,7.383333333333667,192.4614814814809,True,,,0.0,,,,,,,
+saved_issue_forecasts,20,same_hour_previous_day_baseline,1,1.0,3.197916666666666,4.590518761534474,61.726666666666006,61.72666666666737,True,,,0.0,,,,,,,
+saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,1,2.0,3.8883333333333336,8.245542199675931,34.626666666666324,121.52030864197629,True,True,,,,,,,,,
+saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,2,3.0,8.28277777777778,11.347601272630245,108.3733333333336,141.027827160494,True,True,,,,,,,,,
+saved_issue_forecasts,replayed,same_hour_available_at_issue_baseline,3,2.0,4.80916666666667,6.8696235786753554,37.3266666666666,39.25174999999899,True,True,,,,,,,,,
+V5_saved_92day_test,5,V5_profile_hgb_blend,1,92.0,11.093786148024114,13.808639024727148,24.015905797101468,144.51956080246882,False,,,,,,evaluated_reused_existing_summary,existing V5 test predictions,V5 saved actual SMP; final correction status unverified,,2023-10-01..2023-12-31; same 92 dates
+V5_saved_92day_test,5,V5_daily_profile_baseline,1,92.0,13.575801630434784,17.95055398798159,128.73123188405802,339.25068925120786,False,,,,,,evaluated_reused_existing_summary,existing V5 test predictions,V5 saved actual SMP; final correction status unverified,,2023-10-01..2023-12-31; same 92 dates
+V20_42day_historical_replay,20,V17_joint,2,42.0,11.355288573026137,14.420989899827134,89.17325396825397,170.00689626690183,False,False,,,,,evaluated_reused_existing_summary,existing V20 42-day replay,official price history; final correction status unverified,,2026-01-01..2026-10-15; same 42 weekly dates
+V20_42day_historical_replay,20,V17_joint,3,42.0,11.29192035599216,14.387406935678404,75.38634920634927,176.25040737801297,False,False,,,,,evaluated_reused_existing_summary,existing V20 42-day replay,official price history; final correction status unverified,,2026-01-01..2026-10-15; same 42 weekly dates
+V20_42day_historical_replay,20,same_hour_previous_day_baseline,1,42.0,8.158968253968254,11.87187699800544,135.7111111111111,296.64841975308644,False,False,,,,,evaluated_reused_existing_summary,existing V20 42-day replay,official price history; final correction status unverified,,2026-01-01..2026-10-15; same 42 weekly dates
+V20_42day_historical_replay,20,same_hour_previous_day_baseline,2,42.0,9.734146825396826,13.809323985737027,100.0061111111111,239.1263615814228,False,False,,,,,evaluated_reused_existing_summary,existing V20 42-day replay,official price history; final correction status unverified,,2026-01-01..2026-10-15; same 42 weekly dates
+V20_42day_historical_replay,20,same_hour_previous_day_baseline,3,42.0,11.07859126984127,15.2373430036322,80.00944444444451,272.8197031746033,False,False,,,,,evaluated_reused_existing_summary,existing V20 42-day replay,official price history; final correction status unverified,,2026-01-01..2026-10-15; same 42 weekly dates
