@@ -1,0 +1,8 @@
+horizon_days,model,days,MAE,RMSE,G2V_regret,source,assessment
+3,V17_joint_D3,92,15.328199345553394,18.322335682010706,107.35510869565215,V19 saved daily metrics,previously reviewed/selection window; diagnostic
+3,V19_D3_HGB,92,15.619848666490872,18.315851288157376,94.95789855072461,V19 saved daily metrics,previously reviewed/selection window; diagnostic
+3,hgb,92,15.261170327001258,18.061103709812308,109.16471014492754,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+3,ml_anchor_blend,92,12.994740178913423,15.879693961577177,80.27713768115942,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+3,peak_weighted,92,15.171908966787553,18.003396145794856,91.51434782608695,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+3,persistence,92,17.490380434782608,22.52368770739732,302.5482971014493,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+3,rolling_anchor_shadow,92,12.242158854166666,15.65967569419563,110.81536231884058,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"

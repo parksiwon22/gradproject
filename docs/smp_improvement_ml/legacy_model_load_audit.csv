@@ -1,0 +1,9 @@
+model,path,load_status,metadata,reason
+D+1_V11_HGB_saved,artifacts\v11\training\through_2026Q1__hgb.joblib,loaded,"{""family"": ""hgb"", ""stage"": ""through_2026Q1"", ""data_hash"": ""d29cd4549178273bcc45b67d43f04652949133a7d3f9f51d903a10d171e85d9d"", ""trained_through"": ""2026-03-31"", ""days_ahead"": 1}",
+D+1_V11_ExtraTrees_saved,artifacts\v11\training\through_2026Q1__extra_trees.joblib,loaded,"{""family"": ""extra_trees"", ""stage"": ""through_2026Q1"", ""data_hash"": ""d29cd4549178273bcc45b67d43f04652949133a7d3f9f51d903a10d171e85d9d"", ""trained_through"": ""2026-03-31"", ""days_ahead"": 1}",
+D+2_V12_LightGBM_peak_saved,artifacts\v12\study\lightgbm_peak.joblib,unavailable,,ModuleNotFoundError: No module named 'lightgbm'
+D+2_V14_shape_level_blend_saved,artifacts\v14\study\shape_level_blend.joblib,unavailable,,ModuleNotFoundError: No module named 'lightgbm'
+D+2_V15_event_features_lgb_saved,artifacts\v15\model_study\winter2025_event_features_lgb.joblib,unavailable,,ModuleNotFoundError: No module named 'lightgbm'
+D+2/D+3_V17_joint_saved,artifacts\v17\study\winter2025.joblib,unavailable,,ModuleNotFoundError: No module named 'lightgbm'
+D+3_V19_HGB_saved,artifacts\v19\study\d3_hgb.joblib,loaded,"{""trained_at"": ""2026-10-17T03:20:01.785874+00:00"", ""trained_through"": ""2025-06-30"", ""train_rows"": 21648, ""horizon_days"": 3, ""kind"": ""SEPARATE_D3_HGB_RESEARCH_NOT_OPERATING_REPLACEMENT""}",
+D+1_V5_HGB_saved,artifacts\models\day_ahead_hgb_residual_model.joblib,loaded,"{""object_type"": ""HistGradientBoostingRegressor""}",

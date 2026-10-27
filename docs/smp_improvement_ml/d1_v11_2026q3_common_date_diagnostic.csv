@@ -1,0 +1,5 @@
+horizon_days,model,days,MAE,RMSE,G2V_regret,source,assessment
+1,V11 fixed profile saved,92,10.215053170289856,15.13205347523849,55.87626811594203,V11 saved 2026Q3 predictions,previously reviewed audit; diagnostic only
+1,V11 HGB saved through Q1,92,10.721147592648977,14.127216675908047,41.48623188405798,V11 saved 2026Q3 predictions,previously reviewed audit; diagnostic only
+1,V11 ExtraTrees saved through Q1,92,10.405616569689354,14.105389209630932,34.96615942028986,V11 saved 2026Q3 predictions,previously reviewed audit; diagnostic only
+1,New peak-weighted HGB refit through Q1,92,10.769513950903171,14.292866177395112,45.72347826086956,new fixed refit evaluated on same previously reviewed 2026Q3 audit,diagnostic only; not used for reselection

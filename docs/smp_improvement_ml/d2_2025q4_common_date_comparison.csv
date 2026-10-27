@@ -1,0 +1,10 @@
+horizon_days,model,source,start,end,days,MAE,RMSE,G2V_regret,assessment
+2.0,V12 LightGBM peak (saved hourly output),V12 saved selection predictions,2025-10-01,2025-12-31,92,13.297166790961418,17.83654558311831,84.31478260869567,"previously reviewed/selection window; diagnostic, not independent test"
+2.0,V14 shape-level blend (saved hourly output),V14 saved selection predictions,2025-10-01,2025-12-31,92,13.414739722993666,17.563920389333504,70.7882608695652,"previously reviewed/selection window; diagnostic, not independent test"
+2.0,V15 event-features LGB (saved hourly output),V15 saved winter2025 predictions,2025-10-01,2025-12-31,92,12.82714318125502,17.210280305155614,112.68753623188407,"previously reviewed/selection window; diagnostic, not independent test"
+2.0,V17 joint_price (saved daily),V17 saved daily full24 metrics,2025-10-01,2025-12-31,92,15.165238357341352,,101.85869565217395,previously reviewed fold; same full24 EV window; saved hourly predictions/RMSE unavailable
+,hgb,new horizon-specific HGB validation; folds include 2025Q4,2025-10-01,2025-12-31,92,12.885533855206491,15.87474011858948,86.26561594202899,previously reviewed fold; compare only within shared dates
+,ml_anchor_blend,new horizon-specific HGB validation; folds include 2025Q4,2025-10-01,2025-12-31,92,12.142728888079583,15.222973204972742,79.47260869565218,previously reviewed fold; compare only within shared dates
+,peak_weighted,new horizon-specific HGB validation; folds include 2025Q4,2025-10-01,2025-12-31,92,12.914265583536151,16.0809317108061,93.94217391304348,previously reviewed fold; compare only within shared dates
+,persistence,new horizon-specific HGB validation; folds include 2025Q4,2025-10-01,2025-12-31,92,17.108858695652174,22.088792022533315,338.0532246376812,previously reviewed fold; compare only within shared dates
+,rolling_anchor_shadow,new horizon-specific HGB validation; folds include 2025Q4,2025-10-01,2025-12-31,92,12.765882019927536,16.32344528787873,118.07811594202899,previously reviewed fold; compare only within shared dates
