@@ -1,0 +1,59 @@
+{
+  "folds": [
+    {
+      "name": "fall2024",
+      "train_end": "2024-06-30",
+      "cal_start": "2024-07-01",
+      "cal_end": "2024-09-30",
+      "val_start": "2024-10-01",
+      "val_end": "2024-12-31"
+    },
+    {
+      "name": "spring2025",
+      "train_end": "2024-12-31",
+      "cal_start": "2025-01-01",
+      "cal_end": "2025-03-31",
+      "val_start": "2025-04-01",
+      "val_end": "2025-06-30"
+    },
+    {
+      "name": "fall2025",
+      "train_end": "2025-06-30",
+      "cal_start": "2025-07-01",
+      "cal_end": "2025-09-30",
+      "val_start": "2025-10-01",
+      "val_end": "2025-12-31"
+    }
+  ],
+  "models": {
+    "lightgbm_base": {
+      "n_estimators": 300,
+      "learning_rate": 0.05,
+      "num_leaves": 31,
+      "min_child_samples": 20,
+      "random_state": 42
+    },
+    "lightgbm_peak": {
+      "base": "lightgbm_base",
+      "sample_weight": "6 when actual target SMP>=150, else 1"
+    },
+    "d1_extratrees": {
+      "n_estimators": 150,
+      "min_samples_leaf": 10,
+      "max_features": 0.8,
+      "random_state": 42
+    }
+  },
+  "datasets": "same V11 SQLite land SMP history; features cut at nominal origin timestamp, first_seen not enforced for historical replay",
+  "evaluation": "target-day cohorts identical to earlier 275-day 2024Q4/2025Q2/2025Q4 validation, EV=60kWh SOC30->80 7kW efficiency .9 full day",
+  "issue_time_policy": "23:00 KST; v11/v17 builders drop a day when any required origin/lag SMP is missing; no future imputation; adapter raises on incomplete day",
+  "historical_first_seen_vintage_verified": false,
+  "independently_unseen_test": false,
+  "runtime_versions": {
+    "lightgbm": "4.7.0",
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "scikit_learn": "1.7.2",
+    "joblib": "1.5.3"
+  }
+}

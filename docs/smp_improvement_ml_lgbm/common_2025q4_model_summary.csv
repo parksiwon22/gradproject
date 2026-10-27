@@ -1,0 +1,19 @@
+horizon_days,model,days,MAE,RMSE,G2V_regret,source,assessment
+2,V12 LightGBM peak (saved hourly output),92,13.297166790961418,17.83654558311831,84.31478260869567,V12 saved selection predictions,"previously reviewed/selection window; diagnostic, not independent test"
+2,V14 shape-level blend (saved hourly output),92,13.414739722993666,17.563920389333504,70.7882608695652,V14 saved selection predictions,"previously reviewed/selection window; diagnostic, not independent test"
+2,V15 event-features LGB (saved hourly output),92,12.82714318125502,17.210280305155614,112.68753623188408,V15 saved winter2025 predictions,"previously reviewed/selection window; diagnostic, not independent test"
+2,V17 joint_price (saved daily),92,15.165238357341352,,101.85869565217396,V17 saved daily full24 metrics,previously reviewed fold; same full24 EV window; saved hourly predictions/RMSE unavailable
+2,hgb,92,12.885533855206493,15.87474011858948,86.26561594202899,new horizon-specific HGB validation; folds include 2025Q4,previously reviewed fold; compare only within shared dates
+2,ml_anchor_blend,92,12.142728888079583,15.222973204972742,79.47260869565218,new horizon-specific HGB validation; folds include 2025Q4,previously reviewed fold; compare only within shared dates
+2,peak_weighted,92,12.914265583536151,16.0809317108061,93.94217391304348,new horizon-specific HGB validation; folds include 2025Q4,previously reviewed fold; compare only within shared dates
+2,persistence,92,17.108858695652174,22.088792022533315,338.0532246376812,new horizon-specific HGB validation; folds include 2025Q4,previously reviewed fold; compare only within shared dates
+2,rolling_anchor_shadow,92,12.765882019927536,16.32344528787873,118.078115942029,new horizon-specific HGB validation; folds include 2025Q4,previously reviewed fold; compare only within shared dates
+3,V17_joint_D3,92,15.328199345553394,18.322335682010703,107.35510869565216,V19 saved daily metrics,previously reviewed/selection window; diagnostic
+3,V19_D3_HGB,92,15.619848666490872,18.315851288157376,94.9578985507246,V19 saved daily metrics,previously reviewed/selection window; diagnostic
+3,hgb,92,15.261170327001258,18.061103709812308,109.16471014492754,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+3,ml_anchor_blend,92,12.994740178913425,15.879693961577177,80.27713768115942,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+3,peak_weighted,92,15.171908966787552,18.003396145794856,91.51434782608696,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+3,persistence,92,17.490380434782608,22.52368770739732,302.5482971014493,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+3,rolling_anchor_shadow,92,12.242158854166666,15.65967569419563,110.81536231884058,new horizon-specific HGB validation; folds include 2025Q4,"previously reviewed fold; paired dates, vintage unverified"
+2,lightgbm_anchor_blend,92,12.728147370972671,17.256078583704646,86.10336956521739,new fold-trained LightGBM/anchor replay,"2025Q4 previously reviewed; retrospective, vintage unverified"
+3,lightgbm_anchor_blend,92,13.00770071703785,17.83183538044864,80.43666666666668,new fold-trained LightGBM/anchor replay,"2025Q4 previously reviewed; retrospective, vintage unverified"

@@ -47,6 +47,13 @@ class MLShadowAdapterTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             predict(self.prices, '2024-09-01', 4, self.bundle_path(1))
 
+    def test_missing_2300_origin_smp_fails_closed(self):
+        for horizon, target in {1:'2024-09-01', 2:'2024-09-02', 3:'2024-09-03'}.items():
+            origin = pd.Timestamp(target, tz='Asia/Seoul') - pd.Timedelta(days=horizon) + pd.Timedelta(hours=23)
+            missing = self.prices[self.prices.timestamp != origin].copy()
+            with self.subTest(horizon=horizon), self.assertRaises(ValueError):
+                predict(missing, target, horizon, self.bundle_path(horizon))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,5 @@
 /.venv/
+/.venv-smp-research/
 /local_original/
 /data/*
 !/data/README.md

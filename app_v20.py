@@ -16,7 +16,7 @@ OUTPUT.mkdir(parents=True,exist_ok=True)
 st.set_page_config(page_title='전력예보 V20 · D-3/D-2 검증',page_icon='⚡',layout='wide')
 st.title('⚡ 전력예보 V20 · 예측과 충전비용 검증')
 st.caption('육지 SMP · KST. 저장된 AI와 이후 수신한 공식가격을 비교합니다. 가상 SMP 정산이며 실제 충전요금·실증 V2G 수익이 아닙니다.')
-page=st.sidebar.radio('화면',['SMP 예측·공식가격 비교','과거 예측 시연','EV 충전 추천','연구 예측 정확도','연구 결과·시스템 상태'])
+page=st.sidebar.radio('화면',['SMP 예측·공식가격 비교','과거 예측 시연','최종 연구 fold 시연','EV 충전 추천','연구 예측 정확도','연구 결과·시스템 상태'])
 
 @st.cache_data(ttl=20)
 def load():
@@ -43,10 +43,13 @@ def conditions(prefix,day,overnight=False):
 
 def message(e):return {'SOC bounds violated':'초기·목표 SOC와 배터리 상하한을 확인하세요.','departure SOC infeasible in connection window':'연결시간과 전력으로 목표 SOC를 달성할 수 없습니다.'}.get(str(e),str(e))
 
-def show_plans(sources,ev,start,end):
+def show_plans(sources,ev,start,end,actual_reference=None,actual_label='공식가격'):
     actual=None
     try:actual=require_prices(official[['timestamp','price']],start,end).price.to_numpy()
     except ValueError:pass
+    if actual_reference is not None:
+        try:actual=require_prices(actual_reference[['timestamp','price']],start,end).price.to_numpy()
+        except ValueError:actual=None
     costs=[];powers=[];soc=[];saved={}
     for label,f in sources.items():
         if f is None:st.info(label+': 미확보 · 다른 날짜나 모델 값으로 대체하지 않습니다.');continue
@@ -56,11 +59,11 @@ def show_plans(sources,ev,start,end):
                 actual_cost=regret=None
                 if actual is not None:
                     s=plan['schedule'];actual_cost=score(actual,s.charge_kw.to_numpy(),s.discharge_kw.to_numpy(),s.connected_hours.to_numpy(),ev)['net_cost'];oracle=priority_plan(actual,times,ev=ev,start=start,end=end) if kind=='G2V' else dispatch('general',actual,times,None,ev,start,end);regret=actual_cost-oracle['net_cost']
-                costs.append({'자료':label,'방식':kind,'계획가격 비용(원)':plan['net_cost'],'공식가격 평가비용(원)':actual_cost,'regret(원)':regret,'방전(kWh)':plan['grid_export_kwh'],'종료 SOC(%)':plan['ending_soc']})
+                costs.append({'자료':label,'방식':kind,'계획가격 비용(원)':plan['net_cost'],actual_label+' 평가비용(원)':actual_cost,'regret(원)':regret,'방전(kWh)':plan['grid_export_kwh'],'종료 SOC(%)':plan['ending_soc']})
                 s=plan['schedule'];powers.append(pd.DataFrame(dict(timestamp=s.timestamp,계열=label+' '+kind,전력=s.charge_kw-s.discharge_kw)));soc.append(pd.DataFrame(dict(timestamp=s.timestamp,계열=label+' '+kind,SOC=s.soc_end)))
             if True:  # Baselines use the same connection and EV even when only AI is available.
                 for kind,uniform in [('즉시충전',False),('균등충전',True)]:
-                    base=baseline(p,times,ev,start,end,uniform);cost=base['net_cost'];real=None if actual is None else baseline(actual,times,ev,start,end,uniform)['net_cost'];reg=None if actual is None else real-priority_plan(actual,times,ev=ev,start=start,end=end)['net_cost'];costs.append({'자료':label,'방식':kind,'계획가격 비용(원)':cost,'공식가격 평가비용(원)':real,'regret(원)':reg,'방전(kWh)':0,'종료 SOC(%)':max(ev.initial_soc,ev.target_soc)})
+                    base=baseline(p,times,ev,start,end,uniform);cost=base['net_cost'];real=None if actual is None else baseline(actual,times,ev,start,end,uniform)['net_cost'];reg=None if actual is None else real-priority_plan(actual,times,ev=ev,start=start,end=end)['net_cost'];costs.append({'자료':label,'방식':kind,'계획가격 비용(원)':cost,actual_label+' 평가비용(원)':real,'regret(원)':reg,'방전(kWh)':0,'종료 SOC(%)':max(ev.initial_soc,ev.target_soc)})
             st.caption(label+' G2V 추천시간: '+', '.join(t.strftime('%m/%d %H:%M') for t in g['schedule'].loc[g['schedule'].charge_kw>1e-8,'timestamp']))
         except ValueError as exc:st.warning(label+': '+message(exc))
     if costs:
@@ -68,12 +71,21 @@ def show_plans(sources,ev,start,end):
         if actual is not None:
             for label in sources:
                 a=table[(table['자료']==label)&(table['방식']=='G2V')];b=table[(table['자료']==label)&(table['방식']=='가상 V2G')]
-                if len(a) and len(b):st.write(f"{label} 가상 V2G 추가손익: {a.iloc[0]['공식가격 평가비용(원)']-b.iloc[0]['공식가격 평가비용(원)']:.2f}원 · 방전 {b.iloc[0]['방전(kWh)']:.2f}kWh")
+                cost_col=actual_label+' 평가비용(원)'
+                if len(a) and len(b):st.write(f"{label} 가상 V2G 추가손익: {a.iloc[0][cost_col]-b.iloc[0][cost_col]:.2f}원 · 방전 {b.iloc[0]['방전(kWh)']:.2f}kWh")
         for data,value,title,unit in [(powers,'전력','충방전 전력','kW'),(soc,'SOC','배터리 SOC','%')]:
             f=pd.concat(data);chart=alt.Chart(f).mark_line(point=True).encode(x=alt.X('timestamp:T',title='KST'),y=alt.Y(value+':Q',title=unit),color='계열:N',tooltip=['timestamp:T','계열:N',value+':Q']).properties(title=title,height=265);st.altair_chart(chart,width='stretch')
-        st.warning('기본 권장 G2V 유지. 화면에서 다시 계산한 계획은 현재 조건의 시뮬레이션이며 원래 사전 계획을 수정하지 않습니다. 공식 제공가격과 최종 정정통계도 구분합니다.')
+        note=('fold 실제값을 이용한 사후 시뮬레이션이며 운영 결과가 아닙니다.' if actual_reference is not None
+              else '공식 제공가격과 최종 정정통계는 구분합니다.')
+        st.warning('기본 권장 G2V 유지. 화면에서 다시 계산한 계획은 현재 조건의 시뮬레이션이며 원래 사전 계획을 수정하지 않습니다. '+note)
         if st.button('비교 시뮬레이션 로컬 저장'):
             write_audit_once(OUTPUT/'interactive_decisions'/(pd.Timestamp.now(tz='UTC').strftime('%Y%m%dT%H%M%S%f')+'.json'),dict(at=now(),mode='RETROSPECTIVE_INTERACTIVE_NOT_NEW_FORWARD',EV=ev.__dict__,start=start.isoformat(),end=end.isoformat(),plans=saved,costs=costs));st.success('로컬 시뮬레이션으로 저장했습니다. 새 사전 예측 수에는 포함하지 않습니다.')
+
+@st.cache_data(ttl=300)
+def load_fold_demo():
+    path=ROOT/'docs'/'smp_improvement_ml_lgbm'/'final_fold_demo.csv.gz'
+    if not path.exists():return pd.DataFrame()
+    return csv(path)
 
 def select_forecast(day,horizon):
     choices=[x for x in items if day in set(x[2].timestamp.dt.strftime('%Y-%m-%d')) and (pd.Timestamp(day).date()-pd.Timestamp(x[3]['reference_origin']).date()).days==horizon]
@@ -103,6 +115,35 @@ if page=='SMP 예측·공식가격 비교':
     if (HOME/'frozen_costs.csv').exists():
         with st.expander('원래 동결한 사전 계획의 평가 · 위 재생과 별도'):
             f=csv(HOME/'frozen_costs.csv');st.dataframe(f[f.target_date==day],hide_index=True)
+elif page=='최종 연구 fold 시연':
+    demo=load_fold_demo()
+    st.subheader('최종 연구 후보 · 과거 검증 fold 시연')
+    st.warning('과거 검증 구간의 fold 모델 저장 예측입니다. 실제 당시 운영 발급 기록이 아니며, 원본 SMP 수신 시각과 당시 모델 파일 가용성이 확인되지 않아 검증된 운영 성능으로 볼 수 없습니다. 운영 모델과 공식 발급 gate에는 연결되지 않습니다.')
+    if demo.empty:
+        st.error('연구 fold 시연 자료가 없습니다.')
+    else:
+        horizons=sorted(demo.horizon_days.unique().tolist());h=st.selectbox('예측 기간',horizons,format_func=lambda x:f'D+{x}',key='fold_demo_horizon');part=demo[demo.horizon_days==h]
+        dates=sorted(part.target_date.astype(str).unique());day=st.selectbox('검증 대상일',dates,index=max(0,len(dates)-1),key='fold_demo_day')
+        day_data=part[part.target_date.astype(str)==day];models=sorted(day_data.loc[~day_data.series.isin(['실제 SMP','기준선 SMP']),'series'].unique())
+        preferred={1:'V11_ExtraTrees_fold_refit',2:'ml_anchor_blend',3:'ml_anchor_blend'}.get(h)
+        default=models.index(preferred) if preferred in models else 0
+        model=st.selectbox('모델',models,index=default,key='fold_demo_model')
+        metadata=day_data.iloc[0]
+        st.caption(f"유형: 시점 재현 fold 검증 · 학습 종료 {metadata.train_end} · 보정 {metadata.calibration_start}~{metadata.calibration_end} · 평가 {metadata.validation_start}~{metadata.validation_end} · vintage 확인: 아니오")
+        actual=day_data[day_data.series=='실제 SMP'].sort_values('hour');baseline_row=day_data[day_data.series=='기준선 SMP'].sort_values('hour');pred=day_data[day_data.series==model].sort_values('hour')
+        chart_data=pd.DataFrame({'timestamp':pd.date_range(pd.Timestamp(day,tz='Asia/Seoul'),periods=24,freq='h'),'실제 SMP':actual.smp.to_numpy(),'기준선 SMP':baseline_row.smp.to_numpy(),'선택 모델 SMP':pred.smp.to_numpy()})
+        line(chart_data,['실제 SMP','기준선 SMP','선택 모델 SMP'],f'D+{h} {day} 검증 fold 예측과 실제값','원/kWh')
+        e=pred.smp.to_numpy()-actual.smp.to_numpy();mae=float(np.mean(np.abs(e)));rmse=float(np.sqrt(np.mean(e**2)));be=baseline_row.smp.to_numpy()-actual.smp.to_numpy();bmae=float(np.mean(np.abs(be)));brmse=float(np.sqrt(np.mean(be**2)))
+        a,b,c,d=st.columns(4);a.metric('모델 MAE',f'{mae:.2f}',f'{mae-bmae:+.2f} vs 기준선');b.metric('모델 RMSE',f'{rmse:.2f}',f'{rmse-brmse:+.2f} vs 기준선');c.metric('표본','24시간');d.metric('운영 검증','아님')
+        with st.expander('시간대별 오차 표'):
+            detail=chart_data.copy();detail['모델 오차']=e;detail['기준선 오차']=be;st.dataframe(detail,hide_index=True)
+        st.subheader('동일 EV 조건의 G2V 충전 추천 재생')
+        ev,start,end=conditions('fold_demo_'+str(h)+'_'+day,day)
+        pred_prices=chart_data[['timestamp','선택 모델 SMP']].rename(columns={'선택 모델 SMP':'price'})
+        base_prices=chart_data[['timestamp','기준선 SMP']].rename(columns={'기준선 SMP':'price'})
+        actual_prices=chart_data[['timestamp','실제 SMP']].rename(columns={'실제 SMP':'price'})
+        show_plans({'선택 연구 모델':pred_prices,'기준선':base_prices},ev,start,end,actual_reference=actual_prices,actual_label='fold 실제 SMP')
+        st.caption('regret은 같은 대상일과 화면 입력 EV 조건에서 fold 실제 SMP를 기준으로 계산합니다. 이는 retrospective simulation이며 운영 regret 표본은 아닙니다.')
 elif page=='EV 충전 추천':
     st.info('전체 연결기간의 공식 SMP를 우선하며, 없으면 검증된 정시 저장 AI를 선택합니다. 현재 조건의 계획 재계산이며 원래 동결한 결정을 바꾸지 않습니다.')
     ev,start,end=conditions('live',pd.Timestamp.now(tz='Asia/Seoul').strftime('%Y-%m-%d'),True)
