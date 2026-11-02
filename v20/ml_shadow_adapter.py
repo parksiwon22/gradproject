@@ -37,6 +37,13 @@ def predict(prices: pd.DataFrame, target_date: str, horizon_days: int,
     frame['timestamp'] = pd.to_datetime(frame.timestamp, utc=True, format='mixed').dt.tz_convert('Asia/Seoul')
     target = pd.date_range(pd.Timestamp(target_date, tz='Asia/Seoul'), periods=24, freq='h')
     origin = target[0].normalize() - pd.Timedelta(days=horizon_days) + pd.Timedelta(hours=23)
+    # A post-origin checkpoint cannot represent a forecast made at this origin,
+    # even if all feature timestamps have been correctly filtered.
+    trained_through = bundle.get('trained_through')
+    if not trained_through:
+        raise ValueError('model training cutoff is missing from shadow bundle')
+    if pd.Timestamp(trained_through).date() >= origin.date():
+        raise ValueError('shadow bundle was trained on or after its forecast origin')
     receipt_verified = 'first_seen' in frame.columns
     if receipt_verified:
         received = pd.to_datetime(frame.first_seen, utc=True, format='mixed', errors='coerce')
