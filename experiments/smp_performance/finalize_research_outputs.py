@@ -60,10 +60,9 @@ def main():
 
     hourly = pd.read_csv(OUT / 'd2_d3_hourly_predictions.csv')
     d1 = pd.read_csv(OUT / 'd1_v11_extratrees_fold_hourly.csv')
-    all_hourly = pd.concat([hourly, d1], ignore_index=True)
-
     folds = {f['name']: f for f in json.loads((OUT / 'study_manifest.json').read_text(encoding='utf-8'))['folds']}
     old_hourly = pd.read_csv(ROOT / 'docs' / 'smp_improvement_ml' / 'hourly_predictions.csv')
+    all_hourly = pd.concat([hourly, d1, old_hourly], ignore_index=True)
     parts = []
 
     def add_series(source, horizon, models, source_name):
@@ -115,7 +114,7 @@ def main():
     pd.concat(chosen_hourly, axis=1).rename_axis('hour').reset_index().to_csv(OUT / 'final_hourly_mae.csv', index=False)
 
     day = '2025-12-31'
-    chosen_series = {1: ('V11_ExtraTrees_fold_refit', d1), 2: ('ml_anchor_blend', hourly), 3: ('ml_anchor_blend', hourly)}
+    chosen_series = {1: ('V11_ExtraTrees_fold_refit', d1), 2: ('ml_anchor_blend', old_hourly), 3: ('ml_anchor_blend', old_hourly)}
     fig, axes = plt.subplots(3, 1, figsize=(12, 10), sharex=True)
     for ax, (h, (model, data)) in zip(axes, chosen_series.items()):
         actual = data[(data.horizon_days == h) & (data.target_date == day)].drop_duplicates('hour').sort_values('hour')
