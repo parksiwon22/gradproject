@@ -1,0 +1,41 @@
+{
+  "peak_threshold": 150.0,
+  "folds": [
+    {
+      "name": "fall2024",
+      "train_end": "2024-06-30",
+      "cal_start": "2024-07-01",
+      "cal_end": "2024-09-30",
+      "val_start": "2024-10-01",
+      "val_end": "2024-12-31"
+    },
+    {
+      "name": "spring2025",
+      "train_end": "2024-12-31",
+      "cal_start": "2025-01-01",
+      "cal_end": "2025-03-31",
+      "val_start": "2025-04-01",
+      "val_end": "2025-06-30"
+    },
+    {
+      "name": "fall2025",
+      "train_end": "2025-06-30",
+      "cal_start": "2025-07-01",
+      "cal_end": "2025-09-30",
+      "val_start": "2025-10-01",
+      "val_end": "2025-12-31"
+    }
+  ],
+  "feature_set": "unchanged V11 D+1 / V17 D+2,D+3 cyclic time/month/weekday plus historical SMP inputs",
+  "season_models": "fixed DJF/MAM/JJA/SON and KMeans monthly hour-peak profiles (k=4), fit separately inside each training fold",
+  "no_duplicate_calendar_features": true,
+  "cluster_definition": "train-only 12x24 monthly peak-rate matrix plus monthly peak-rate; standardize then KMeans seed42 n_init20",
+  "calibration_guardrails": "MAE +0.10; RMSE +0.25; normal MAE +0.10; G2V regret +2; peak MAE must improve; calibration only",
+  "evaluation_not_used_for_selection": true,
+  "historical_first_seen_vintage_verified": false,
+  "operating_model_replaced": false,
+  "EV": "60kWh; SOC30->80; 7kW; efficiency0.90; full24h",
+  "classifier": "balanced HistGradientBoostingClassifier",
+  "peak_regressor": "peak-only HistGradientBoostingRegressor",
+  "known_limit": "past first_seen/publication vintage and model file availability are unverified"
+}

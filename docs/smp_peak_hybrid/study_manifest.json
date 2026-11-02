@@ -1,0 +1,53 @@
+{
+  "peak_threshold": 150.0,
+  "folds": [
+    {
+      "name": "fall2024",
+      "train_end": "2024-06-30",
+      "cal_start": "2024-07-01",
+      "cal_end": "2024-09-30",
+      "val_start": "2024-10-01",
+      "val_end": "2024-12-31"
+    },
+    {
+      "name": "spring2025",
+      "train_end": "2024-12-31",
+      "cal_start": "2025-01-01",
+      "cal_end": "2025-03-31",
+      "val_start": "2025-04-01",
+      "val_end": "2025-06-30"
+    },
+    {
+      "name": "fall2025",
+      "train_end": "2025-06-30",
+      "cal_start": "2025-07-01",
+      "cal_end": "2025-09-30",
+      "val_start": "2025-10-01",
+      "val_end": "2025-12-31"
+    }
+  ],
+  "EV": "60kWh; SOC 30->80%; charge 7kW; efficiency 0.90; full 24h",
+  "features": "V11 for D+1; V17 shared-origin for D+2/D+3; 23:00 KST cutoff enforced",
+  "classifier": {
+    "model": "HistGradientBoostingClassifier",
+    "max_iter": 180,
+    "max_leaf_nodes": 7,
+    "learning_rate": 0.05,
+    "min_samples_leaf": 20,
+    "class_weight": "balanced"
+  },
+  "peak_regressor": {
+    "model": "HistGradientBoostingRegressor",
+    "max_iter": 180,
+    "max_leaf_nodes": 7,
+    "learning_rate": 0.05,
+    "min_samples_leaf": 12,
+    "fit_rows": "training SMP >= 150 only"
+  },
+  "calibration": "Only each fold preceding quarter selects probability threshold and correction scale; guardrails keep calibration MAE/RMSE/normal MAE/G2V near base.",
+  "fixed_hour": "Top 3/5/8 hours selected by that fold training peak rates; per-hour uplift from training peaks; scale selected on calibration only.",
+  "vintage_verified": false,
+  "validation_used_for_model_selection": false,
+  "operating_model_replaced": false,
+  "known_limit": "historical first_seen publication vintage and checkpoint existence are not verified"
+}

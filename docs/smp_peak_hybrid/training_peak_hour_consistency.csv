@@ -1,0 +1,4 @@
+horizon_days,mean_pairwise_top3_jaccard,fold_top3_overlap_hours,interpretation
+1,0.6666666666666666,2,"train-only frequency; stability is descriptive, not validation-selected"
+2,0.6666666666666666,2,"train-only frequency; stability is descriptive, not validation-selected"
+3,0.6666666666666666,2,"train-only frequency; stability is descriptive, not validation-selected"
