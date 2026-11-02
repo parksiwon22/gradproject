@@ -109,8 +109,18 @@ def main():
     chosen_hourly = []
     for h, name in chosen.items():
         frame = all_hourly[(all_hourly.horizon_days == h) & (all_hourly.model == name)].copy()
-        frame['abs_error'] = frame.error.abs()
-        chosen_hourly.append(frame.groupby('hour').abs_error.mean().rename(f'D+{h} MAE'))
+        if frame.empty:
+            raise ValueError(f'Missing final D+{h} hourly model predictions: {name}')
+        if frame[['fold', 'target_date', 'hour']].duplicated().any():
+            raise ValueError(f'Duplicate D+{h} model-hour rows: {name}')
+        counts = frame.groupby(['fold', 'target_date']).hour.agg(['size', 'nunique'])
+        expected_days = int(summary.loc[(summary.horizon_days == h) & (summary.model == name), 'days'].iloc[0])
+        if len(counts) != expected_days or (counts['size'] != 24).any() or (counts['nunique'] != 24).any():
+            raise ValueError(f'Incomplete final D+{h} forecast day for {name}')
+        hourly_mae = frame.assign(abs_error=frame.error.abs()).groupby('hour').abs_error.mean()
+        if len(hourly_mae) != 24 or hourly_mae.isna().any():
+            raise ValueError(f'Incomplete D+{h} hourly MAE for {name}')
+        chosen_hourly.append(hourly_mae.rename(f'D+{h} MAE'))
     pd.concat(chosen_hourly, axis=1).rename_axis('hour').reset_index().to_csv(OUT / 'final_hourly_mae.csv', index=False)
 
     day = '2025-12-31'
