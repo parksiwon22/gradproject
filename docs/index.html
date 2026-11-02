@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#152f46">
+  <meta name="description" content="전력예보 V20 연구 결과 기반 육지 SMP 24시간 예측과 전기차 충전 계획 비교">
+  <title>전력예보 | SMP 예측과 스마트 충전</title>
+  <link rel="stylesheet" href="./web_v20_public.css">
+  <script defer src="./web_v20_public.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">본문 바로가기</a>
+  <header class="topbar">
+    <div class="wrap navwrap">
+      <a class="brand" href="#top" aria-label="전력예보 홈"><span class="brand-icon">↗</span><span>전력예보 <small>POWER FORECAST</small></span></a>
+      <nav aria-label="주요 메뉴">
+        <a href="#forecast">가격 예측</a>
+        <a href="#charging">충전 추천</a>
+        <a href="#research">연구 결과</a>
+      </nav>
+      <span class="nav-chip">V20 연구 시연</span>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="wrap hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="tiny-dot"></span> SMP 기반 스마트 충전 연구</p>
+          <h1>전력 가격을 읽고,<br><em>충전 시간을 선택하다.</em></h1>
+          <p class="hero-desc">하루 24시간의 SMP를 예측하고 전기차에 적합한 충전 시간대를 찾아봅니다. 연구에서 선정한 D+1, D+2, D+3 모델의 과거 검증 결과를 직접 확인해 보세요.</p>
+          <a class="hero-button" href="#forecast">예측 결과 살펴보기 <span aria-hidden="true">↗</span></a>
+          <p class="hero-fineprint">2024~2025년 과거 검증 시연입니다. 실시간 예측이나 실제 전기요금 안내가 아닙니다.</p>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orb one"></div><div class="orb two"></div>
+          <div class="illustration-card"><div class="ill-top"><span>24H PRICE PROFILE</span><span>↗</span></div><svg viewBox="0 0 440 150" role="presentation" focusable="false"><defs><linearGradient id="heroFill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#6ee3cf" stop-opacity=".3"/><stop offset="1" stop-color="#6ee3cf" stop-opacity="0"/></linearGradient></defs><path d="M0 117 L30 105 L55 112 L88 75 L126 88 L157 55 L186 69 L216 37 L250 58 L277 25 L301 46 L337 23 L370 42 L401 16 L440 31 L440 150 L0 150 Z" fill="url(#heroFill)"/><path d="M0 117 L30 105 L55 112 L88 75 L126 88 L157 55 L186 69 L216 37 L250 58 L277 25 L301 46 L337 23 L370 42 L401 16 L440 31" fill="none" stroke="#75ecdb" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="401" cy="16" r="5" fill="#fff" stroke="#75ecdb" stroke-width="3"/></svg><div class="ill-bottom"><strong>가격 흐름 분석</strong><span>24시간 최적 충전 의사결정</span></div></div>
+          <div class="float-badge">⚡ <span>스마트 충전</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="summary wrap" aria-label="연구 핵심 숫자">
+      <div class="summary-card"><span class="summary-number">24<small>시간</small></span><span class="summary-label">시간대별 가격 비교</span></div>
+      <div class="summary-card"><span class="summary-number">3<small>개</small></span><span class="summary-label">D+1 ~ D+3 예측 기간</span></div>
+      <div class="summary-card"><span class="summary-number">275<small>일</small></span><span class="summary-label">기간별 과거 검증 일수</span></div>
+      <div class="summary-card"><span class="summary-number">G2V</span><span class="summary-label">기본 충전 추천 방식</span></div>
+    </section>
+    <section class="content-section wrap" id="forecast">
+      <div class="section-head">
+        <div><p class="section-kicker">01 / FORECAST</p><h2>하루의 전력 가격을 비교해 보세요.</h2><p class="section-desc">예측일과 기준 시점을 선택하면 모델 예측, 과거 실제 SMP, 단순 기준선을 함께 보여드립니다.</p></div>
+      </div>
+      <div class="controls panel">
+        <div class="field"><label for="horizon">예측 시점</label><select id="horizon"><option value="1">D+1 · 하루 전 예측</option><option value="2">D+2 · 이틀 전 예측</option><option value="3">D+3 · 사흘 전 예측</option></select></div>
+        <div class="field"><label for="date">예측 대상 날짜</label><select id="date"><option>데이터 불러오는 중</option></select></div>
+        <div class="source-note"><span class="state-dot"></span><span id="dataStatus">연구 데이터를 읽고 있습니다</span></div>
+      </div>
+      <div id="error" class="error-panel" role="alert" hidden></div>
+      <div class="metric-grid">
+        <div class="metric panel"><span>해당 날짜 모델 MAE</span><strong id="dailyMae">—</strong><small>원/kWh · 과거 실제값 대비</small></div>
+        <div class="metric panel"><span>해당 날짜 모델 RMSE</span><strong id="dailyRmse">—</strong><small>원/kWh · 큰 오차에 민감</small></div>
+        <div class="metric panel"><span>예측 최저가 시간</span><strong id="cheapHour">—</strong><small id="cheapPrice">저렴한 시간대를 확인하세요</small></div>
+        <div class="metric panel"><span>기준선 대비 MAE</span><strong id="dailyDiff">—</strong><small id="baselineNote">기준선과 같은 날짜로 비교</small></div>
+      </div>
+      <div class="panel chart-card">
+        <div class="chart-top"><div><h3>24시간 SMP 가격 곡선</h3><p>단위: 원/kWh · 한국시간(KST)</p></div><div class="legend"><span><i class="line-bullet prediction"></i>AI 예측</span><span><i class="line-bullet actual"></i>과거 실제</span><span><i class="line-bullet baseline"></i>단순 기준선</span></div></div>
+        <div id="chartArea" class="chart-area"><p class="loading">가격 데이터를 준비하고 있습니다…</p></div>
+        <div class="chart-foot"><span id="modelName">예측 모델 정보 불러오는 중</span><span>시계열 연구 재현</span></div>
+      </div>
+    </section>
+    <section class="content-section section-tint" id="charging">
+      <div class="wrap">
+        <div class="section-head"><div><p class="section-kicker">02 / EV CHARGING</p><h2>내 조건에 맞춰 충전 시간을 추천받으세요.</h2><p class="section-desc">예측 SMP가 낮은 시간부터 필요한 양만 충전하는 계획입니다. 실제 전기요금이 아닌 SMP 기반 가상 비용입니다.</p></div></div>
+        <div class="charging-layout">
+          <div class="panel charge-settings">
+            <h3>차량과 충전 조건</h3>
+            <div class="form-grid">
+              <div class="field"><label for="capacity">배터리 용량 <span>kWh</span></label><input id="capacity" type="number" min="1" max="300" value="60" step="1"></div>
+              <div class="field"><label for="power">충전기 출력 <span>kW</span></label><input id="power" type="number" min=".1" max="350" value="7" step=".1"></div>
+              <div class="field"><label for="socInitial">현재 SOC <span>%</span></label><input id="socInitial" type="number" min="0" max="100" value="30" step="1"></div>
+              <div class="field"><label for="socTarget">목표 SOC <span>%</span></label><input id="socTarget" type="number" min="0" max="100" value="80" step="1"></div>
+              <div class="field"><label for="start">충전 시작 <span>시</span></label><select id="start"></select></div>
+              <div class="field"><label for="end">충전 종료 <span>시</span></label><select id="end"></select></div>
+              <div class="field wide"><label for="eff">충전 효율 <span id="effLabel">90%</span></label><input type="range" min="50" max="100" value="90" id="eff"></div>
+            </div>
+            <p class="helper">선택한 날짜의 00~24시 안에서 시간 단위로 계획합니다. 연결 시간을 벗어난 충전은 하지 않습니다.</p>
+            <button id="calculate" class="primary-button" type="button">내 충전 계획 계산하기 <span>↗</span></button>
+          </div>
+          <div class="panel charge-results" aria-live="polite">
+            <div class="results-header"><div><span class="eyebrow-dark">추천 결과</span><h3 id="resultHeading">차량 조건을 선택해 주세요</h3></div><span class="research-tag">G2V 기본</span></div>
+            <div class="result-big"><span>예측 SMP 기준 계획 비용</span><strong id="expectedCost">—</strong><small>원 · 실제 청구 금액이 아닙니다</small></div>
+            <div class="result-split"><div><span>실제 SMP로 사후 평가한 비용</span><strong id="actualCost">—</strong></div><div><span>최적 계획 대비 추가 비용 (regret)</span><strong id="regret">—</strong></div></div>
+            <div class="charging-visual"><p class="mini-label">추천 충전 시간대 (24시간)</p><div id="chargingSlots" class="charging-slots" aria-label="시간별 충전시간 표시"></div><div class="slots-legend"><span><i></i>선택한 충전 시간</span><span id="energyNote">—</span></div></div>
+            <div id="planMessage" class="plan-message">데이터를 불러오면 충전 계획이 표시됩니다.</div>
+            <div class="saving-row"><span>같은 조건의 즉시 충전 대비 사후 비용 차이</span><strong id="saving">—</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="content-section wrap" id="research">
+      <div class="section-head"><div><p class="section-kicker">03 / RESEARCH</p><h2>어떤 모델을 선택했을까요?</h2><p class="section-desc">세 기간 모두 275일의 과거 시점 재현 검증을 진행하고, 단순한 전일 가격 기준선과 비교했습니다.</p></div></div>
+      <div class="panel performance"><div class="table-scroll"><table><thead><tr><th>예측 기간</th><th>선정 모델</th><th>MAE</th><th>RMSE</th><th>기준선 대비 MAE 감소</th></tr></thead><tbody><tr><td><b>D+1</b></td><td>ExtraTrees</td><td>9.248</td><td>13.200</td><td><span class="good">23.9%</span></td></tr><tr><td><b>D+2</b></td><td>HGB + seasonal anchor</td><td>10.175</td><td>14.223</td><td><span class="good">36.5%</span></td></tr><tr><td><b>D+3</b></td><td>HGB + seasonal anchor</td><td>10.429</td><td>14.621</td><td><span class="good">35.7%</span></td></tr></tbody></table></div><p class="table-caption">MAE와 RMSE 단위: 원/kWh. 이 수치는 275개 과거 validation일의 연구 평가로, 실제 운영 성능이나 독립 최종 테스트가 아닙니다.</p></div>
+      <div class="insight-grid"><article class="insight panel"><span class="insight-no">01</span><h3>가격 흐름 학습</h3><p>월, 요일, 시간대, 최근 SMP 변동을 결합해 내일과 이틀 및 사흘 뒤의 가격 변화를 예측합니다.</p></article><article class="insight panel"><span class="insight-no">02</span><h3>피크 예측도 검증</h3><p>급등 가중 LightGBM과 계절별 피크 전용 모델을 시험했으나 전체 MAE와 충전 판단 성능이 일관되게 개선되지 않아 최종 후보에서 제외했습니다.</p></article><article class="insight panel"><span class="insight-no">03</span><h3>충전 의사결정에 활용</h3><p>가격을 예측하는 것에서 끝나지 않고, 같은 차량 조건에서 실제 SMP 기준 충전 비용과 사후 최적 계획의 차이를 검증합니다.</p></article></div>
+      <div class="fineprint panel"><h3>사용 전 꼭 알아주세요</h3><p>이 웹은 V20에 연결된 최종 연구 fold 예측 데이터를 불러오는 <b>공개 연구 시연</b>입니다. 새 미래 가격을 예측하지 않으며 실시간 발급, 공식 발급 게이트, 로컬 데이터베이스에 연결하지 않습니다. 실제 SMP는 검증 대상일의 과거 가격이며, 당시의 최초 공개 시각과 모델 가용성은 검증되지 않았습니다. 충전 비용은 도매 SMP를 사용하는 가상 정산으로 가정용 충전요금이나 V2G 수익이 아닙니다. 충전 계획은 서로 떨어진 시간대에 나누어 충전할 수 있습니다.</p><a href="https://github.com/parksiwon22/gradproject/tree/web/v20-public-20261102" target="_blank" rel="noopener noreferrer">연구 코드와 결과 보기 ↗</a></div>
+    </section>
+  </main>
+  <footer><div class="wrap footer-inner"><span class="footer-brand">↗ 전력예보</span><span>SMP 기반 EV 충전 의사결정 연구</span><span>V20 과거 검증 시연 · 2026</span></div></footer>
+</body>
+</html>
