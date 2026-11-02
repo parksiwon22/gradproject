@@ -1,0 +1,33 @@
+name: Build current SMP model handoff package
+on:
+  push:
+    branches: [handoff/current-model-full-20261102]
+    paths:
+      - ".github/workflows/build_current_model_handoff.yml"
+      - "scripts/build_current_model_handoff.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install model and application dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "numpy==2.2.6" "pandas==2.3.3" "scikit-learn==1.7.2" "joblib==1.5.3" "scipy>=1.14,<1.18" "streamlit==1.66.1" "altair==6.3.0"
+      - name: Retrieve public mainland hourly SMP history
+        run: python -m v11.collect --backfill --market land
+      - name: Refit selected model families and assemble ZIP
+        run: python scripts/build_current_model_handoff.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SMP_Current_Model_Complete
+          path: dist/SMP_Current_Model_Complete.zip
+          retention-days: 30
+          if-no-files-found: error
