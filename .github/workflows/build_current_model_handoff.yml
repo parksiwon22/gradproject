@@ -26,7 +26,7 @@ jobs:
       - name: Collect public mainland SMP history
         run: python -m v11.collect --backfill --market land
       - name: Train current model families and bundle historical SMP
-        run: python scripts/build_current_model_handoff.py
+        run: python -m scripts.build_current_model_handoff
       - name: Test packaged Python source
         run: |
           python -m py_compile dist/SMP_Current_Model_Complete/app.py dist/SMP_Current_Model_Complete/forecast.py
