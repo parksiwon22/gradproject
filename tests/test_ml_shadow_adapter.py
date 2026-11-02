@@ -55,5 +55,17 @@ class MLShadowAdapterTests(unittest.TestCase):
                 predict(missing, target, horizon, self.bundle_path(horizon))
 
 
+    def test_rejects_checkpoint_trained_on_or_after_origin(self):
+        for cutoff in ('2024-08-31', '2024-09-01', None):
+            with self.subTest(trained_through=cutoff):
+                with tempfile.TemporaryDirectory() as folder:
+                    path = Path(folder) / 'unsafe.joblib'
+                    fixture = joblib.load(self.bundle_path(3))
+                    fixture['trained_through'] = cutoff
+                    joblib.dump(fixture, path)
+                    with self.assertRaisesRegex(ValueError, 'training cutoff|trained on or after'):
+                        predict(self.prices, '2024-09-03', 3, path)
+
+
 if __name__ == '__main__':
     unittest.main()
