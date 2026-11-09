@@ -9,7 +9,7 @@ function boot(){
  live.innerHTML=`<div class="live-inner">
  <div class="live-heading"><p class="section-kicker">PUBLIC RESEARCH FORECAST / 자동 갱신</p><h1>육지 SMP 예측과 EV 충전 추천</h1><p>매일 한국시간 23시 기준으로 수집 가능한 자료만 사용합니다. 공식 발급과 분리된 연구용 예측입니다.</p></div>
  <div id="liveStatus" class="live-status" role="status">최신 실행 상태를 확인하는 중입니다…</div>
- <div class="live-controls"><label>기간 <select id="liveHorizon"><option value="1">D+1</option><option value="2">D+2</option><option value="3">D+3</option></select></label><span id="liveTarget">대상일 —</span></div>
+ <div class="live-controls"><label>기간 <select id="liveHorizon"><option value="1">D+1</option><option value="2">D+2</option><option value="3">D+3</option></select></label><span id="liveTarget">대상일 —</span></div><p id="liveAvailability" class="live-muted">대상일 공식가격 공개 상태 —</p>
  <div class="live-grid"><div class="live-card"><h2>시간대별 SMP 예측</h2><p id="liveModel">모델 정보 —</p><p id="liveScores" class="live-muted">대상일 SMP 확보 후 정확도를 계산합니다.</p><div class="live-legend"><span><i class="forecast-key"></i>AI 예측</span><span id="liveActualLegend" hidden><i class="actual-key"></i><span id="liveActualLabel">공식 SMP</span></span></div><div id="liveChart" class="live-chart"></div><div class="live-hours" id="liveHours"></div></div>
  <div class="live-card"><h2>G2V 충전 시간 추천</h2><div class="live-ev"><label>배터리 kWh<input id="liveCapacity" type="number" min="1" value="60"></label><label>현재 SOC %<input id="liveSoc" type="number" min="0" max="100" value="30"></label><label>목표 SOC %<input id="liveGoal" type="number" min="0" max="100" value="80"></label><label>충전 kW<input id="livePower" type="number" min=".1" value="7" step=".1"></label><label>시작 시각<select id="liveStart"></select></label><label>종료 시각<select id="liveEnd"></select></label></div><button id="liveRecommend" class="live-button">충전 추천 계산</button><p id="liveRecommendation">예측이 준비되면 추천을 표시합니다.</p><p id="liveRegret" class="live-muted">실제 SMP가 확보되기 전에는 사후 비용과 regret을 계산하지 않습니다.</p><p class="live-muted">도매 SMP 기반 가상비용이며 실제 충전요금이 아닙니다. 충전은 선택된 저가 시간대에 나누어 배분합니다.</p></div></div>
  <p class="live-foot">수집·예측 이력: <a href="./live/latest.json" target="_blank" rel="noopener">latest.json</a>. 수신시각이 기준시각보다 늦거나 23시 입력이 불완전하면 발급을 보류합니다. 과거 연구 시연과 실제 자동 실행은 아래 탭에서 구분됩니다.</p></div>`;
@@ -22,8 +22,17 @@ function boot(){
  let payload=null;
  function draw(){
   const sel=payload?.last_successful_forecast?.horizons?.find(x=>x.horizon_days===Number($('liveHorizon').value));
-  if(!sel||payload.run?.status!=='issued_research_only'){ $('liveTarget').textContent='대상일 —';$('liveModel').textContent='모델 정보 —';$('liveChart').innerHTML='<p class="live-muted">현재 실행에서 새 예측을 발급하지 않았습니다. 아래 상태와 latest.json의 사유를 확인하세요.</p>';$('liveHours').innerHTML='';$('liveRecommendation').textContent='현재 예측이 없어 추천을 계산할 수 없습니다.';return; }
+  if(!sel||payload.run?.status!=='issued_research_only'){ $('liveTarget').textContent='대상일 —';$('liveAvailability').textContent='대상일 공식가격 공개 상태 —';$('liveModel').textContent='모델 정보 —';$('liveChart').innerHTML='<p class="live-muted">현재 실행에서 새 예측을 발급하지 않았습니다. 아래 상태와 latest.json의 사유를 확인하세요.</p>';$('liveHours').innerHTML='';$('liveRecommendation').textContent='현재 예측이 없어 추천을 계산할 수 없습니다.';return; }
   $('liveTarget').textContent=`예측 대상일 ${sel.target_date}`;$('liveModel').textContent=`${sel.model_family} · 학습 cutoff ${sel.trained_through} · SHA-256 ${sel.model_sha256.slice(0,12)}…`;
+  const probe=sel.publication_probe||{}, checked=probe.checked_at_kst?` · 조회 ${probe.checked_at_kst}`:'';let publicationText;
+  if(sel.official_smp_at_issue==='official_smp_observed_before_origin')publicationText='기준시각 이전 EPSIS 입력에 대상일 가격이 이미 포함되어 사전예측 성능 평가에서 제외합니다.';
+  else if(sel.official_smp_at_issue==='partial_smp_observed_before_origin')publicationText='기준시각 이전 일부 대상일 가격이 관측되어 사전예측 성능 평가에서 제외합니다.';
+  else if(probe.status==='not_observed_on_this_page'&&probe.before_origin)publicationText='기준시각 전 KPX 공개 페이지에서 대상일 가격을 찾지 못했습니다. 공개페이지 조회 시점의 기록이며, 최초 공개시각을 증명하지는 않습니다.'+checked;
+  else if(probe.status==='probe_failed')publicationText='공식가격 공개 여부 조회에 실패했습니다. 미공개로 간주하지 않으며 사전예측 검증 대상에서 제외합니다.'+checked;
+  else publicationText='기준시각의 공식가격 공개 여부를 검증하지 못했습니다. 사전예측 검증 대상에서 제외합니다.'+checked;
+  if(sel.prospective_forecast_eligible===false&&!publicationText.includes('제외'))publicationText+=' 사전예측 평가 제외.';
+  const receivedDate=sel.input_max_first_seen_utc?new Date(sel.input_max_first_seen_utc):null;const receivedText=receivedDate&&!Number.isNaN(receivedDate.getTime())?new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'short',timeStyle:'medium'}).format(receivedDate):'확인 불가';
+  $('liveAvailability').textContent=`공식 SMP 상태: ${publicationText} · 최신 입력 수신(KST) ${receivedText}`;
   const vals=sel.predictions.map(Number),actual=Array.isArray(sel.actual_smp)?sel.actual_smp.map(Number):sel.official_smp_at_issue_values,observed=Array.isArray(actual)&&actual.length===24&&actual.every(Number.isFinite),all=observed?vals.concat(actual):vals,lo=Math.min(...all),hi=Math.max(...all),span=Math.max(1,hi-lo),path=a=>a.map((v,i)=>`${(i*400/23).toFixed(1)},${(120-(v-lo)*100/span).toFixed(1)}`).join(' '),pts=path(vals);
   $('liveActualLegend').hidden=!observed;$('liveActualLabel').textContent=Array.isArray(sel.actual_smp)?'사후 공식 실적':'기준시각 전 관측 SMP';
   $('liveScores').textContent=sel.metrics?`사후 비교 ${sel.metrics.n_hours}시간 · MAE ${money(sel.metrics.mae)}원/kWh · RMSE ${money(sel.metrics.rmse)}원/kWh`:(sel.prospective_forecast_eligible===false?'기준시각에 대상 SMP가 관측되어 사전예측 성능 평가에서는 제외합니다.':'대상일 SMP 확보 후 24시간 MAE/RMSE를 계산합니다.');

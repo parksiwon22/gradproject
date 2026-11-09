@@ -1,6 +1,6 @@
 """Conservative research-only daily runner; never calls or changes the V20 issue gate."""
 from __future__ import annotations
-import hashlib, json, os, sys
+import hashlib, json, os, sys, urllib.request
 from pathlib import Path
 import joblib
 import numpy as np
@@ -20,8 +20,34 @@ def sha256(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 def seasonal_anchor(prices, targets):
     series=prices.set_index("timestamp").smp.sort_index()
-    weeks=np.vstack([series.reindex(targets-pd.Timedelta(days=7*k)).to_numpy(float) for k in range(1,5)])
+    if series.index.tz is None or series.index.duplicated().any():
+        raise ValueError("seasonal anchor 입력의 시간대 또는 시간 중복이 유효하지 않습니다.")
+    weeks=np.vstack([series.reindex(targets-pd.Timedelta(days=7*k)).to_numpy(float) for k in (1,2,3,4)])
+    if weeks.shape!=(4,len(targets)) or not np.isfinite(weeks).all():
+        raise ValueError("7·14·21·28일 seasonal anchor 입력 중 결측 또는 비정상 값이 있습니다.")
     return np.median(weeks,axis=0)
+
+def load_history(state_path):
+    try:
+        history=json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else []
+        if isinstance(history,list) and history: return history,"local_state",None
+    except Exception as exc:
+        history_error=type(exc).__name__
+    else:
+        history_error=None
+    url=os.environ.get("SMP_PUBLISHED_HISTORY_URL")
+    if url:
+        try:
+            request=urllib.request.Request(url,headers={"Cache-Control":"no-cache","User-Agent":"gradproject-research-automation/1.0"})
+            with urllib.request.urlopen(request,timeout=15) as response: payload=json.loads(response.read().decode("utf-8"))
+            history=payload.get("forecast_history",[])
+            if not history and payload.get("last_successful_forecast"):
+                history=[payload["last_successful_forecast"]]
+            if isinstance(history,list): return history,"published_pages",None
+            history_error="invalid_history_schema"
+        except Exception as exc:
+            history_error=type(exc).__name__
+    return [],"empty_after_recovery_attempt",history_error
 
 def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
              now=None, origin_date=None):
@@ -37,8 +63,9 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
              "collection_status":"status file unavailable","official_target_status":"unknown"},
              "last_successful_forecast":None}
     state_path.parent.mkdir(parents=True,exist_ok=True)
-    try: history=json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else []
-    except Exception: history=[]
+    history,history_source,history_recovery_error=load_history(state_path)
+    result["run"]["history_source"]=history_source
+    if history_recovery_error: result["run"]["history_recovery_status"]=history_recovery_error
     status_path=source/"artifacts"/"v11"/"collection_status.json"
     if status_path.exists():
         try:
@@ -87,6 +114,7 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
         recent=pd.date_range(origin-pd.Timedelta(hours=167),origin,freq="h")
         indexed=prices.set_index("timestamp").smp
         if not recent.isin(indexed.index).all(): raise RuntimeError("23:00 기준 최근 168시간 입력에 결측이 있어 예측을 보류했습니다.")
+        if not np.isfinite(indexed.reindex(recent).to_numpy(float)).all(): raise RuntimeError("최근 168시간 입력에 NaN 또는 무한대가 있어 예측을 보류했습니다.")
         model_meta=json.loads((model_dir/"manifest.json").read_text(encoding="utf-8"))["models"]
         horizons=[]
         for h in (1,2,3):
@@ -125,6 +153,7 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
             base=frame.daily.to_numpy(float)+bundle["model"].predict(frame[bundle["features"]].to_numpy(float))
             anchor=seasonal_anchor(prices,targets)
             pred=base*(1-float(bundle["anchor_weight"]))+anchor*float(bundle["anchor_weight"])
+            if not np.isfinite(pred).all(): raise RuntimeError(f"D+{h} 예측에 NaN 또는 무한대가 있어 발급을 보류했습니다.")
             horizons.append({"horizon_days":h,"target_date":target_date.strftime("%Y-%m-%d"),
               "model_family":bundle["family"],"model_file":path.name,"model_sha256":sha256(path),
               "trained_through":bundle["trained_through"],"predictions":[round(float(x),6) for x in pred],
@@ -145,7 +174,6 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
           official_target_status="target_smp_observed_for_one_or_more_horizons" if any_known else "not_observed_in_eps_is_snapshot")
     except Exception as exc:
         result["run"].update(status="withheld",reason=f"{type(exc).__name__}: {exc}")
-    history=history[-90:]
     state_path.write_text(json.dumps(history,ensure_ascii=False,indent=2),encoding="utf-8")
     result["last_successful_forecast"]=history[-1] if history else None
     result["forecast_history"]=history
