@@ -111,8 +111,6 @@ jobs:
           SMP_SOURCE: ${{ github.workspace }}/source
           SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
         run: python automation/smp_auto/publish_forecast.py
-      - name: Configure Pages and upload site artifact
-        uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs
@@ -128,6 +126,8 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
       - name: Deploy Pages artifact
         id: deployment
         uses: actions/deploy-pages@v4
