@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: '0 14 * * *' # 23:00 Asia/Seoul
   workflow_dispatch:
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
@@ -55,6 +57,7 @@ jobs:
         run: python -m unittest discover -s tests/smp_auto -v
       - name: Restore the append-only EPSIS history
         uses: actions/cache@v4
+        if: github.event_name != 'pull_request'
         with:
           path: |
             source/artifacts/v11
@@ -63,21 +66,25 @@ jobs:
           restore-keys: |
             smp-epsis-v1-${{ runner.os }}-
       - name: Collect or recheck public mainland SMP
+        if: github.event_name != 'pull_request'
         continue-on-error: true
         working-directory: source
         run: python -m v11.collect --market land
       - name: Generate research-only forecasts or a clear withheld status
+        if: github.event_name != 'pull_request'
         env:
           SMP_SOURCE: ${{ github.workspace }}/source
           SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
         run: python automation/smp_auto/publish_forecast.py
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
       - name: Upload the complete public site
         uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
           path: docs
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
