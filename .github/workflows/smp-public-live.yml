@@ -1,0 +1,83 @@
+name: SMP public forecast and Pages refresh
+
+on:
+  schedule:
+    - cron: '0 14 * * *' # 23:00 Asia/Seoul
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: smp-pages
+  cancel-in-progress: false
+
+jobs:
+  collect-predict-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out V5 base and public dashboard
+        uses: actions/checkout@v4
+      - name: Check out pinned V20 research source
+        uses: actions/checkout@v4
+        with:
+          repository: parksiwon22/gradproject
+          ref: fb6fc173d682b5cce2657b65c0b97c11e26ebd32
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: automation/smp_auto/requirements.txt
+      - name: Install the minimal inference environment
+        run: python -m pip install -r automation/smp_auto/requirements.txt
+      - name: Resolve the scheduled 23:00 KST origin date
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_ENV"
+          from datetime import datetime, timedelta
+          from zoneinfo import ZoneInfo
+          now = datetime.now(ZoneInfo("Asia/Seoul"))
+          day = now.date()
+          if "${{ github.event_name }}" == "schedule" and now.hour < 12:
+              day -= timedelta(days=1)
+          print(f"SMP_ORIGIN_DATE={day.isoformat()}")
+          PY
+      - name: Verify append-only vintage and duplicate handling
+        env:
+          SMP_SOURCE: ${{ github.workspace }}/source
+        run: python -m unittest discover -s tests/smp_auto -v
+      - name: Restore the append-only EPSIS history
+        uses: actions/cache@v4
+        with:
+          path: |
+            source/artifacts/v11
+            automation/state
+          key: smp-epsis-v1-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            smp-epsis-v1-${{ runner.os }}-
+      - name: Collect or recheck public mainland SMP
+        continue-on-error: true
+        working-directory: source
+        run: python -m v11.collect --market land
+      - name: Generate research-only forecasts or a clear withheld status
+        env:
+          SMP_SOURCE: ${{ github.workspace }}/source
+          SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
+        run: python automation/smp_auto/publish_forecast.py
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload the complete public site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        if: github.ref == 'refs/heads/main'

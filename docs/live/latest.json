@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "market": "land",
+  "run": {
+    "status": "not_run",
+    "reason": "자동 수집·예측 워크플로가 아직 기본 브랜치에서 실행되지 않았습니다.",
+    "scheduled_origin_kst": null,
+    "issued_at_utc": null,
+    "issued_at_kst": null,
+    "collection_status": "first GitHub Actions execution pending",
+    "official_target_status": "unknown"
+  },
+  "last_successful_forecast": null,
+  "forecast_history": []
+}
