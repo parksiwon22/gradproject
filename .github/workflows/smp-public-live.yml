@@ -174,7 +174,7 @@ jobs:
         shell: bash
         run: python automation/smp_auto/probe_target_publication.py 2>&1 | tee "$RUNNER_TEMP/smp-publication-probe.log"
       - name: Wait until the fixed 23:00 KST origin
-        if: github.event_name == 'schedule'
+        if: github.event_name != 'pull_request'
         env:
           SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
         run: |
