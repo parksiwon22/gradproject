@@ -56,7 +56,13 @@ def main():
                     item["actual_status"]="observed_after_issue"
                     item["actual_first_seen_min_utc"]=str(actual.first_seen.min())
                     item["actual_first_seen_max_utc"]=str(actual.first_seen.max())
-                    item["evaluation_type"]="post_issue_official_price_comparison"
+                    if item.get("prospective_forecast_eligible") and len(item.get("predictions",[]))==24:
+                        errors=actual.smp.to_numpy(float)-pd.Series(item["predictions"],dtype=float).to_numpy()
+                        item["evaluation_type"]="post_issue_official_price_comparison"
+                        item["metrics"]={"n_hours":24,"mae":float(abs(errors).mean()),
+                          "rmse":float((errors**2).mean()**.5),"hourly_signed_error":[round(float(x),6) for x in errors]}
+                    else:
+                        item["evaluation_type"]="excluded_target_smp_observed_at_origin"
         prices=asof_prices[asof_prices.timestamp<=origin].drop_duplicates("timestamp").sort_values("timestamp")
         if prices.empty or prices.timestamp.max()<origin:
             raise RuntimeError("23:00 기준 입력 SMP 미확보: 해당 시각 이후 수신된 SMP는 제외했으며 예측 발급을 보류했습니다.")
