@@ -6,6 +6,7 @@ const LABELS={1:'V11 ExtraTrees',2:'HGB + seasonal anchor',3:'HGB + seasonal anc
 const els={};
 const cache=new Map();
 let current=null;
+const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const $=id=>document.getElementById(id);
 const fmt=(x,d=2)=>Number.isFinite(x)?Number(x).toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
 const clamp=(x,a,b)=>Math.max(a,Math.min(x,b));
@@ -46,6 +47,9 @@ async function loadData(){
   hz.value=String(available[0]);
   hz.addEventListener('change',selectHorizon);
   $('date').addEventListener('change',update);
+  $('period').addEventListener('change',update);
+  $('latestDate').addEventListener('click',()=>{const dates=[...cache.values()].filter(g=>g.h===Number($('horizon').value)&&valid(g)&&g.day<=today()).map(g=>g.day).sort();$('date').value=dates.at(-1)||today();update();});
+  $('date').max=today();$('date').value=today();
   $('calculate').addEventListener('click',calculate);
   $('eff').addEventListener('input',()=>{$('effLabel').textContent=$('eff').value+'%'});
   for(let i=0;i<=24;i++){
@@ -57,38 +61,53 @@ async function loadData(){
   selectHorizon();
 }
 function valid(g){
- const lists=[PREFERRED[g.h],'실제 SMP','기준선 SMP'];
+ const lists=[PREFERRED[g.h],'실제 SMP'];
  return lists.every(k=>g.series.has(k)&&g.series.get(k).size===24);
 }
 function selectHorizon(){
- const h=Number($('horizon').value);
- const dates=[...cache.values()].filter(g=>g.h===h&&valid(g)).map(g=>g.day).sort();
- const s=$('date');s.replaceChildren();
- for(const d of dates)s.add(new Option(d,d));
- if(dates.length)s.value=dates[dates.length-1];
+ $('date').max=today();
+ if(!$('date').value)$('date').value=today();
  update();
 }
 function selected(){
  const g=cache.get($('horizon').value+'|'+$('date').value);
  if(!g||!valid(g))return null;
  const toArray=(name)=>Array.from({length:24},(_,i)=>g.series.get(name).get(i));
- return {...g,actual:toArray('실제 SMP'),predict:toArray(PREFERRED[g.h]),baseline:toArray('기준선 SMP')};
+ return {...g,actual:toArray('실제 SMP'),predict:toArray(PREFERRED[g.h])};
 }
 const mae=(a,b)=>a.reduce((s,x,i)=>s+Math.abs(x-b[i]),0)/a.length;
 const rmse=(a,b)=>Math.sqrt(a.reduce((s,x,i)=>s+(x-b[i])**2,0)/a.length);
+function clearDay(){
+ current=null;
+ for(const id of ['cheapHour','cheapPrice','expectedCost','actualCost','regret','saving','energyNote'])$(id).textContent='—';
+ $('chargingSlots').replaceChildren();$('weatherHours').replaceChildren();
+ $('resultHeading').textContent='선택한 날짜의 예측 자료가 없습니다';
+ $('planMessage').textContent='자료가 있는 날짜를 선택하면 충전 계획을 계산할 수 있습니다.';
+ $('weatherIcon').textContent='☁';$('weatherTitle').textContent='가격 예보 미발행';
+ $('weatherNote').textContent='당일 예측 데이터가 연결되면 가격 날씨가 표시됩니다. 최근 데이터 날짜에서 과거 시연을 확인할 수 있습니다.';
+}
 function update(){
- const g=selected();if(!g){failure('해당 기간에 완전한 24시간 검증 자료가 없습니다.');return}
- current=g;$('error').hidden=true;
- const m=mae(g.actual,g.predict),baseline=mae(g.actual,g.baseline);
+ $('date').max=today();
+ if(!$('date').value||$('date').value>today())$('date').value=today();
+ const g=selected();$('error').hidden=true;
+ $('dataStatus').textContent='조회 '+$('date').value+' · 저장된 과거 검증 데이터';
+ if(!g){clearDay();$('modelName').textContent='선택한 날짜의 예측 없음 · 실시간 예측 미연결';}
+ else{
+ current=g;
  const min=Math.min(...g.predict),h=g.predict.indexOf(min);
- $('dailyMae').textContent=fmt(m);$('dailyRmse').textContent=fmt(rmse(g.actual,g.predict));
  $('cheapHour').textContent=String(h).padStart(2,'0')+':00';
- $('cheapPrice').textContent=fmt(min)+'원/kWh · 예측 최저가';
- const difference=m-baseline;
- $('dailyDiff').textContent=(difference>0?'+':'')+fmt(difference);
- $('baselineNote').textContent=difference<=0?'기준선보다 오차가 낮습니다':'기준선보다 오차가 높습니다';
+ $('cheapPrice').textContent='충전 맑음 · 최저 '+fmt(min)+'원/kWh';
  $('modelName').textContent='선정 모델: '+LABELS[g.h]+' · 검증 대상 '+g.day;
- drawChart(g);calculate();
+ drawWeather(g);calculate();
+ }
+ drawChart(g);
+}
+function drawWeather(g){
+ const sorted=[...g.predict].sort((a,b)=>a-b),low=sorted[5],high=sorted[18];
+ const weather=p=>p<=low?['☀','충전 맑음','sunny']:p>=high?['♨','가격 폭염주의','hot']:['☁','충전 보통','cloudy'];
+ $('weatherIcon').textContent='☀';$('weatherTitle').textContent='충전 맑음 시간대를 확인하세요';
+ $('weatherNote').textContent='하루 예측 가격 하위 25%는 충전 맑음, 상위 25%는 가격 폭염주의입니다. 동일 가격은 맑음을 우선하며, 기상특보가 아닌 상대적인 SMP 가격 안내입니다.';
+ $('weatherHours').replaceChildren(...g.predict.map((p,h)=>{const [icon,label,cls]=weather(p),el=document.createElement('div');el.className='weather-hour '+cls;el.textContent=String(h).padStart(2,'0')+'시 '+icon;el.title=label+' · '+fmt(p)+'원/kWh';el.setAttribute('aria-label',h+'시 '+label+' '+fmt(p)+'원/kWh');return el;}));
 }
 function svgEl(tag,attrs,text){
  const ns='http://www.w3.org/2000/svg',e=document.createElementNS(ns,tag);
@@ -98,28 +117,43 @@ function svgEl(tag,attrs,text){
 }
 function drawChart(g){
  const area=$('chartArea');area.replaceChildren();
+ const period=$('period').value,day=$('date').value;
+ let labels;
+ if(period==='day'){
+  labels=Array.from({length:24},(_,i)=>String(i).padStart(2,'0')+':00');
+ }else{
+  const end=new Date(day+'T00:00:00Z'),start=new Date(end);
+  if(period==='month'){start.setUTCDate(1);start.setUTCMonth(start.getUTCMonth()-1);start.setUTCDate(Math.min(end.getUTCDate(),new Date(Date.UTC(start.getUTCFullYear(),start.getUTCMonth()+1,0)).getUTCDate()));}
+  else {start.setUTCFullYear(start.getUTCFullYear()-1);}
+  start.setUTCDate(start.getUTCDate()+1);
+  const groups=[...cache.values()].filter(x=>x.h===Number($('horizon').value)&&valid(x)&&x.day>=start.toISOString().slice(0,10)&&x.day<=day).sort((a,b)=>a.day.localeCompare(b.day));
+  labels=groups.map(x=>x.day);
+  const avg=(x,key)=>[...x.series.get(key).values()].reduce((a,b)=>a+b,0)/24;
+  g=groups.length?{day:labels[0]+' ~ '+labels.at(-1),predict:groups.map(x=>avg(x,PREFERRED[x.h])),actual:groups.map(x=>avg(x,'실제 SMP'))}:null;
+ }
+ $('chartTitle').textContent=(period==='day'?'하루 · 시간별':period==='month'?'한 달 · 일평균':'1년 · 일평균')+' SMP 가격 곡선';
+ if(!g){const p=document.createElement('p');p.className='loading';p.textContent='선택한 기간에 저장된 데이터가 없습니다. 최근 데이터 날짜를 선택해 주세요.';area.append(p);return;}
+ if(period!=='day'){const note=document.createElement('p');note.textContent=g.day+' · 자료가 있는 '+labels.length+'일 표시 (누락일은 연결하지 않음)';area.append(note);}
  const W=920,H=325,margin={l:64,r:25,t:22,b:42},w=W-margin.l-margin.r,h=H-margin.t-margin.b;
- const values=[...g.predict,...g.actual,...g.baseline],lo=Math.min(...values),hi=Math.max(...values),diff=Math.max(10,hi-lo);
+ const values=[...g.predict,...g.actual],lo=Math.min(...values),hi=Math.max(...values),diff=Math.max(10,hi-lo);
  const min=lo-diff*.1,max=hi+diff*.1;
- const xp=i=>margin.l+i/23*w;
+ const xp=i=>margin.l+(period==='day'?i/23:(new Date(labels[i])-new Date(labels[0]))/Math.max(86400000,new Date(labels.at(-1))-new Date(labels[0])))*w;
  const yp=v=>margin.t+(max-v)/(max-min)*h;
- const svg=svgEl('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':g.day+' 시간별 SMP, 실제값, 기준선의 가격 비교 그래프',preserveAspectRatio:'none'});
+ const svg=svgEl('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':g.day+' SMP 예측과 실제값의 가격 비교 그래프',preserveAspectRatio:'none'});
  for(let i=0;i<=5;i++){
   const val=min+(max-min)*(5-i)/5,y=margin.t+h*i/5;
   svg.append(svgEl('line',{x1:margin.l,y1:y,x2:W-margin.r,y2:y,class:'grid'}));
   svg.append(svgEl('text',{x:margin.l-13,y:y+4,'text-anchor':'end'},fmt(val,0)));
  }
  svg.append(svgEl('line',{x1:margin.l,y1:margin.t+h,x2:W-margin.r,y2:margin.t+h,class:'axis'}));
- for(const hour of [0,4,8,12,16,20,23])svg.append(svgEl('text',{x:xp(hour),y:H-12,'text-anchor':'middle'},String(hour).padStart(2,'0')+':00'));
- for(const [cls,arr]of [['series-base',g.baseline],['series-actual',g.actual],['series-pred',g.predict]]){
-  const pts=arr.map((v,i)=>(i?'L':'M')+xp(i).toFixed(2)+' '+yp(v).toFixed(2)).join(' ');
+ const ticks=[...new Set(Array.from({length:Math.min(7,labels.length)},(_,i)=>Math.round(i*(labels.length-1)/Math.max(1,Math.min(7,labels.length)-1))))];
+ for(const i of ticks)svg.append(svgEl('text',{x:xp(i),y:H-12,'text-anchor':'middle'},period==='day'?labels[i]:labels[i].slice(5)));
+ for(const [cls,arr]of [['series-actual',g.actual],['series-pred',g.predict]]){
+  const pts=arr.map((v,i)=>{const gap=period!=='day'&&i>0&&(new Date(labels[i])-new Date(labels[i-1]))>86400000;return (i&&!gap?'L':'M')+xp(i).toFixed(2)+' '+yp(v).toFixed(2)}).join(' ');
   svg.append(svgEl('path',{d:pts,class:'plot '+cls}));
+  arr.forEach((v,i)=>{const dot=svgEl('circle',{cx:xp(i),cy:yp(v),r:labels.length>40?2:3,fill:cls==='series-pred'?'#0e9188':'#60758a'});dot.append(svgEl('title',{},labels[i]+' · '+(cls==='series-pred'?'AI 예측 ':'실제 ')+fmt(v)+'원/kWh'));svg.append(dot);});
  }
- for(let i=0;i<24;i++){
-  const overlay=svgEl('rect',{x:xp(i)-w/46,y:margin.t,width:w/23,height:h,fill:'transparent','aria-label':i+'시 예측 '+fmt(g.predict[i])+'원, 실제 '+fmt(g.actual[i])+'원'});
-  overlay.append(svgEl('title',{},String(i).padStart(2,'0')+':00\nAI 예측 '+fmt(g.predict[i])+'원/kWh\n실제 '+fmt(g.actual[i])+'원/kWh\n기준선 '+fmt(g.baseline[i])+'원/kWh'));
-  svg.append(overlay);
- }
+
  area.append(svg);
 }
 function readNumber(id){
