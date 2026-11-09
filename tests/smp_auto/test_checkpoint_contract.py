@@ -2,6 +2,8 @@ import hashlib
 import json
 import os
 import sys
+import datetime
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -14,8 +16,18 @@ SOURCE=Path(os.environ["SMP_SOURCE"]).resolve()
 sys.path.insert(0,str(SOURCE))
 from v11.features import build as build_d1
 from v17.features import build as build_dx
+from v11.store import connect,ingest
+from automation.smp_auto.publish_forecast import generate,seasonal_anchor
 
 class CheckpointContractTests(unittest.TestCase):
+    def test_anchor_is_median_of_the_four_prior_same_weekday_days(self):
+        timestamps=pd.date_range(pd.Timestamp("2026-10-01",tz="Asia/Seoul"),periods=24*40,freq="h")
+        prices=pd.DataFrame({"timestamp":timestamps,"smp":np.repeat(np.arange(40,dtype=float),24)})
+        target=pd.date_range(pd.Timestamp("2026-11-10",tz="Asia/Seoul"),periods=24,freq="h")
+        anchor=seasonal_anchor(prices,target)
+        # 7/14/21/28-day lags are 33, 26, 19, and 12 in this fixture.
+        np.testing.assert_allclose(anchor,np.full(24,22.5))
+
     def test_selected_family_checkpoints_make_24_point_vectors(self):
         model_dir=ROOT/"automation"/"models"
         manifest=json.loads((model_dir/"manifest.json").read_text(encoding="utf-8"))
@@ -36,5 +48,26 @@ class CheckpointContractTests(unittest.TestCase):
             prediction=frame.daily.to_numpy()+residual
             self.assertEqual(prediction.shape,(24,))
             self.assertTrue(np.isfinite(prediction).all())
+
+    def test_full_issue_replay_emits_three_24_hour_vectors_and_excludes_known_d1(self):
+        with tempfile.TemporaryDirectory() as d:
+            source=Path(d); home=source/"artifacts"/"v11"; db=connect(home)
+            times=pd.date_range(pd.Timestamp("2026-09-01",tz="Asia/Seoul"),pd.Timestamp("2026-11-10 23:00",tz="Asia/Seoul"),freq="h")
+            price=110+8*np.sin(np.arange(len(times))*2*np.pi/24)+3*np.cos(np.arange(len(times))*2*np.pi/(24*7))
+            frame=pd.DataFrame({"timestamp":times,"smp":price})
+            ingest(db,"land",frame,b"synthetic replay fixture","test",home=home,retrieved="2026-11-09T13:00:00+00:00")
+            db.close()
+            probe={"origin_kst":"2026-11-09T23:00:00+09:00","results":[
+              {"horizon_days":1,"target_date":"2026-11-10","checked_at_kst":"2026-11-09T22:45:00+09:00","status":"official_available","before_origin":True},
+              {"horizon_days":2,"target_date":"2026-11-11","checked_at_kst":"2026-11-09T22:45:00+09:00","status":"not_observed_on_this_page","before_origin":True},
+              {"horizon_days":3,"target_date":"2026-11-12","checked_at_kst":"2026-11-09T22:45:00+09:00","status":"not_observed_on_this_page","before_origin":True}]}
+            (home/"public_availability_live.json").write_text(json.dumps(probe),encoding="utf-8")
+            result=generate(source=source,model_dir=ROOT/"automation"/"models",out_path=source/"latest.json",
+                state_path=source/"history.json",now=pd.Timestamp("2026-11-09T23:01:00+09:00"),origin_date="2026-11-09")
+            horizons=result["last_successful_forecast"]["horizons"]
+            self.assertEqual([len(x["predictions"]) for x in horizons],[24,24,24])
+            self.assertFalse(horizons[0]["prospective_forecast_eligible"])
+            self.assertTrue(horizons[1]["prospective_forecast_eligible"])
+            self.assertTrue(horizons[2]["prospective_forecast_eligible"])
 
 if __name__=="__main__": unittest.main()

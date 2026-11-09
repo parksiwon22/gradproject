@@ -15,7 +15,9 @@
       "training_hours": 33288,
       "anchor_weight": 0.0,
       "vintage_verified": false,
-      "research_metrics_applied": false
+      "research_metrics_applied": false,
+      "anchor_method": "none",
+      "anchor_days": []
     },
     "2": {
       "file": "d2_selected_refit.joblib",
@@ -27,7 +29,14 @@
       "training_hours": 33264,
       "anchor_weight": 0.05,
       "vintage_verified": false,
-      "research_metrics_applied": false
+      "research_metrics_applied": false,
+      "anchor_method": "median_same_hour_days_7_14_21_28",
+      "anchor_days": [
+        7,
+        14,
+        21,
+        28
+      ]
     },
     "3": {
       "file": "d3_selected_refit.joblib",
@@ -39,8 +48,16 @@
       "training_hours": 33240,
       "anchor_weight": 0.05,
       "vintage_verified": false,
-      "research_metrics_applied": false
+      "research_metrics_applied": false,
+      "anchor_method": "median_same_hour_days_7_14_21_28",
+      "anchor_days": [
+        7,
+        14,
+        21,
+        28
+      ]
     }
   },
-  "warning": "The published 275-day CV metrics do not apply to these refit weights. Historical first_seen/vintage is unverified."
+  "warning": "The published 275-day CV metrics do not apply to these refit weights. Historical first_seen/vintage is unverified.",
+  "note": "Checkpoint estimator files and weights are retained unchanged. D+2/D+3 inference now uses the final-study 7/14/21/28-day same-hour median anchor; historical 275-day metrics remain fold-model results and are not performance claims for these refits."
 }

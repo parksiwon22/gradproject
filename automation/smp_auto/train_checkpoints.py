@@ -44,11 +44,14 @@ def main():
         path=OUT/f"d{h}_selected_refit.joblib"
         joblib.dump(dict(model=model,horizon_days=h,features=features,anchor_weight=anchor,
                          trained_through=CUTOFF,family=family,model_origin="AUTOMATION_REFIT_20261109",
-                         vintage_verified=False),path,compress=3)
+                         anchor_method="median_same_hour_days_7_14_21_28" if h>1 else "none",
+                         anchor_days=[7,14,21,28] if h>1 else [],vintage_verified=False),path,compress=3)
         records[str(h)]={"file":path.name,"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
                          "family":family,"trained_through":CUTOFF,
                          "train_start":str(frame.target_date.min()),"training_days":int(frame.target_date.nunique()),
                          "training_hours":int(len(frame)),"anchor_weight":anchor,
+                         "anchor_method":"median_same_hour_days_7_14_21_28" if h>1 else "none",
+                         "anchor_days":[7,14,21,28] if h>1 else [],
                          "vintage_verified":False,"research_metrics_applied":False}
     manifest={"created_utc":pd.Timestamp.now(tz="UTC").isoformat(),"source_db_sha256":hashlib.sha256(dbpath.read_bytes()).hexdigest(),
               "source_commit":"fb6fc173d682b5cce2657b65c0b97c11e26ebd32","data_cutoff":"2026-10-26T23:00:00+09:00",
