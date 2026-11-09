@@ -2,6 +2,7 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>Number.isFinite(Number(n))?Number(n).toLocaleString('ko-KR',{maximumFractionDigits:1}):'—';
+const kstTime=iso=>{const d=iso?new Date(iso):null;return d&&!Number.isNaN(d.getTime())?new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'short',timeStyle:'medium'}).format(d):'확인 불가';};
 function boot(){
  const main=$('main'); if(!main)return;
  const mode=document.createElement('div');mode.className='live-mode live-mode-bar';mode.innerHTML='<button id="showLive" class="live-active">최신 자동 예측</button><button id="showStudy">과거 연구 시연</button>';
@@ -31,7 +32,7 @@ function boot(){
   else if(probe.status==='probe_failed')publicationText='공식가격 공개 여부 조회에 실패했습니다. 미공개로 간주하지 않으며 사전예측 검증 대상에서 제외합니다.'+checked;
   else publicationText='기준시각의 공식가격 공개 여부를 검증하지 못했습니다. 사전예측 검증 대상에서 제외합니다.'+checked;
   if(sel.prospective_forecast_eligible===false&&!publicationText.includes('제외'))publicationText+=' 사전예측 평가 제외.';
-  const receivedDate=sel.input_max_first_seen_utc?new Date(sel.input_max_first_seen_utc):null;const receivedText=receivedDate&&!Number.isNaN(receivedDate.getTime())?new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',dateStyle:'short',timeStyle:'medium'}).format(receivedDate):'확인 불가';
+  const receivedText=kstTime(sel.input_max_first_seen_utc);
   $('liveAvailability').textContent=`공식 SMP 상태: ${publicationText} · 최신 입력 수신(KST) ${receivedText}`;
   const vals=sel.predictions.map(Number),actual=Array.isArray(sel.actual_smp)?sel.actual_smp.map(Number):sel.official_smp_at_issue_values,observed=Array.isArray(actual)&&actual.length===24&&actual.every(Number.isFinite),all=observed?vals.concat(actual):vals,lo=Math.min(...all),hi=Math.max(...all),span=Math.max(1,hi-lo),path=a=>a.map((v,i)=>`${(i*400/23).toFixed(1)},${(120-(v-lo)*100/span).toFixed(1)}`).join(' '),pts=path(vals);
   $('liveActualLegend').hidden=!observed;$('liveActualLabel').textContent=Array.isArray(sel.actual_smp)?'사후 공식 실적':'기준시각 전 관측 SMP';
@@ -49,7 +50,7 @@ function boot(){
   const actual=sel.actual_smp;if(Array.isArray(actual)&&actual.length===24&&actual.every(Number.isFinite)){const chosen=plan.reduce((s,x)=>s+x.kwh*actual[x.h],0);let left=need,best=0;for(const h of [...slots].sort((a,b)=>actual[a]-actual[b])){if(left<=0)break;const k=Math.min(power,left/efficiency);best+=k*actual[h];left-=k*efficiency;} $('liveRegret').textContent=`실제 SMP 사후 비용 ${money(chosen)}원 · 최적 계획 대비 regret ${money(chosen-best)}원`;}else $('liveRegret').textContent='실제 SMP가 확보되기 전에는 사후 비용과 regret을 계산하지 않습니다.';
  }
  $('liveHorizon').onchange=draw;$('liveRecommend').onclick=recommend;['liveCapacity','liveSoc','liveGoal','livePower','liveStart','liveEnd'].forEach(id=>$(id).addEventListener('change',recommend));
- fetch('./live/latest.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}).then(data=>{payload=data;const run=data.run||{};const last=data.last_successful_forecast;const status=run.status==='issued_research_only'?`이번 실행에서 연구 예측 발급 · ${run.issued_at_kst||run.issued_at_utc}`:`이번 실행은 예측을 보류했습니다 · ${run.reason||'최근 실행 결과 없음'}`;const collected=run.collection_status||'수집 상태 확인 필요';$('liveStatus').innerHTML=`<b>${esc(status)}</b><br><small>${esc(collected)}${last&&run.status!=='issued_research_only'?` · 이전 발급 ${esc(last.issued_at_kst||last.issued_at_utc)} (현재 예측으로 사용하지 않음)`:''}</small>`;draw();}).catch(e=>{$('liveStatus').textContent='최신 실행 상태 파일을 읽지 못했습니다: '+e.message;draw();});
+ fetch('./live/latest.json?ts='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}).then(data=>{payload=data;const run=data.run||{};const last=data.last_successful_forecast;const status=run.status==='issued_research_only'?`이번 실행에서 연구 예측 발급 · ${kstTime(run.issued_at_kst||run.issued_at_utc)}`:`이번 실행은 예측을 보류했습니다 · ${run.reason||'최근 실행 결과 없음'}`;const collected=run.collection_status||'수집 상태 확인 필요';const delay=Number(run.schedule_delay_seconds);const timing=Number.isFinite(delay)?(delay>=0?`기준시각 대비 ${Math.round(delay)}초 후 발급`:`기준시각까지 ${Math.round(-delay)}초 남아 발급 보류`):'기준시각 지연 확인 불가';$('liveStatus').innerHTML=`<b>${esc(status)}</b><br><small>${esc(collected)} · 수집 완료 ${esc(kstTime(run.collection_completed_at_utc))} · ${esc(timing)}${last&&run.status!=='issued_research_only'?` · 이전 발급 ${esc(kstTime(last.issued_at_kst||last.issued_at_utc))} (현재 예측으로 사용하지 않음)`:''}</small>`;draw();}).catch(e=>{$('liveStatus').textContent='최신 실행 상태 파일을 읽지 못했습니다: '+e.message;draw();});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

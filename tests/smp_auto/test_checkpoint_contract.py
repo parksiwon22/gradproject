@@ -97,6 +97,7 @@ class CheckpointContractTests(unittest.TestCase):
             (home/"public_availability_live.json").write_text(json.dumps(probe),encoding="utf-8")
             result=generate(source=source,model_dir=ROOT/"automation"/"models",out_path=source/"latest.json",
                 state_path=source/"history.json",now=pd.Timestamp("2026-11-09T23:01:00+09:00"),origin_date="2026-11-09")
+            self.assertEqual(result["run"]["schedule_delay_seconds"],60.0)
             horizons=result["last_successful_forecast"]["horizons"]
             self.assertEqual([len(x["predictions"]) for x in horizons],[24,24,24])
             self.assertFalse(horizons[0]["prospective_forecast_eligible"])

@@ -60,6 +60,8 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
     issued=now.tz_convert("UTC").isoformat()
     result={"schema_version":1,"market":"land","run":{"status":"withheld","reason":None,
              "scheduled_origin_kst":origin.isoformat(),"issued_at_utc":issued,"issued_at_kst":now.isoformat(),
+             "schedule_delay_seconds":float((now-origin).total_seconds()) if now>=origin else None,
+             "collection_completed_at_utc":None,
              "collection_status":"status file unavailable","official_target_status":"unknown"},
              "last_successful_forecast":None}
     state_path.parent.mkdir(parents=True,exist_ok=True)
@@ -70,6 +72,7 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
     if status_path.exists():
         try:
             collected=json.loads(status_path.read_text(encoding="utf-8"))
+            result["run"]["collection_completed_at_utc"]=collected.get("at")
             result["run"]["collection_status"]=("collection completed" if not collected.get("failures") else
                 "collection failed: "+"; ".join(x.get("market","")+" "+x.get("error","") for x in collected["failures"]))
         except Exception: result["run"]["collection_status"]="collection status parse failed"
