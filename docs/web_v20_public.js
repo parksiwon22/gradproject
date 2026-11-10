@@ -61,7 +61,7 @@ async function loadData(){
   selectHorizon();
 }
 function valid(g){
- const lists=[PREFERRED[g.h],'실제 SMP'];
+ const lists=[PREFERRED[g.h],'기준선 SMP','실제 SMP'];
  return lists.every(k=>g.series.has(k)&&g.series.get(k).size===24);
 }
 function selectHorizon(){
@@ -73,12 +73,13 @@ function selected(){
  const g=cache.get($('horizon').value+'|'+$('date').value);
  if(!g||!valid(g))return null;
  const toArray=(name)=>Array.from({length:24},(_,i)=>g.series.get(name).get(i));
- return {...g,actual:toArray('실제 SMP'),predict:toArray(PREFERRED[g.h])};
+ return {...g,actual:toArray('실제 SMP'),baseline:toArray('기준선 SMP'),predict:toArray(PREFERRED[g.h])};
 }
 const mae=(a,b)=>a.reduce((s,x,i)=>s+Math.abs(x-b[i]),0)/a.length;
 const rmse=(a,b)=>Math.sqrt(a.reduce((s,x,i)=>s+(x-b[i])**2,0)/a.length);
 function clearDay(){
  current=null;
+ $('dayMetrics').textContent='';$('peakCase').textContent='';$('hourlyError').replaceChildren();
  for(const id of ['cheapHour','cheapPrice','expectedCost','actualCost','regret','saving','energyNote'])$(id).textContent='—';
  $('chargingSlots').replaceChildren();$('weatherHours').replaceChildren();
  $('resultHeading').textContent='선택한 날짜의 예측 자료가 없습니다';
@@ -98,9 +99,24 @@ function update(){
  $('cheapHour').textContent=String(h).padStart(2,'0')+':00';
  $('cheapPrice').textContent='충전 맑음 · 최저 '+fmt(min)+'원/kWh';
  $('modelName').textContent='선정 모델: '+LABELS[g.h]+' · 검증 대상 '+g.day;
- drawWeather(g);calculate();
+  drawWeather(g);drawDiagnostics(g);calculate();
  }
  drawChart(g);
+}
+function drawDiagnostics(g){
+ const lines=(x,y)=>`${fmt(mae(x,y))} / ${fmt(rmse(x,y))}`;
+ $('dayMetrics').textContent=`선택일 ${g.day} · 24시간 MAE / RMSE (원/kWh): 선정 모델 ${lines(g.predict,g.actual)} · 단순 기준선 ${lines(g.baseline,g.actual)}`;
+ const peakHour=g.actual.indexOf(Math.max(...g.actual)),actual=g.actual[peakHour],pred=g.predict[peakHour],err=pred-actual;
+ $('peakCase').textContent=`선택일 최고 SMP ${String(peakHour).padStart(2,'0')}시 · 실제 ${fmt(actual)}원/kWh · AI 오차 ${err<0?'과소예측 ':'과대예측 '}${fmt(Math.abs(err))}원/kWh${actual>=150?' · 150원/kWh 이상 피크':''}`;
+ const table=document.createElement('table');table.innerHTML='<thead><tr><th>시각</th><th>실제 SMP</th><th>선정 AI</th><th>AI 오차</th><th>기준선</th><th>기준선 오차</th></tr></thead>';
+ const body=document.createElement('tbody');
+ for(let h=0;h<24;h++){
+  const tr=document.createElement('tr');if(g.actual[h]>=150)tr.className='peak-row';
+  const values=[String(h).padStart(2,'0')+':00',fmt(g.actual[h]),fmt(g.predict[h]),fmt(g.predict[h]-g.actual[h]),fmt(g.baseline[h]),fmt(g.baseline[h]-g.actual[h])];
+  for(const [i,value]of values.entries()){const td=document.createElement('td');td.textContent=value;if((i===3||i===5)&&Number(value.replaceAll(',',''))<0)td.className='under-prediction';tr.append(td);}
+  body.append(tr);
+ }
+ table.append(body);$('hourlyError').replaceChildren(table);
 }
 function drawWeather(g){
  const sorted=[...g.predict].sort((a,b)=>a-b),low=sorted[5],high=sorted[18];
@@ -129,13 +145,13 @@ function drawChart(g){
   const groups=[...cache.values()].filter(x=>x.h===Number($('horizon').value)&&valid(x)&&x.day>=start.toISOString().slice(0,10)&&x.day<=day).sort((a,b)=>a.day.localeCompare(b.day));
   labels=groups.map(x=>x.day);
   const avg=(x,key)=>[...x.series.get(key).values()].reduce((a,b)=>a+b,0)/24;
-  g=groups.length?{day:labels[0]+' ~ '+labels.at(-1),predict:groups.map(x=>avg(x,PREFERRED[x.h])),actual:groups.map(x=>avg(x,'실제 SMP'))}:null;
+  g=groups.length?{day:labels[0]+' ~ '+labels.at(-1),predict:groups.map(x=>avg(x,PREFERRED[x.h])),baseline:groups.map(x=>avg(x,'기준선 SMP')),actual:groups.map(x=>avg(x,'실제 SMP'))}:null;
  }
  $('chartTitle').textContent=(period==='day'?'하루 · 시간별':period==='month'?'한 달 · 일평균':'1년 · 일평균')+' SMP 가격 곡선';
  if(!g){const p=document.createElement('p');p.className='loading';p.textContent='선택한 기간에 저장된 데이터가 없습니다. 최근 데이터 날짜를 선택해 주세요.';area.append(p);return;}
  if(period!=='day'){const note=document.createElement('p');note.textContent=g.day+' · 자료가 있는 '+labels.length+'일 표시 (누락일은 연결하지 않음)';area.append(note);}
  const W=920,H=325,margin={l:64,r:25,t:22,b:42},w=W-margin.l-margin.r,h=H-margin.t-margin.b;
- const values=[...g.predict,...g.actual],lo=Math.min(...values),hi=Math.max(...values),diff=Math.max(10,hi-lo);
+ const values=[...g.predict,...g.baseline,...g.actual],lo=Math.min(...values),hi=Math.max(...values),diff=Math.max(10,hi-lo);
  const min=lo-diff*.1,max=hi+diff*.1;
  const xp=i=>margin.l+(period==='day'?i/23:(new Date(labels[i])-new Date(labels[0]))/Math.max(86400000,new Date(labels.at(-1))-new Date(labels[0])))*w;
  const yp=v=>margin.t+(max-v)/(max-min)*h;
@@ -148,10 +164,10 @@ function drawChart(g){
  svg.append(svgEl('line',{x1:margin.l,y1:margin.t+h,x2:W-margin.r,y2:margin.t+h,class:'axis'}));
  const ticks=[...new Set(Array.from({length:Math.min(7,labels.length)},(_,i)=>Math.round(i*(labels.length-1)/Math.max(1,Math.min(7,labels.length)-1))))];
  for(const i of ticks)svg.append(svgEl('text',{x:xp(i),y:H-12,'text-anchor':'middle'},period==='day'?labels[i]:labels[i].slice(5)));
- for(const [cls,arr]of [['series-actual',g.actual],['series-pred',g.predict]]){
+ for(const [cls,arr]of [['series-actual',g.actual],['series-base',g.baseline],['series-pred',g.predict]]){
   const pts=arr.map((v,i)=>{const gap=period!=='day'&&i>0&&(new Date(labels[i])-new Date(labels[i-1]))>86400000;return (i&&!gap?'L':'M')+xp(i).toFixed(2)+' '+yp(v).toFixed(2)}).join(' ');
   svg.append(svgEl('path',{d:pts,class:'plot '+cls}));
-  arr.forEach((v,i)=>{const dot=svgEl('circle',{cx:xp(i),cy:yp(v),r:labels.length>40?2:3,fill:cls==='series-pred'?'#0e9188':'#60758a'});dot.append(svgEl('title',{},labels[i]+' · '+(cls==='series-pred'?'AI 예측 ':'실제 ')+fmt(v)+'원/kWh'));svg.append(dot);});
+  arr.forEach((v,i)=>{const name=cls==='series-pred'?'선정 AI':cls==='series-base'?'단순 기준선':'실제 SMP';const fill=cls==='series-pred'?'#0e9188':cls==='series-base'?'#cf995c':'#60758a';const dot=svgEl('circle',{cx:xp(i),cy:yp(v),r:labels.length>40?2:3,fill});dot.append(svgEl('title',{},labels[i]+' · '+name+' '+fmt(v)+'원/kWh'));svg.append(dot);});
  }
 
  area.append(svg);
