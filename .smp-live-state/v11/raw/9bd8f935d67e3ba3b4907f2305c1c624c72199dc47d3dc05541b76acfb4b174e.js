@@ -1,0 +1,2351 @@
+
+
+
+<!DOCTYPE html>
+
+
+
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="_csrf_parameter" content="_csrf" /><meta name="_csrf_header" content="X-XSRF-TOKEN" /><meta name="_csrf" content="779d234f-5275-4d7d-8f64-dec69a0d74ef" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=yes" />
+
+<meta name="title" content="육지 &lt; 계통한계가격(SMP) &lt; 전력관련정보 &lt; 주요사업 : 전력거래소" />
+<meta name="description" content="전력거래소,육지 &lt; 계통한계가격(SMP) &lt; 전력관련정보 &lt; 주요사업" />
+<meta name="keyword" content="KPX" />
+<meta name="author" content="전력거래소" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="전력거래소" />
+<meta property="og:title" content="육지 &lt; 계통한계가격(SMP) &lt; 전력관련정보 &lt; 주요사업 : 전력거래소" />
+<meta property="og:url" content="https://www.kpx.or.kr/smpInland.es?mid=a10404080100&issue_date=2026-11-11" />
+<meta property="og:description" content="전력거래소" />
+
+<title>육지 &lt; 계통한계가격(SMP) &lt; 전력관련정보 &lt; 주요사업 : 전력거래소</title>
+
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+
+
+                   
+<link rel="stylesheet" href="/main/css/default.css" />
+<link rel="stylesheet" href="/main/css/layout.css" />
+<link rel="stylesheet" href="/main/css/layout_respond.css?v=2" />	
+
+                   
+
+<link rel="stylesheet" href="/main/css/sub.css" />
+<link rel="stylesheet" href="/main/css/sub_respond.css" />
+<link rel="stylesheet" href="/main/css/sub_es.css" />
+<link rel="stylesheet" href="/main/css/content.css?v=5" />
+<link rel="stylesheet" href="/main/css/content_respond.css?v=3" />
+<link rel="stylesheet" href="/jquery/css/jquery.mCustomScrollbar.min.css" />	
+
+
+
+<link rel="stylesheet" type="text/css" href="/jquery/css/slick.css">
+<link rel="stylesheet" type="text/css" href="/jquery/css/fullpage.css">
+<link rel="stylesheet" href="/jquery/css/jquery.bxslider-4.2.17.css" />	
+                  
+<script src="/jquery/js/jquery-3.6.0.min.js"></script>
+<script src="/jquery/js/jquery.fullPage.min.js"></script>
+<script src="/js/global.js"></script>
+<script src="/jquery/js/jquery.bxslider-4.2.17.js"></script>
+<script src="/jquery/js/slick.js"></script>
+<script src="/ease_src/js/captchaboard.js"></script>
+
+                  
+<script src="/ease_src/sEditor/js/HuskyEZCreator.js" charset="UTF-8"></script>
+
+
+<script src="/jquery/js/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<script type="text/javascript">
+
+
+function accessClose(){
+	$(".accessLogWrap").css("display","none");
+	$("#header").css("top","0");
+	
+	sessionStorage.setItem("hideSecretField","Y");
+}
+
+
+</script>
+</head>
+<body>
+<p id="skip_nav">
+	<a href="#contents_body" class="cont_link">본문으로 바로가기</a>
+	<a href="#main" class="main_link">메인 본문으로 바로가기</a>
+</p>
+
+
+<link rel="stylesheet" href="/css/modalpopup.css" />
+
+	
+	
+		<div id="issue">
+	
+
+
+	
+	<article class="modal group">
+		<h2 class="title">주요알림</h2>
+		
+		
+		
+		
+		<p class="blank">등록된 팝업이 없습니다.</p>
+		
+		
+	    
+	    <div class="item">
+            <p class="label">팝업건수 : 총 <span class="count">0</span>건</p>
+            
+            <a href="" class="control close">닫기</a>
+            <a href="" class="control close oneday" data-focus="popup_focus01" data-focus-next="popup_focus01">오늘하루열지않기</a>
+        </div>
+        
+    	<div class="close_box">닫기</div>       
+    </article>
+</div>
+<script src="/jquery/jstree/_lib/jquery.cookie.js"></script>	
+<script>
+
+// 팝업 갯수
+var issuecount = $("#issue .group .list .img").length;
+$('#issue .count strong, #issue .item .count').text(issuecount);
+
+// 팝업 열고 닫기
+$('#issue').find('.control').on('click', function() {
+	if ( $(this).hasClass('open') == true ) {
+		$('#issue').addClass('active');
+	}
+	else {
+		$('#issue').removeClass('active');
+	}
+	return false;
+});
+$('#issue .close_box').on('click', function() {
+	$('#issue').removeClass('active');
+	return false;
+});
+
+$('#issue .group .list').slick({
+	draggable: true,
+	arrows: true,
+	dots: true,
+	speed: 700,
+	mobileFirst: true,
+	pauseOnDotsHover: true,
+    responsive: [
+       {
+         breakpoint: 640,
+         settings: {
+           slidesToShow: 3,
+           slidesToScroll:1
+         }
+       },
+       {
+           breakpoint: 639,  
+           settings: {
+             slidesToShow: 2,
+             slidesToScroll:1
+           }
+         }
+     ]
+});
+
+
+
+
+$(function(){
+    //  오늘하루열지않기
+    $('.oneday').on('click', function () {
+    	$('#issue').removeClass("active");
+		    // $('#issue').css("display","none");
+    	var name = "a1.oneday.open";
+    	var value	= "1";
+    	var expiredays = 1;    	
+		var expire_date = new Date() ;  //오늘날짜를  대입값으로 설정한다.
+		var secure = location.protocol == 'https:' ? ' secure;' : '';
+		expire_date.setDate(expire_date.getDate() + expiredays) ;
+		$.cookie(name,value,{expires: expiredays});
+		// $.ajax("/ondayOpen.es?name="+name);
+    });
+    $("#popup_cnt").html('00');
+    if(00 == 0){
+     $("#modal_popup").css("display","none");
+    }
+    
+    // 팝업 열고 닫기
+	$('#quick').find('.control').on('click', function() {
+		if ( $(this).hasClass('open') == true ) {
+			$('#issue').addClass('active');
+		}
+		else {
+			$('#issue').removeClass('active');
+		}
+		return false;
+	});
+	//$('.slick-slide').attr("tabindex","1");
+	//$('.slick-cloned').attr("tabindex","-1");
+	$('.slick-dots > li > button').attr("tabindex","0");
+	//$('.modal .prev').attr("data-focus-next","popup_focus_arrow01");
+	//$('.modal .next').attr("data-focus","popup_focus_arrow01");
+	
+	
+})
+</script>
+
+<div id="hiddenLayer" style="display:none"></div>
+<div class="mw" id="mw_temp" style="display:none;"></div>
+
+<div id="wrap">
+	
+	
+
+
+
+
+
+	
+
+			
+	
+	<header id="header">
+		
+<script>
+	function head_logout(){
+		sessionStorage.setItem("hideSecretField","N");
+		location.href="/logout.es?sid=a1";
+	}
+</script>
+<h1 class="logo"><a title="메인페이지로 이동" href="/main/">전력거래소 로고</a></h1>
+<div id="hnb">
+    <ul class="hnb2">
+                                                                                                                                                                                                                                                                                                                                                              
+        <li class="global" id="global">
+            <a href="#main" class="active">KOR<span class="blind">언어선택 열기</span></a>
+        	<div class="lang">
+	            <a href="/main/">KOR<span class="hidden">국문 사이트</span></a>
+	            <a href="/eng/">ENG<span class="hidden">영문 사이트</span></a>
+            </div>
+        </li>        
+		
+			
+			
+				<li class="login" style="z-index: 999;margin:0 25px 0 11px;"><a href="/loginPin_search.es?sid=a1" title="로그인"><i class="xi-lock-o"></i>로그인</a></li>
+			
+			
+
+		<li class="hnb_search"><a href="" class="label">검색<span class="blind">열기</span></a></li>
+	</ul>
+</div>
+<div class="search">
+	<div class="form">
+		<form id="searchForm" name="searchForm" action="/findeepSearch.es?mid=a10700000000" method="post">
+			<label for="search" class="IR">검색</label>
+			<input type="text" placeholder="검색어를 입력해 주세요" class="search_keyword" id="search" name="allKeyWord" value="" title="검색어 입력">
+			<button type="submit" name="button" onclick="document.searchForm.submit(); return false;">검색</button>
+		<div>
+<input type="hidden" name="_csrf" value="779d234f-5275-4d7d-8f64-dec69a0d74ef" />
+</div></form>
+	</div>
+	<button type="button" class="close">닫기</button>
+</div>
+		<nav id="gnb">
+			
+
+<ul id="head_menu" class="topmenu">
+	<li class="lnb1 mnfirst">
+		<a href="/menu.es?mid=a10301010000">KPX소개</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub03">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a10301010000">전력거래소는?</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301010000">회사개요</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301020000">주요역할</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301030000">비전 및 경영전략</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301060000">CI소개</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301080000">인재상</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301070100">찾아오시는 길</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03"><a href="/menu.es?mid=a10303010000">CEO 소개</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10303010000">인사말</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10303020000">약력</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a10302010000">조직구성</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10302010200">조직소개</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10302020100">임원구성 및 선임절차</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a10304000000">회원사 현황</a></li>
+				<li class="sub05 sublast"><a href="https://kpx.saramin.co.kr/" target="_blank" rel="noopener noreferrer" title="새창으로 이동" class="linkWindow">채용안내</a></li>
+			</ul>
+			
+
+		</div>
+	</li>
+	<li class="lnb2">
+		<a href="/menu.es?mid=a10201000000">열린경영</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub02">
+				<li class="sub11 subfirst"><a href="/menu.es?mid=a10211010000">국민의 의견을 듣습니다</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10211010000">국민제안 이용안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10211020000">국민제안 접수 및 조회</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub12"><a href="/menu.es?mid=a10212010000">적극행정</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212010000">적극행정이란</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212020000">전력거래소 적극행정 추진방안</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212030000">적극행정 우수사례</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212040000">적극행정 우수직원 추천</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212050000">소극행정 신고센터</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212060000">적극행정 소통 게시판</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212070000">소극행정 혁파 소통 게시판</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub13"><a href="/menu.es?mid=a10213010000">기업성장응답센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10213010000">기업성장응답센터는?</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10213020000">규제애로 접수</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub14"><a href="/menu.es?mid=a10214010000">행동강령.부패신고센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10214010000">신문고이용안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10214020000">행동강령.부패신고/상담</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub15"><a href="/menu.es?mid=a10215010000">인권침해신고센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10215010000">인권침해 신고접수 및 상담</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10215020000">인권침해 사건처리 절차</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10215030000">사건처리 원칙</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub16"><a href="/menu.es?mid=a10216010000">공익신고센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10216010000">공익신고안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10216020000">공익신고자보호안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10216030000">구조금.보상금지급안내</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub18 sublast"><a href="/menu.es?mid=a10218010000">안전제안(신고)센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10218010000">안전제안/신고센터는?</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10218020000">안전제안/신고접수</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+			
+
+		</div>
+	</li>
+	<li class="lnb3">
+		<a href="/menu.es?mid=a10901050000">ESG경영</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub09">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a10901040000">ESG경영</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901050000">CEO 인사말</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901040300">ESG 추진전략</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901110300">ESG 추진조직</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901130200">ESG 성과지표</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901120100">ESG 수상 및 인증내역</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a10902010000">E(환경)</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10902010600">환경경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10902070100">친환경정책지원</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10902090000">녹색제품 구매</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03"><a href="/menu.es?mid=a10903020000">S(사회)</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10903020100">동반성장</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10903030300">안전경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10903040100">인권경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10903050000">다양성 존중</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a10904010000">G(지배구조)</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904010200">이사회</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904040100">ESG전략위원회</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904050100">윤리경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904070100">청렴경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904030000">비상임이사 경영활동</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub05 sublast"><a href="/menu.es?mid=a10905020000">지속가능경영보고서</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10905010000">2023년</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10905020000">2025년</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+			
+
+		</div>
+	</li>
+	<li class="lnb4">
+		<a href="/menu.es?mid=a11001010000">법령·규칙</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub10">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a11001010000">법령 및 고시</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11001010000">법령</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11001020000">고시</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a11002010000">전력시장운영규칙 및 세부규정</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11002010000">전력시장운영규칙 아카이브</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11002020000">세부운영규정</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11002030000">규칙개정 제안 및 자문</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11002040000">기타</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03 sublast"><a href="/menu.es?mid=a11003010000">내규</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11003010000">내규 공개</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11003020000">내규·제·개정 예고</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+			
+
+		</div>
+	</li>
+	<li class="lnb5">
+		<a href="/menu.es?mid=a10101010000">정보공개</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub01">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a10101010000">정보공개제도</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101010000">정보공개제도란?</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101020000">정보처리절차흐름도</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101030000">정보공개 방법</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101040000">비공개정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101050000">불복구제절차</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101060000">정보공개수수료</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub06"><a href="/menu.es?mid=a10106000000">공공기관정보공개청구</a></li>
+				<li class="sub07"><a href="/menu.es?mid=a10107010000">공공데이터 제공</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10107010000">공공데이터 신청 및 안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10107020000">공공데이터 목록</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10107030000">전력데이터 큐레이션 서비스</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub11"><a href="/menu.es?mid=a10111010000">경영공시</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10111010000">경영공시 안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10111020000">ALIO 통합공시</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10111030000">자율공시</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10111040000">담당자 현황</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a10102090000">사전정보공표</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10102090000">사전정보공표 목록</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10102100000">즐겨찾기 정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10102110000">사전정보 모니터링</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub09"><a href="/menu.es?mid=a10109010000">전력시장·전력계통 운영정보</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109010000">전력시장 정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109020000">전력계통 운영정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109040000">IT시스템 운영정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109050000">비중앙 출력제어 정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109030000">기타정보</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub10"><a href="/menu.es?mid=a10110010000">사업실명제</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10110010000">사업실명제 개요</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10110020000">대상사업 리스트</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub05 sublast"><a href="/menu.es?mid=a10105000000">정보목록</a></li>
+			</ul>
+			
+
+		</div>
+	</li>
+	<li class="lnb6">
+		<a href="/menu.es?mid=a10401010000">주요사업</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub04">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a10401010000">시장운영</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401010000">전력거래절차</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401040000">시장가격결정</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401050000">정산처리일정</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401080000">정산스마트 매뉴얼</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401060000">전력시장운영협의체</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401020000">REC거래</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401030000">전력거래시스템</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10801000000">전력거래 준비 안내</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a10402010000">계통운영</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10402010000">전력계통운영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10402030000">단기전력수급운영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10402040000">급전운영</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03"><a href="/menu.es?mid=a10403010000">전력수급</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403010000">전력수급개요</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403020000">전력수급계획수립절차</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403030100">전력수요전망</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403040000">발전소건설현황</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403050100">계통계획</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403060100">발전사업허가업무</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403070000">전력수급기본계획</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a10404010000">전력관련정보</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404010000">최대부하전망</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404020000">최대부하전망(제주)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404030000">실시간 전력수급현황</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404040000">실시간 전력수급현황 (제주)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404050000">비상시 절전참여요령</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404060000">전력수급실적</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404070000">전력수급실적(제주)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404080100">계통한계가격(SMP)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404090100">하루전 발전계획용 수요예측</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub06"><a href="/menu.es?mid=a10406010000">제주시범사업 정보</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10406010100">발전계획용 수요예측</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10406020100">계통한계가격(SMP)</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub07"><a href="/menu.es?mid=a10407010000">스마트그리드</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10407010000">스마트그리드 개요</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub05 sublast"><a href="/menu.es?mid=a10405010000">해외동향</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10405010000">전력산업동향</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+			
+
+		</div>
+	</li>
+	<li class="lnb7">
+		<a href="/menu.es?mid=a11101000000">통합계약정보</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub11">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a11101010000">입찰공고</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11101010000">공고 안내사항</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11101020000">입찰공고 게시판</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03"><a href="/menu.es?mid=a11103010000">계약절차안내</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11103010000">계약종류및방법</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11103020000">업무절차도</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11103030000">계약준비서류</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11103040000">예상소요일수</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a11104000000">통합자료실</a></li>
+				<li class="sub05 sublast"><a href="/menu.es?mid=a11105010000">청렴계약안내</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11105010000">청렵계약이란</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+			
+
+		</div>
+	</li>
+	<li class="lnb8">
+		<a href="/menu.es?mid=a11201000000">소식알림</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub12">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a11201000000">공지사항</a></li>
+				<li class="sub05"><a href="/menu.es?mid=a11205000000">보도자료</a></li>
+				<li class="sub07"><a href="/menu.es?mid=a11207000000">KPX 브리핑</a></li>
+				<li class="sub06"><a href="/menu.es?mid=a11206000000">이사장 동정</a></li>
+				<li class="sub03"><a href="/menu.es?mid=a11203000000">시장개선</a></li>
+				<li class="sub04"><a href="/menu.es?mid=a11204000000">KPX 종합자료실</a></li>
+				<li class="sub02 sublast"><a href="/menu.es?mid=a11202000000">(구)보도자료</a></li>
+			</ul>
+			
+
+		</div>
+	</li>
+	<li class="lnb9 mnlast">
+		<a href="/menu.es?mid=a10501010000">고객지원</a>
+		<div class="submenu" style="display:none;">
+			
+
+			<ul class="sub05">
+				<li class="sub03 subfirst"><a href="/menu.es?mid=a10503010100">고객만족</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10503010100">고객서비스 헌장 및 이행표준</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10503020000">친절사원을 추천하세요</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a10504010000">KPX에 물어보세요</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10504010000">고객질의 이용안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10504020000">자주 받는 질문(FAQ)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10504030000">묻고 답하기(Q&A)</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub28"><a href="/menu.es?mid=a10528000000">홈페이지 개선 제안</a></li>
+				<li class="sub21"><a href="/menu.es?mid=a10521000000">프로그램다운로드</a></li>
+				<li class="sub22"><a href="/menu.es?mid=a10522010000">개인정보처리방침</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10522010000">알기 쉬운 개인정보처리방침</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10522040000">유·청소년 개인정보 처리방침</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10522020000">개인정보처리방침</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10522030000">정보주체 권리행사</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub23"><a href="/menu.es?mid=a10523000000">이메일 무단수집거부</a></li>
+				<li class="sub24"><a href="https://visit.kpx.or.kr">방문신청</a></li>
+				<li class="sub27 sublast"><a href="/menu.es?mid=a10527010000">시설개방</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10527010000">시설개방 안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10527020000">시설 사용 약관</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+			
+
+		</div>
+	</li>
+</ul>
+
+
+		</nav>
+		<nav id="gnb2">
+			<a href="" class="control open"><span class="bar"></span>메뉴열기</a>
+			<div class="gnb_wrap">
+						
+				<div class="gnb_top">
+					<div class="gnb_search">
+							<form id="searchForm2" name="searchForm" action="/findeepSearch.es?mid=a10700000000" method="post">
+								<label for="search2" class="IR">검색</label>
+								<input type="text" placeholder="검색어를 입력해 주세요" class="search_keyword" id="search2" name="allKeyWord" value="" title="검색어 입력">
+								<button type="submit" name="button" onclick="document.searchForm.submit(); return false;">검색</button>
+							<div>
+<input type="hidden" name="_csrf" value="779d234f-5275-4d7d-8f64-dec69a0d74ef" />
+</div></form>
+					</div>				
+				</div>
+						
+				<div class="topmenu_wrap">
+					
+
+<ul id="head_menu_all" class="topmenu_all">
+	<li class="lnb1 mnfirst">
+		<a href="/menu.es?mid=a10301010000">KPX소개</a>
+		<div class="submenu">
+			<ul class="sub03">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a10301010000">전력거래소는?</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301010000">회사개요</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301020000">주요역할</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301030000">비전 및 경영전략</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301060000">CI소개</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301080000">인재상</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10301070100">찾아오시는 길</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03"><a href="/menu.es?mid=a10303010000">CEO 소개</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10303010000">인사말</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10303020000">약력</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a10302010000">조직구성</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10302010200">조직소개</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10302020100">임원구성 및 선임절차</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a10304000000">회원사 현황</a></li>
+				<li class="sub05 sublast"><a href="https://kpx.saramin.co.kr/" target="_blank" rel="noopener noreferrer" title="새창으로 이동" class="linkWindow">채용안내</a></li>
+			</ul>
+		</div>
+	</li>
+	<li class="lnb2">
+		<a href="/menu.es?mid=a10201000000">열린경영</a>
+		<div class="submenu">
+			<ul class="sub02">
+				<li class="sub11 subfirst"><a href="/menu.es?mid=a10211010000">국민의 의견을 듣습니다</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10211010000">국민제안 이용안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10211020000">국민제안 접수 및 조회</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub12"><a href="/menu.es?mid=a10212010000">적극행정</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212010000">적극행정이란</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212020000">전력거래소 적극행정 추진방안</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212030000">적극행정 우수사례</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212040000">적극행정 우수직원 추천</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212050000">소극행정 신고센터</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212060000">적극행정 소통 게시판</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10212070000">소극행정 혁파 소통 게시판</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub13"><a href="/menu.es?mid=a10213010000">기업성장응답센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10213010000">기업성장응답센터는?</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10213020000">규제애로 접수</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub14"><a href="/menu.es?mid=a10214010000">행동강령.부패신고센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10214010000">신문고이용안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10214020000">행동강령.부패신고/상담</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub15"><a href="/menu.es?mid=a10215010000">인권침해신고센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10215010000">인권침해 신고접수 및 상담</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10215020000">인권침해 사건처리 절차</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10215030000">사건처리 원칙</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub16"><a href="/menu.es?mid=a10216010000">공익신고센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10216010000">공익신고안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10216020000">공익신고자보호안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10216030000">구조금.보상금지급안내</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub18 sublast"><a href="/menu.es?mid=a10218010000">안전제안(신고)센터</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10218010000">안전제안/신고센터는?</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10218020000">안전제안/신고접수</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li class="lnb3">
+		<a href="/menu.es?mid=a10901050000">ESG경영</a>
+		<div class="submenu">
+			<ul class="sub09">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a10901040000">ESG경영</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901050000">CEO 인사말</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901040300">ESG 추진전략</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901110300">ESG 추진조직</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901130200">ESG 성과지표</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10901120100">ESG 수상 및 인증내역</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a10902010000">E(환경)</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10902010600">환경경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10902070100">친환경정책지원</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10902090000">녹색제품 구매</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03"><a href="/menu.es?mid=a10903020000">S(사회)</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10903020100">동반성장</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10903030300">안전경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10903040100">인권경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10903050000">다양성 존중</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a10904010000">G(지배구조)</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904010200">이사회</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904040100">ESG전략위원회</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904050100">윤리경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904070100">청렴경영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10904030000">비상임이사 경영활동</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub05 sublast"><a href="/menu.es?mid=a10905020000">지속가능경영보고서</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10905010000">2023년</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10905020000">2025년</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li class="lnb4">
+		<a href="/menu.es?mid=a11001010000">법령·규칙</a>
+		<div class="submenu">
+			<ul class="sub10">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a11001010000">법령 및 고시</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11001010000">법령</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11001020000">고시</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a11002010000">전력시장운영규칙 및 세부규정</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11002010000">전력시장운영규칙 아카이브</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11002020000">세부운영규정</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11002030000">규칙개정 제안 및 자문</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11002040000">기타</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03 sublast"><a href="/menu.es?mid=a11003010000">내규</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11003010000">내규 공개</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11003020000">내규·제·개정 예고</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li class="lnb5">
+		<a href="/menu.es?mid=a10101010000">정보공개</a>
+		<div class="submenu">
+			<ul class="sub01">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a10101010000">정보공개제도</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101010000">정보공개제도란?</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101020000">정보처리절차흐름도</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101030000">정보공개 방법</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101040000">비공개정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101050000">불복구제절차</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10101060000">정보공개수수료</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub06"><a href="/menu.es?mid=a10106000000">공공기관정보공개청구</a></li>
+				<li class="sub07"><a href="/menu.es?mid=a10107010000">공공데이터 제공</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10107010000">공공데이터 신청 및 안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10107020000">공공데이터 목록</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10107030000">전력데이터 큐레이션 서비스</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub11"><a href="/menu.es?mid=a10111010000">경영공시</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10111010000">경영공시 안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10111020000">ALIO 통합공시</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10111030000">자율공시</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10111040000">담당자 현황</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a10102090000">사전정보공표</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10102090000">사전정보공표 목록</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10102100000">즐겨찾기 정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10102110000">사전정보 모니터링</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub09"><a href="/menu.es?mid=a10109010000">전력시장·전력계통 운영정보</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109010000">전력시장 정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109020000">전력계통 운영정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109040000">IT시스템 운영정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109050000">비중앙 출력제어 정보</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10109030000">기타정보</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub10"><a href="/menu.es?mid=a10110010000">사업실명제</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10110010000">사업실명제 개요</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10110020000">대상사업 리스트</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub05 sublast"><a href="/menu.es?mid=a10105000000">정보목록</a></li>
+			</ul>
+		</div>
+	</li>
+	<li class="lnb6">
+		<a href="/menu.es?mid=a10401010000">주요사업</a>
+		<div class="submenu">
+			<ul class="sub04">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a10401010000">시장운영</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401010000">전력거래절차</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401040000">시장가격결정</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401050000">정산처리일정</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401080000">정산스마트 매뉴얼</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401060000">전력시장운영협의체</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401020000">REC거래</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10401030000">전력거래시스템</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10801000000">전력거래 준비 안내</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub02"><a href="/menu.es?mid=a10402010000">계통운영</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10402010000">전력계통운영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10402030000">단기전력수급운영</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10402040000">급전운영</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03"><a href="/menu.es?mid=a10403010000">전력수급</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403010000">전력수급개요</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403020000">전력수급계획수립절차</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403030100">전력수요전망</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403040000">발전소건설현황</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403050100">계통계획</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403060100">발전사업허가업무</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10403070000">전력수급기본계획</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a10404010000">전력관련정보</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404010000">최대부하전망</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404020000">최대부하전망(제주)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404030000">실시간 전력수급현황</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404040000">실시간 전력수급현황 (제주)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404050000">비상시 절전참여요령</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404060000">전력수급실적</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404070000">전력수급실적(제주)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404080100">계통한계가격(SMP)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10404090100">하루전 발전계획용 수요예측</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub06"><a href="/menu.es?mid=a10406010000">제주시범사업 정보</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10406010100">발전계획용 수요예측</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10406020100">계통한계가격(SMP)</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub07"><a href="/menu.es?mid=a10407010000">스마트그리드</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10407010000">스마트그리드 개요</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub05 sublast"><a href="/menu.es?mid=a10405010000">해외동향</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10405010000">전력산업동향</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li class="lnb7">
+		<a href="/menu.es?mid=a11101000000">통합계약정보</a>
+		<div class="submenu">
+			<ul class="sub11">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a11101010000">입찰공고</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11101010000">공고 안내사항</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11101020000">입찰공고 게시판</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub03"><a href="/menu.es?mid=a11103010000">계약절차안내</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11103010000">계약종류및방법</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11103020000">업무절차도</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11103030000">계약준비서류</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11103040000">예상소요일수</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a11104000000">통합자료실</a></li>
+				<li class="sub05 sublast"><a href="/menu.es?mid=a11105010000">청렴계약안내</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a11105010000">청렵계약이란</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</li>
+	<li class="lnb8">
+		<a href="/menu.es?mid=a11201000000">소식알림</a>
+		<div class="submenu">
+			<ul class="sub12">
+				<li class="sub01 subfirst"><a href="/menu.es?mid=a11201000000">공지사항</a></li>
+				<li class="sub05"><a href="/menu.es?mid=a11205000000">보도자료</a></li>
+				<li class="sub07"><a href="/menu.es?mid=a11207000000">KPX 브리핑</a></li>
+				<li class="sub06"><a href="/menu.es?mid=a11206000000">이사장 동정</a></li>
+				<li class="sub03"><a href="/menu.es?mid=a11203000000">시장개선</a></li>
+				<li class="sub04"><a href="/menu.es?mid=a11204000000">KPX 종합자료실</a></li>
+				<li class="sub02 sublast"><a href="/menu.es?mid=a11202000000">(구)보도자료</a></li>
+			</ul>
+		</div>
+	</li>
+	<li class="lnb9 mnlast">
+		<a href="/menu.es?mid=a10501010000">고객지원</a>
+		<div class="submenu">
+			<ul class="sub05">
+				<li class="sub03 subfirst"><a href="/menu.es?mid=a10503010100">고객만족</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10503010100">고객서비스 헌장 및 이행표준</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10503020000">친절사원을 추천하세요</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub04"><a href="/menu.es?mid=a10504010000">KPX에 물어보세요</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10504010000">고객질의 이용안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10504020000">자주 받는 질문(FAQ)</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10504030000">묻고 답하기(Q&A)</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub28"><a href="/menu.es?mid=a10528000000">홈페이지 개선 제안</a></li>
+				<li class="sub21"><a href="/menu.es?mid=a10521000000">프로그램다운로드</a></li>
+				<li class="sub22"><a href="/menu.es?mid=a10522010000">개인정보처리방침</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10522010000">알기 쉬운 개인정보처리방침</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10522040000">유·청소년 개인정보 처리방침</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10522020000">개인정보처리방침</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10522030000">정보주체 권리행사</a></li>
+						</ul>
+					</div>
+				</li>
+				<li class="sub23"><a href="/menu.es?mid=a10523000000">이메일 무단수집거부</a></li>
+				<li class="sub24"><a href="https://visit.kpx.or.kr">방문신청</a></li>
+				<li class="sub27 sublast"><a href="/menu.es?mid=a10527010000">시설개방</a>
+					<div>
+						<ul class="lnb-detail">
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10527010000">시설개방 안내</a></li>
+							<li class="lnb-detail-item"><a href="/menu.es?mid=a10527020000">시설 사용 약관</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</li>
+</ul>
+
+
+				</div>
+			</div>
+			<a href="" class="control close">메뉴닫기</a>
+		</nav>
+	</header>
+	<main id="main">
+		<div class="main_wrap">
+
+
+
+
+
+
+
+		
+<div id="visual" class="visual4">
+<strong class="title">주요사업</strong>
+
+</div>
+		
+		<section id="snb" class="sub04">
+			
+				
+				
+   			<h2 class="title"><span>주요사업</span></h2>
+				
+			
+			<nav class="list">
+		
+			
+
+<ul id="left_menu_top" class="head_menu_depth">
+	<li id="li0401000000" class="first type1"><a href="/menu.es?mid=a10401010000">시장운영</a>
+		<ul id="smenu1" class="ul0401000000" style="display:none;">
+			<li id="li0401010000"><a href="/menu.es?mid=a10401010000">전력거래절차</a></li>
+			<li id="li0401040000"><a href="/menu.es?mid=a10401040000">시장가격결정</a></li>
+			<li id="li0401050000"><a href="/menu.es?mid=a10401050000">정산처리일정</a></li>
+			<li id="li0401080000"><a href="/menu.es?mid=a10401080000">정산스마트 매뉴얼</a></li>
+			<li id="li0401060000"><a href="/menu.es?mid=a10401060000">전력시장운영협의체</a></li>
+			<li id="li0401020000"><a href="/menu.es?mid=a10401020000">REC거래</a></li>
+			<li id="li0401030000"><a href="/menu.es?mid=a10401030000">전력거래시스템</a></li>
+			<li id="li0401090000" class="last"><a href="/menu.es?mid=a10801000000">전력거래 준비 안내</a></li>
+		</ul>
+	</li>
+	<li id="li0402000000" class="type1"><a href="/menu.es?mid=a10402010000">계통운영</a>
+		<ul id="smenu2" class="ul0402000000" style="display:none;">
+			<li id="li0402010000"><a href="/menu.es?mid=a10402010000">전력계통운영</a></li>
+			<li id="li0402030000"><a href="/menu.es?mid=a10402030000">단기전력수급운영</a></li>
+			<li id="li0402040000" class="last"><a href="/menu.es?mid=a10402040000">급전운영</a></li>
+		</ul>
+	</li>
+	<li id="li0403000000" class="type1"><a href="/menu.es?mid=a10403010000">전력수급</a>
+		<ul id="smenu3" class="ul0403000000" style="display:none;">
+			<li id="li0403010000"><a href="/menu.es?mid=a10403010000">전력수급개요</a></li>
+			<li id="li0403020000"><a href="/menu.es?mid=a10403020000">전력수급계획수립절차</a></li>
+			<li id="li0403030000"><a href="/menu.es?mid=a10403030100">전력수요전망</a></li>
+			<li id="li0403040000"><a href="/menu.es?mid=a10403040000">발전소건설현황</a></li>
+			<li id="li0403050000"><a href="/menu.es?mid=a10403050100">계통계획</a></li>
+			<li id="li0403060000"><a href="/menu.es?mid=a10403060100">발전사업허가업무</a></li>
+			<li id="li0403070000" class="last"><a href="/menu.es?mid=a10403070000">전력수급기본계획</a></li>
+		</ul>
+	</li>
+	<li id="li0404000000" class="type1"><a href="/menu.es?mid=a10404010000">전력관련정보</a>
+		<ul id="smenu4" class="ul0404000000" style="display:none;">
+			<li id="li0404010000"><a href="/menu.es?mid=a10404010000">최대부하전망</a></li>
+			<li id="li0404020000"><a href="/menu.es?mid=a10404020000">최대부하전망(제주)</a></li>
+			<li id="li0404030000"><a href="/menu.es?mid=a10404030000">실시간 전력수급현황</a></li>
+			<li id="li0404040000"><a href="/menu.es?mid=a10404040000">실시간 전력수급현황 (제주)</a></li>
+			<li id="li0404050000"><a href="/menu.es?mid=a10404050000">비상시 절전참여요령</a></li>
+			<li id="li0404060000"><a href="/menu.es?mid=a10404060000">전력수급실적</a></li>
+			<li id="li0404070000"><a href="/menu.es?mid=a10404070000">전력수급실적(제주)</a></li>
+			<li id="li0404080000"><a href="/menu.es?mid=a10404080100">계통한계가격(SMP)</a></li>
+			<li id="li0404090000" class="last"><a href="/menu.es?mid=a10404090100">하루전 발전계획용 수요예측</a></li>
+		</ul>
+	</li>
+	<li id="li0406000000" class="type1"><a href="/menu.es?mid=a10406010000">제주시범사업 정보</a>
+		<ul id="smenu5" class="ul0406000000" style="display:none;">
+			<li id="li0406010000"><a href="/menu.es?mid=a10406010100">발전계획용 수요예측</a></li>
+			<li id="li0406020000" class="last"><a href="/menu.es?mid=a10406020100">계통한계가격(SMP)</a></li>
+		</ul>
+	</li>
+	<li id="li0407000000" class="type1"><a href="/menu.es?mid=a10407010000">스마트그리드</a>
+		<ul id="smenu6" class="ul0407000000" style="display:none;">
+			<li id="li0407010000" class="last"><a href="/menu.es?mid=a10407010000">스마트그리드 개요</a></li>
+		</ul>
+	</li>
+	<li id="li0405000000" class="last type1"><a href="/menu.es?mid=a10405010000">해외동향</a>
+		<ul id="smenu7" class="ul0405000000" style="display:none;">
+			<li id="li0405010000" class="last"><a href="/menu.es?mid=a10405010000">전력산업동향</a></li>
+		</ul>
+	</li>
+</ul>
+
+
+		
+			</nav>
+			
+		</section>
+		<section id="contents">
+			<div class="contents_util">
+				
+				
+				
+					<h2 id="contents_title"><span>계통한계가격(SMP)</span></h2>
+				
+				
+				<nav class="location">
+					<ol class="path">
+						<li class="icon"><a href="/main"><span class="IR">홈</span></a></li>
+						
+						
+							
+						<li><a href="/menu.es?mid=a10400000000">주요사업</a></li>
+							
+						<li><a href="/menu.es?mid=a10404000000">전력관련정보</a></li>
+							
+						<li><a href="/menu.es?mid=a10404080000">계통한계가격(SMP)</a></li>
+							
+						<li><a href="/menu.es?mid=a10404080100" class="active">육지</a></li>
+							
+						
+						
+					</ol>
+					<div class="nav-depth">
+						<ul>
+							<li class="home"><a href="/main">HOME</a></li>
+						
+
+<li id="head_menu_depth1" class="list depth1">
+<button title="클릭시 탭메뉴 목록을 볼 수 있습니다." type="button">메뉴</button>
+<ul class="sub">
+	<li id="depth1_li0300000000"><a href="/menu.es?mid=a10301010000">KPX소개</a></li>
+	<li id="depth1_li0200000000"><a href="/menu.es?mid=a10201000000">열린경영</a></li>
+	<li id="depth1_li0900000000"><a href="/menu.es?mid=a10901050000">ESG경영</a></li>
+	<li id="depth1_li1000000000"><a href="/menu.es?mid=a11001010000">법령·규칙</a></li>
+	<li id="depth1_li0100000000"><a href="/menu.es?mid=a10101010000">정보공개</a></li>
+	<li id="depth1_li0400000000"><a href="/menu.es?mid=a10401010000">주요사업</a></li>
+	<li id="depth1_li1100000000"><a href="/menu.es?mid=a11101000000">통합계약정보</a></li>
+	<li id="depth1_li1200000000"><a href="/menu.es?mid=a11201000000">소식알림</a></li>
+	<li id="depth1_li0500000000"><a href="/menu.es?mid=a10501010000">고객지원</a></li>
+	<li id="depth1_li0600000000"><a href="/menu.es?mid=a10608000000">부가메뉴</a></li>
+	<li id="depth1_li0800000000"><a href="/menu.es?mid=a10801000000">전력거래 시작하기</a></li>
+	<li id="depth1_li0700000000"><a href="/menu.es?mid=a10700000000">통합검색</a></li>
+</ul>
+</li>
+
+
+						
+							
+
+<li id="head_menu_depth2" class="list depth2">
+<button title="클릭시 탭메뉴 목록을 볼 수 있습니다." type="button">메뉴</button>
+<ul class="sub">
+	<li id="depth2_li0401000000"><a href="/menu.es?mid=a10401010000">시장운영</a></li>
+	<li id="depth2_li0402000000"><a href="/menu.es?mid=a10402010000">계통운영</a></li>
+	<li id="depth2_li0403000000"><a href="/menu.es?mid=a10403010000">전력수급</a></li>
+	<li id="depth2_li0404000000"><a href="/menu.es?mid=a10404010000">전력관련정보</a></li>
+	<li id="depth2_li0406000000"><a href="/menu.es?mid=a10406010000">제주시범사업 정보</a></li>
+	<li id="depth2_li0407000000"><a href="/menu.es?mid=a10407010000">스마트그리드</a></li>
+	<li id="depth2_li0405000000" class="last"><a href="/menu.es?mid=a10405010000">해외동향</a></li>
+</ul>
+</li>
+
+
+						
+						
+							
+
+<li id="head_menu_depth3" class="list depth3">
+<button title="클릭시 탭메뉴 목록을 볼 수 있습니다." type="button">메뉴</button>
+<ul class="sub">
+	<li id="depth3_li0404010000"><a href="/menu.es?mid=a10404010000">최대부하전망</a></li>
+	<li id="depth3_li0404020000"><a href="/menu.es?mid=a10404020000">최대부하전망(제주)</a></li>
+	<li id="depth3_li0404030000"><a href="/menu.es?mid=a10404030000">실시간 전력수급현황</a></li>
+	<li id="depth3_li0404040000"><a href="/menu.es?mid=a10404040000">실시간 전력수급현황 (제주)</a></li>
+	<li id="depth3_li0404050000"><a href="/menu.es?mid=a10404050000">비상시 절전참여요령</a></li>
+	<li id="depth3_li0404060000"><a href="/menu.es?mid=a10404060000">전력수급실적</a></li>
+	<li id="depth3_li0404070000"><a href="/menu.es?mid=a10404070000">전력수급실적(제주)</a></li>
+	<li id="depth3_li0404080000"><a href="/menu.es?mid=a10404080100">계통한계가격(SMP)</a></li>
+	<li id="depth3_li0404090000" class="last"><a href="/menu.es?mid=a10404090100">하루전 발전계획용 수요예측</a></li>
+</ul>
+</li>
+
+
+						
+						
+						</ul>
+					</div>
+				</nav>
+				
+				
+				<div class="util">
+					<span class="zoom">
+						<a href="#contents_body" onclick="zoomInOut('plus'); return false;" class="btn up">글자 크게</a>
+						<a href="#contents_body" onclick="zoomInOut('minus'); return false;" class="btn down">글자 작게</a>
+					</span>
+					
+					<article class="share" id="shareWrap" title="닫힘">
+						<h2 class="title"><a href="" class="btn open" onclick="toggleTitle('#shareWrap');">공유하기</a></h2>
+						
+						<form id="snsForm" name="snsForm" action="/api/sns.es" method="post">
+						<input type="hidden" name="title" value="" />
+						<input type="hidden" name="mid" value="a10404080100" />
+						<input type="hidden" name="url" value="" />
+						<input type="submit" value="전송" style="display:none;height:0;width:0;" />
+						<div>
+<input type="hidden" name="_csrf" value="779d234f-5275-4d7d-8f64-dec69a0d74ef" />
+</div></form>
+						<div class="item">
+							<ul id="share" class="list">
+								<li class="facebook"><a title="새 창 열림" href="#share" onclick="snsApi('facebook'); return false;">페이스북</a></li>
+								<li class="twitter"><a title="새 창 열림" href="#share" onclick="snsApi('twitter'); return false;">트위터</a></li>
+								<li class="band"><a title="새 창 열림" href="#share" onclick="snsApi('band'); return false;">밴드</a></li>
+								<li class="kakaostory"><a title="새 창 열림" href="#share" onclick="snsApi('kakao'); return false;">카카오스토리</a></li>
+                                                                                                                 
+								
+								<li class="urlShare"><a href="#share" onclick="copyURI(document.location.href); return false;" class="url">URL 복사</a></li>
+							</ul>
+							<script type="text/javascript">
+							//<![CDATA[
+								var now = escape(document.location.href);
+								var url = "/ease_src/kakao.jsp?title=전력거래소&url="+now;
+								$("#kakao-link-btn").attr("href",url);
+							//]]>
+							</script>
+						</div>
+					</article>
+					<a class="btn print" href="#contents_detail" onclick="printAreaAction(); return false;">인쇄</a>
+				</div>
+				
+			</div>
+			
+			<div id="contents_body">
+				
+				<div id="depth4_menu_div" class="depth4_tab">
+
+<ul id="depth4_menu_ul">
+	<li id="tab_li0404080100"><a href="/menu.es?mid=a10404080100">육지</a></li>
+	<li id="tab_li0404080200"><a href="/menu.es?mid=a10404080200">제주(하루전시장)</a></li>
+	<li id="tab_li0404080300"><a href="/menu.es?mid=a10404080300">월별</a></li>
+	<li id="tab_li0404080400" class="last"><a href="/menu.es?mid=a10404080400">연도별</a></li>
+</ul>
+
+</div>
+				
+				
+				<div class="content_style">
+
+<script>
+	// 엑셀저장
+	function fncXlsDown(url){
+		var fm = document.srhForm;
+		fm.action = url;
+		fm.target = "_self";
+		fm.submit();
+	}
+	
+	function fncSearch(){
+		var fm = document.srhForm;
+		fm.action = "/smpInland.es?mid=a10404080100&device=pc";
+		fm.submit();
+	}
+	
+	function goDay(arg){
+		$("#issue_date").val(arg);
+		fncSearch();
+	}
+
+</script>
+<link rel="stylesheet" href="/css/board.css" />
+
+<div class="bidSmpList search_box">
+<form id="srhForm" name="srhForm" action="/smpInland.es" method="post">
+	<h5>
+		
+	 	<a href="?mid=a10404080100" onclick="goDay('2026-11-10'); return false;">이전</a>
+		2026년 11월 11일 거래분
+		<a href="?mid=a10404080100" onclick="goDay('2026-11-12'); return false;">다음</a>
+	</h5>
+	<div class="box01">
+		<label for="issue_date">검색</label>
+		
+		
+		<input type="date" class="form_textbox calendar" id="issue_date" name="issue_date" value="2026-11-11" size="10" maxlength="10" title="날짜를 선택하세요." placeholder="2021-01-01"/>
+		<input type="button" value="검색" onclick="fncSearch(); return false;">
+	</div>
+	<div class="box02">
+		
+		
+		<div>
+			<label>금일</label>
+			<div class="btn_area">
+				<a class="btn_download xlsx" href="/xlsxdownload.es?act=smpInLand&division=smpInLand&gubun=today" onclick="fncXlsDown(this.href); return false;">엑셀다운로드</a>
+			</div>
+		</div>
+		<div>
+			<label>년도</label>
+			<select name="yy" id="yy" title="년도을 선택하세요" class="formLineSel">
+			
+				
+				<option value="2026">2026</option>
+			
+				
+				<option value="2025">2025</option>
+			
+				
+				<option value="2024">2024</option>
+			
+				
+				<option value="2023">2023</option>
+			
+				
+				<option value="2022">2022</option>
+			
+				
+				<option value="2021">2021</option>
+			
+				
+				<option value="2020">2020</option>
+			
+				
+				<option value="2019">2019</option>
+			
+				
+				<option value="2018">2018</option>
+			
+				
+				<option value="2017">2017</option>
+			
+				
+				<option value="2016">2016</option>
+			
+				
+				<option value="2015">2015</option>
+			
+				
+				<option value="2014">2014</option>
+			
+				
+				<option value="2013">2013</option>
+			
+				
+				<option value="2012">2012</option>
+			
+				
+				<option value="2011">2011</option>
+			
+				
+				<option value="2010">2010</option>
+			
+				
+				<option value="2009">2009</option>
+			
+				
+				<option value="2008">2008</option>
+			
+				
+				<option value="2007">2007</option>
+			
+				
+				<option value="2006">2006</option>
+			
+				
+				<option value="2005">2005</option>
+			
+				
+				<option value="2004">2004</option>
+			
+				
+				<option value="2003">2003</option>
+			
+				
+				<option value="2002">2002</option>
+			
+				
+				<option value="2001">2001</option>
+			
+				
+				<option value="2000">2000</option>
+			
+			</select>
+			<div class="btn_area">
+				<a class="btn_download xlsx" href="/xlsxdownload.es?act=smpInLand&division=smpInLand&gubun=year" onclick="fncXlsDown(this.href); return false;">엑셀다운로드</a>
+			</div>	
+		</div>
+	</div>
+<div>
+<input type="hidden" name="_csrf" value="779d234f-5275-4d7d-8f64-dec69a0d74ef" />
+</div></form>
+</div>
+	<p class="info_top">단위 : 원/kWh</p>
+	<div class="conTableGroup scroll">
+	<div class="scroll_txt"><b><span class="txt_orange">좌우</span>로 움직여</b>주세요</div>
+	<table class="conTable tdCenter">
+	<caption class="hidden">육지 SMP</caption>
+		<colgroup><col class="W7" /><col /></colgroup>
+		<thead>
+			<tr>
+				<th scope="col">구분</th>
+				
+					<th scope="col">11.05<br/>(목)</th>
+				
+					<th scope="col">11.06<br/>(금)</th>
+				
+					<th scope="col">11.07<br/>(토)</th>
+				
+					<th scope="col">11.08<br/>(일)</th>
+				
+					<th scope="col">11.09<br/>(월)</th>
+				
+					<th scope="col">11.10<br/>(화)</th>
+				
+					<th scope="col">11.11<br/>(수)</th>
+				
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1h</td>
+				
+					<td>101.81</td>
+				
+					<td>119.29</td>
+				
+					<td>120.65</td>
+				
+					<td>111.29</td>
+				
+					<td>100.42</td>
+				
+					<td>106.28</td>
+				
+					<td>107.14</td>
+				
+			</tr>
+			<tr>
+				<td>2h</td>
+				
+					<td>97.63</td>
+				
+					<td>99.15</td>
+				
+					<td>116.67</td>
+				
+					<td>99.64</td>
+				
+					<td>93.94</td>
+				
+					<td>102.55</td>
+				
+					<td>102.33</td>
+				
+			</tr>
+			<tr>
+				<td>3h</td>
+				
+					<td>97.63</td>
+				
+					<td>99.15</td>
+				
+					<td>117.68</td>
+				
+					<td>99.64</td>
+				
+					<td>93.94</td>
+				
+					<td>96.23</td>
+				
+					<td>102.33</td>
+				
+			</tr>
+			<tr>
+				<td>4h</td>
+				
+					<td>97.63</td>
+				
+					<td>99.15</td>
+				
+					<td>120.65</td>
+				
+					<td>99.88</td>
+				
+					<td>93.94</td>
+				
+					<td>95.21</td>
+				
+					<td>100.88</td>
+				
+			</tr>
+			<tr>
+				<td>5h</td>
+				
+					<td>97.63</td>
+				
+					<td>99.07</td>
+				
+					<td>125.86</td>
+				
+					<td>99.88</td>
+				
+					<td>93.94</td>
+				
+					<td>100.55</td>
+				
+					<td>102.33</td>
+				
+			</tr>
+			<tr>
+				<td>6h</td>
+				
+					<td>97.63</td>
+				
+					<td>113.51</td>
+				
+					<td>137.38</td>
+				
+					<td>98.56</td>
+				
+					<td>93.94</td>
+				
+					<td>113.51</td>
+				
+					<td>113.51</td>
+				
+			</tr>
+			<tr>
+				<td>7h</td>
+				
+					<td>99.38</td>
+				
+					<td>137.04</td>
+				
+					<td>137.42</td>
+				
+					<td>98.56</td>
+				
+					<td>114.32</td>
+				
+					<td>135.54</td>
+				
+					<td>113.91</td>
+				
+			</tr>
+			<tr>
+				<td>8h</td>
+				
+					<td>124.93</td>
+				
+					<td>137.17</td>
+				
+					<td>137.42</td>
+				
+					<td>98.56</td>
+				
+					<td>124.93</td>
+				
+					<td>146.94</td>
+				
+					<td>124.93</td>
+				
+			</tr>
+			<tr>
+				<td>9h</td>
+				
+					<td>165.37</td>
+				
+					<td>172.95</td>
+				
+					<td>125.86</td>
+				
+					<td>97.8</td>
+				
+					<td>164.5</td>
+				
+					<td>175.8</td>
+				
+					<td>165.27</td>
+				
+			</tr>
+			<tr>
+				<td>10h</td>
+				
+					<td>178.77</td>
+				
+					<td>172.83</td>
+				
+					<td>125.86</td>
+				
+					<td>97.8</td>
+				
+					<td>174.08</td>
+				
+					<td>175.67</td>
+				
+					<td>165.37</td>
+				
+			</tr>
+			<tr>
+				<td>11h</td>
+				
+					<td>180.38</td>
+				
+					<td>172.58</td>
+				
+					<td>125.86</td>
+				
+					<td>126.01</td>
+				
+					<td>174.95</td>
+				
+					<td>175.36</td>
+				
+					<td>165.22</td>
+				
+			</tr>
+			<tr>
+				<td>12h</td>
+				
+					<td>180.37</td>
+				
+					<td>172.46</td>
+				
+					<td>125.86</td>
+				
+					<td>126.01</td>
+				
+					<td>174.56</td>
+				
+					<td>164.96</td>
+				
+					<td>165.22</td>
+				
+			</tr>
+			<tr>
+				<td>13h</td>
+				
+					<td>180.36</td>
+				
+					<td>92.25</td>
+				
+					<td>92.72</td>
+				
+					<td>126.01</td>
+				
+					<td>174.22</td>
+				
+					<td>92.25</td>
+				
+					<td>164.49</td>
+				
+			</tr>
+			<tr>
+				<td>14h</td>
+				
+					<td>180.35</td>
+				
+					<td>172.21</td>
+				
+					<td>125.86</td>
+				
+					<td>126.01</td>
+				
+					<td>175.06</td>
+				
+					<td>164.96</td>
+				
+					<td>164.71</td>
+				
+			</tr>
+			<tr>
+				<td>15h</td>
+				
+					<td>180.34</td>
+				
+					<td>172.09</td>
+				
+					<td>125.86</td>
+				
+					<td>126.01</td>
+				
+					<td>182.93</td>
+				
+					<td>164.96</td>
+				
+					<td>165.14</td>
+				
+			</tr>
+			<tr>
+				<td>16h</td>
+				
+					<td>179.89</td>
+				
+					<td>172.09</td>
+				
+					<td>125.86</td>
+				
+					<td>113.72</td>
+				
+					<td>175.07</td>
+				
+					<td>164.96</td>
+				
+					<td>164.71</td>
+				
+			</tr>
+			<tr>
+				<td>17h</td>
+				
+					<td>124.93</td>
+				
+					<td>172.33</td>
+				
+					<td>133.14</td>
+				
+					<td>113.81</td>
+				
+					<td>175.08</td>
+				
+					<td>165.45</td>
+				
+					<td>165.22</td>
+				
+			</tr>
+			<tr>
+				<td>18h</td>
+				
+					<td>124.93</td>
+				
+					<td>172.46</td>
+				
+					<td>133.26</td>
+				
+					<td>113.72</td>
+				
+					<td>174.99</td>
+				
+					<td>165.61</td>
+				
+					<td>164.71</td>
+				
+			</tr>
+			<tr>
+				<td>19h</td>
+				
+					<td>124.93</td>
+				
+					<td>172.71</td>
+				
+					<td>133.56</td>
+				
+					<td>113.72</td>
+				
+					<td>174.32</td>
+				
+					<td>165.61</td>
+				
+					<td>164.71</td>
+				
+			</tr>
+			<tr>
+				<td>20h</td>
+				
+					<td>124.93</td>
+				
+					<td>172.83</td>
+				
+					<td>133.3</td>
+				
+					<td>113.72</td>
+				
+					<td>165.27</td>
+				
+					<td>165.69</td>
+				
+					<td>164.34</td>
+				
+			</tr>
+			<tr>
+				<td>21h</td>
+				
+					<td>124.93</td>
+				
+					<td>131.79</td>
+				
+					<td>133.3</td>
+				
+					<td>113.72</td>
+				
+					<td>165.27</td>
+				
+					<td>164.4</td>
+				
+					<td>163.82</td>
+				
+			</tr>
+			<tr>
+				<td>22h</td>
+				
+					<td>103.74</td>
+				
+					<td>124.95</td>
+				
+					<td>133.39</td>
+				
+					<td>113.72</td>
+				
+					<td>124.93</td>
+				
+					<td>144.39</td>
+				
+					<td>124.93</td>
+				
+			</tr>
+			<tr>
+				<td>23h</td>
+				
+					<td>106.42</td>
+				
+					<td>123.5</td>
+				
+					<td>133.39</td>
+				
+					<td>113.72</td>
+				
+					<td>124.93</td>
+				
+					<td>134.38</td>
+				
+					<td>124.93</td>
+				
+			</tr>
+			<tr>
+				<td>24h</td>
+				
+					<td>106.16</td>
+				
+					<td>122.49</td>
+				
+					<td>133.47</td>
+				
+					<td>99.37</td>
+				
+					<td>124.93</td>
+				
+					<td>124.93</td>
+				
+					<td>118.95</td>
+				
+			</tr>
+			<tr>
+				<td>최대</td>
+				
+					<td>180.38</td>
+				
+					<td>172.95</td>
+				
+					<td>137.42</td>
+				
+					<td>126.01</td>
+				
+					<td>182.93</td>
+				
+					<td>175.8</td>
+				
+					<td>165.37</td>
+				
+			</tr>
+			<tr>
+				<td>최소</td>
+				
+					<td>97.63</td>
+				
+					<td>92.25</td>
+				
+					<td>92.72</td>
+				
+					<td>97.8</td>
+				
+					<td>93.94</td>
+				
+					<td>92.25</td>
+				
+					<td>100.88</td>
+				
+			</tr>
+			<tr>
+				<td>가중평균</td>
+				
+					<td>134.65</td>
+				
+					<td>142.97</td>
+				
+					<td>127.85</td>
+				
+					<td>110.24</td>
+				
+					<td>146.84</td>
+				
+					<td>143.77</td>
+				
+					<td>141.88</td>
+				
+			</tr>
+			
+		</tbody>
+	</table>
+</div>
+
+
+				</div>
+			</div>
+			<div class="contents_info">
+				
+				
+				<div class="group">
+				
+				<article id="satisfy" class="item">
+					
+<script type="text/javascript">
+//<![CDATA[
+	function satisfy_confirm(){
+		var fm = document.s_form;
+		var selChk = document.getElementsByName("chk_point");
+		for(var i = 0 ; i < selChk.length ; i++){
+			if(selChk[i].checked == true){
+				fm.point.value = selChk[i].value;
+			}
+		}
+		fm.action = "/satisfy.es?mid=a10404080100&act=ins";
+		fm.submit();
+	}
+//]]>
+</script>
+
+<fieldset>
+	<legend>콘텐츠 만족도 조사</legend>
+	<h2 class="title">
+		
+		<strong>이 페이지에서 제공하는 정보에 대하여 만족하십니까?</strong>
+		
+		
+	</h2>
+	<div class="cont">
+		
+		
+		
+		<form id="s_form" name="s_form" action="/satisfy.es" method="post">
+		<input type="hidden" name="mid" value="a10404080100" />
+		<input type="hidden" name="act" value="ins" />
+		<input type="hidden" name="point" value="0" />
+		<ul class="list">
+			<li class="form_radio"><input type="radio" name="chk_point" id="q1" value="5" checked="checked" /><label for="q1"> 매우만족</label></li>
+			<li class="form_radio"><input type="radio" name="chk_point" id="q2" value="4" /><label for="q2"> 만족</label></li>
+			<li class="form_radio"><input type="radio" name="chk_point" id="q3" value="3" /><label for="q3"> 보통</label></li>
+			<li class="form_radio"><input type="radio" name="chk_point" id="q4" value="2" /><label for="q4"> 불만족</label></li>
+			<li class="form_radio"><input type="radio" name="chk_point" id="q5" value="1" /><label for="q5"> 매우불만족</label></li>
+		</ul>
+		<p class="form">
+			<label for="opinionContents" class="IR">의견을 남겨주세요</label>
+			<input type="text" class="form_textbox" name="contents" id="opinionContents" onkeyup="insertContentsMax('opinionLength2', '100', document.s_form.contents); return false;" title="의견을 남겨주세요" placeholder="의견을 남겨주세요" />
+			<input type="submit" class="btn" onclick="satisfy_confirm(); return false;" value="의견등록"  />
+			<span class="length"><strong><span id="opinionLength2">0</span></strong>/100</span>
+		</p>
+		<div>
+<input type="hidden" name="_csrf" value="779d234f-5275-4d7d-8f64-dec69a0d74ef" />
+</div></form>
+		
+		
+	</div>
+</fieldset>
+
+				</article>
+				
+				</div>
+			</div>
+		</section>
+
+		</div>
+	</main>
+	
+	<footer id="footer">
+		<div class="footer_wrap">
+			
+		<span class='visually_hidden'>smartKPX 전력거래소</span>
+		                                 
+		<div class="ismsp_icon">
+			<div class="ismsp_pop remove">
+				<ul>
+					<li><span>[인증범위] </span>
+						<div>
+						 대국민서비스(대표홈페이지, 방문예약시스템) 및 전력거래서비스(전력거래시스템, 신재생 에너지 공급인증서 거래시스템)
+						</div>
+					</li>
+					<li><span>[유효기간]</span> 2025.11.13. ~ 2028.11.12.</li>
+				</ul>
+			</div>
+			<ul class="mark" >
+				<li><a title="한국인터넷진흥원 - 새창열림" href="https://isms.kisa.or.kr/main/ispims/issue/?certificationMode=list&searchCondition=2&searchKeyword=ISMS-P-KISA-2019-023" target="_blank" class="ismspImg"><img src="/main/img/layout/mark_isms.png" alt="ismsp"></a></li>
+				<li><a href="https://webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110&npp=9&skey=1&sval=%EC%A0%84%EB%A0%A5%EA%B1%B0%EB%9E%98%EC%86%8C&search_btn=%EA%B2%80%EC%83%89" target="_blank" title="WA인증마크-새창열림">
+					<img width="80" src="/main/img/layout/mark_wa_2026.png" alt="과학기술정보통신부 WA(WEB접근성) 품질인증 마크,웹와치(WebWatch) 2026.1.21 ~ 2027.1.20" title="WA 품질인증 마크, 웹와치(WebWatch) 2026.1.21 ~ 2027.1.20">
+				</a></li>
+			</ul>			
+    	</div>
+		                           
+		<script>
+		                                 
+		$(document).ready(function(){
+			$(".ismspImg").mouseover(function(){
+				$(".ismsp_pop").removeClass("remove");
+			});
+		
+			$(".ismspImg").mouseout(function(){
+				$(".ismsp_pop").addClass("remove");
+			});
+		});
+		                                    
+		</script>			
+		<div class="related">
+			
+
+
+	<div class="group group1">
+		<a href="" class="label">관련유관기관</a>
+		<ul class="list">
+	
+		<li>
+			<a href="http://www.kepco.co.kr/" target="_blank" title="새창">한국전력공사</a>
+		</li>
+	
+		<li>
+			<a href="http://www.koenergy.kr" target="_blank" title="새창">한국남동발전</a>
+		</li>
+	
+		<li>
+			<a href="http://www.komipo.co.kr/" target="_blank" title="새창">한국중부발전</a>
+		</li>
+	
+		<li>
+			<a href="http://www.iwest.co.kr" target="_blank" title="새창">한국서부발전</a>
+		</li>
+	
+		<li>
+			<a href="http://www.kospo.co.kr/" target="_blank" title="새창">한국남부발전</a>
+		</li>
+	
+		<li>
+			<a href="http://www.ewp.co.kr/" target="_blank" title="새창">한국동서발전</a>
+		</li>
+	
+		<li>
+			<a href="http://www.khnp.co.kr/" target="_blank" title="새창">한국수력원자력</a>
+		</li>
+	
+		</ul>
+	</div>
+
+
+
+		</div>
+		<div id="fnb">
+			<ul class="fnb1">
+				  <li><a href="/menu.es?mid=a10301010000">KPX소개</a></li>
+			      <li class="point"><a href="/menu.es?mid=a10522000000">개인정보처리방침</a></li>
+			      <li><a href="/menu.es?mid=a10605030000">이메일무단수집거부</a></li>
+			      <li><a href="/menu.es?mid=a10605010000">프로그램 다운로드</a></li>
+			      <li><a href="https://mail.kpx.or.kr/login" target="_blank">전자메일(직원전용)</a></li>
+			</ul>
+		</div>
+		<div id="siteinfo">
+			<address><em>(58322)전남광주통합특별시 나주시 빛가람로 625(빛가람동)</em> <span>Tel : <a href="tel:061-330-8100" title='대표번호 전화걸기'>061.330.8100</a></span> <span>Fax : 061.330.8299</span> <span>REC문의 : rec@kpx.or.kr</span></address>
+			<p class="copyright">COPYRIGHT(C) 2021 KOREA POWER EXCHANGE(KPX) ALL RIGHTS RESERVED</p>
+		</div>
+
+
+		</div>
+		
+<div id="quick">
+	<h2 class="blind">퀵메뉴</h2>
+	<a href="" class="control_m open">퀵메뉴 열기</a>
+	                                                                                                                                                                                     
+	
+
+
+	<ul class="link_list">
+
+		<li class="link01"><a href="/menu.es?mid=a10403010000" target="_self">전력수급계획</a></li>
+
+		<li class="link02"><a href="/menu.es?mid=a10504040000" target="_self">서비스 담당자 안내</a></li>
+
+		<li class="link03"><a href="/menu.es?mid=a10208000000" target="_self">입찰공고 및 수의계약</a></li>
+
+		<li class="link04"><a href="/main/#section-3rd" target="_self">홈으로 바로가기</a></li>
+
+		<li class="link05"><a href="/menu.es?mid=a10510000000" target="_self">실적증명서 발급</a></li>
+
+	</ul>
+
+
+
+	<ul class="member_list">
+		<li class="member01"><a href="/menu.es?mid=a10605050000">세무로 회원가입</a></li>
+	</ul>
+	<a href="" class="control_m close">퀵메뉴 닫기</a>
+</div>
+<div id="quick_nav">
+	<div class="anchor">
+		<a href="#main" class="anchorLink up">위로가기</a>
+	</div>
+	
+</div>
+
+	</footer>
+</div>
+
+<!--[if lt IE 9]><script src="/js/html5.js"></script><![endif]-->
+<link rel="stylesheet" href="/css/printArea.css" media="print" />
+
+                  
+<script src="/main/js/layout.js"></script>
+
+                  
+<script src="/main/js/sub.js"></script>
+
+<script src="/jquery/js/jquery.bxslider-4.2.17.js"></script>
+<script src="/jquery/js/ui.datepicker.js"></script>
+<script src="/jquery/js/jquery-ui.min.js"></script>
+
+
+	
+
+	
+<script>
+	try { initNavigation('04'); } catch (e) { console.log(""); }	// 메인메뉴 활성화
+	//try { initNavigationMbl('04'); } catch (e) { console.log(""); }	// 모바일 메인메뉴 활성화
+	try { initLeftMenuLI('0404', '040408'); } catch (e) { console.log(""); }	// 서브메뉴 활성화
+	try { init3DepthMenu('040408'); } catch (e) { console.log(""); }
+	try { init4DepthMenu('04040801'); } catch (e) { console.log(""); }
+	try { init5DepthMenu('0404080100'); } catch (e) { console.log(""); }
+	try { init1DepthComboMenu('04'); } catch (e) { console.log(""); }
+	try { init2DepthComboMenu('0404'); } catch (e) { console.log(""); }
+	try { init3DepthComboMenu('040408'); } catch (e) { console.log(""); }
+	try { init4DepthComboMenu('04040801'); } catch (e) { console.log(""); }
+	try { init5DepthComboMenu('0404080100'); } catch (e) { console.log(""); }
+	try { init1DepthComboMenu2('04'); } catch (e) { console.log(""); }
+	try { init2DepthComboMenu2('0404'); } catch (e) { console.log(""); }
+	try { init3DepthComboMenu2('040408'); } catch (e) { console.log(""); }
+	$.ajax({ url:'/logInsert.es?mid=a10404080100' });		// 로그기록
+</script>
+	
+	
+
+</body>
+</html>
