@@ -173,6 +173,24 @@ jobs:
           SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
         shell: bash
         run: python automation/smp_auto/probe_target_publication.py 2>&1 | tee "$RUNNER_TEMP/smp-publication-probe.log"
+      - name: Refresh SMP immediately before the fixed origin
+        continue-on-error: true
+        env:
+          SMP_SOURCE: ${{ github.workspace }}/source
+          SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
+        shell: bash
+        working-directory: source
+        run: |
+          python - <<'PY'
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          import os, time
+          origin = datetime.fromisoformat(os.environ['SMP_ORIGIN_DATE']+'T23:00:00').replace(tzinfo=ZoneInfo('Asia/Seoul'))
+          refresh_at = origin.timestamp() - 90
+          time.sleep(max(0, refresh_at-datetime.now(ZoneInfo('Asia/Seoul')).timestamp()))
+          PY
+          python -m v11.collect --market land 2>&1 | tee "$RUNNER_TEMP/smp-epsis-final-refresh.log" || echo "final collection failed; origin-time vintage checks remain fail-closed"
+          python "$GITHUB_WORKSPACE/automation/smp_auto/probe_target_publication.py" 2>&1 | tee "$RUNNER_TEMP/smp-publication-final-probe.log" || echo "final publication probe failed; horizon remains ineligible"
       - name: Wait until the fixed 23:00 KST origin
         if: github.event_name != 'pull_request'
         env:
@@ -229,7 +247,9 @@ jobs:
             source/artifacts/v11/public_availability_live.json
             automation/state/forecast_history.json
             ${{ runner.temp }}/smp-epsis-collection.log
+            ${{ runner.temp }}/smp-epsis-final-refresh.log
             ${{ runner.temp }}/smp-publication-probe.log
+            ${{ runner.temp }}/smp-publication-final-probe.log
             ${{ runner.temp }}/smp-forecast-generation.log
             ${{ runner.temp }}/smp-state-persist.log
           if-no-files-found: warn
