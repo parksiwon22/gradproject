@@ -8,7 +8,6 @@
   <title>전력예보 | SMP 예측과 스마트 충전</title>
   <link rel="stylesheet" href="./web_v20_public.css">
   <script defer src="./web_v20_public.js"></script>
-  <script defer src="./live_forecast.js"></script>
 </head>
 <body>
   <a class="skip" href="#main">본문 바로가기</a>
@@ -20,7 +19,7 @@
         <a href="#charging">충전 추천</a>
         <a href="#research">연구 결과</a>
       </nav>
-      <span class="nav-chip">V20 연구 시연</span>
+      <span class="nav-chip">연구 · 재현 · 운영 이력</span>
     </div>
   </header>
   <main id="main">
@@ -29,9 +28,9 @@
         <div class="hero-copy">
           <p class="eyebrow"><span class="tiny-dot"></span> SMP 기반 스마트 충전 연구</p>
           <h1>오늘의 전력 날씨,<br><em>충전하기 좋은 시간은?</em></h1>
-          <p class="hero-desc">하루 24시간의 SMP를 예측하고 전기차에 적합한 충전 시간대를 찾아봅니다. 연구에서 선정한 D+1, D+2, D+3 모델의 과거 검증 결과를 직접 확인해 보세요.</p>
+          <p class="hero-desc">과거 fold 검증부터 2026년 시점 재현, 저장된 실제 운영 예측까지 하나의 날짜 흐름으로 확인합니다. 예측 원점과 원래 지평을 보존해 SMP 비교와 EV 충전 효과를 살펴봅니다.</p>
           <a class="hero-button" href="#forecast">예측 결과 살펴보기 <span aria-hidden="true">↗</span></a>
-          <p class="hero-fineprint">2024~2025년 과거 검증 시연입니다. 실시간 예측이나 실제 전기요금 안내가 아닙니다.</p>
+          <p class="hero-fineprint">자료 유형과 예측 원점을 선택한 결과마다 표시합니다. 연구용 SMP 비교이며 실제 전기요금 안내가 아닙니다.</p>
         </div>
         <div class="hero-art" aria-hidden="true">
           <div class="orb one"></div><div class="orb two"></div>
@@ -48,13 +47,14 @@
     </section>
     <section class="content-section wrap" id="forecast">
       <div class="section-head">
-        <div><p class="section-kicker">01 / FORECAST</p><h2>하루의 전력 가격을 비교해 보세요.</h2><p class="section-desc">날짜와 기간을 선택해 가격 흐름과 충전하기 좋은 시간대를 확인하세요. 월·년 단위에서는 일평균 가격을 표시합니다.</p></div>
+        <div><p class="section-kicker">01 / DATE-LINKED FORECAST</p><h2>날짜를 선택해 예측 원점과 실제 SMP를 확인하세요.</h2><p class="section-desc">과거 fold, 보존된 발급, 시점 재현, 향후 운영 이력을 같은 날짜 화면에 연결합니다. 서로 다른 자료 집단의 점수는 합산하지 않습니다.</p></div>
       </div>
       <div class="controls panel">
-        <div class="field"><label for="horizon">예측 시점</label><select id="horizon"><option value="1">D+1 · 하루 전 예측</option><option value="2">D+2 · 이틀 전 예측</option><option value="3">D+3 · 사흘 전 예측</option></select></div>
-        <div class="field"><label for="date">예측 대상 날짜</label><input id="date" type="date"><button id="latestDate" type="button">최근 데이터 날짜 보기</button></div>
-        <div class="field"><label for="period">가격 곡선 기간</label><select id="period"><option value="day">하루 · 시간별</option><option value="month" selected>한 달 · 일평균</option><option value="year">1년 · 일평균</option></select></div><div class="source-note"><span class="state-dot"></span><span id="dataStatus">연구 데이터를 읽고 있습니다</span></div>
+        <div class="field"><label for="date">대상 날짜</label><input id="date" type="date"><button id="latestDate" type="button">최근 기록 날짜</button></div>
+        <div class="field"><label for="recordSelect">예측 원점 · 모델 · 원래 지평</label><select id="recordSelect"></select></div>
+        <div class="source-note"><span class="state-dot"></span><span id="dataStatus">저장된 예측 자료를 읽고 있습니다</span></div>
       </div>
+      <p id="recordMeta" class="record-meta" aria-live="polite"></p>
       <div id="error" class="error-panel" role="alert" hidden></div>
       <div class="weather-panel panel" aria-live="polite"><span id="weatherIcon" aria-hidden="true">☁</span><div><p class="section-kicker">PRICE WEATHER / 가격 날씨</p><h3 id="weatherTitle">가격 예보 준비 중</h3><p id="weatherNote"></p><p id="cheapPrice"></p><strong id="cheapHour">—</strong></div></div>
       <div id="weatherHours" class="weather-hours" aria-label="시간별 가격 날씨"></div>
@@ -105,7 +105,7 @@
       <div class="section-head research-history-head"><div><p class="section-kicker">MODEL DEVELOPMENT / V5–V20</p><h2>모델은 어떻게 발전했나요?</h2><p class="section-desc">저장된 보고서에서 확인되는 주요 실험 흐름입니다. 성능 숫자는 평가 기간·산식이 같은 표 안에서만 비교합니다.</p></div></div>
       <div class="research-timeline panel"><article><b>V5</b><div><h3>일별 프로파일 HGB</h3><p>과거 SMP 프로파일과 외생 피처를 결합한 D+1 기준. 자체 92일 테스트에서 MAE 11.094, RMSE 13.809, G2V regret 24.02원/일. 후속 검증에서 원래 63개 입력의 과거 시점 이용 가능성을 입증하기 어려워 그대로 다른 기간에 일반화하지 않았습니다.</p></div></article><article><b>V6–V10</b><div><h3>피크·잔차·분위수 실험</h3><p>고정 프로파일 보정, ExtraTrees, 피크 분류·가중, 잔차 앙상블과 분위수 후보를 비교했습니다. 일부 가격 지표는 개선됐지만 충전 regret 또는 다른 기간의 일관된 개선이 확인되지 않아 다음 공통 SMP-only 비교로 이어졌습니다.</p></div></article><article><b>V11</b><div><h3>21개 SMP·달력 입력, 독립 D+1</h3><p>수요·날씨 등 과거 시점 수신 근거가 약한 변수를 제외하고 24/168시간 SMP lag, rolling/change와 달력 변수를 사용했습니다. D+1 ExtraTrees가 최종 275일 fold 후보로 선택됐습니다.</p></div></article><article><b>V12</b><div><h3>D+2 LightGBM 피크 가중</h3><p>장기 horizon의 비선형 잔차와 고가 구간을 보완하도록 LightGBM을 시험했습니다. 피크 가중만으로는 최종 평균 오차와 충전 regret의 균형을 안정적으로 개선하지 못했습니다.</p></div></article><article><b>V14–V15</b><div><h3>형태 혼합과 이벤트 입력</h3><p>V14는 가격 곡선 형태 보정·혼합, V15는 변동·이벤트 입력을 포함한 LightGBM 계열을 비교했습니다. 2025Q4 참고 비교에서 오차와 regret의 순위가 엇갈려 공통 기간/산식 밖의 직접 우열 주장은 제한했습니다.</p></div></article><article><b>V17–V19</b><div><h3>공동 horizon과 독립 D+3</h3><p>V17은 여러 horizon의 공동 구조, V19는 D+3 독립 HGB를 검토했습니다. D+3 장기 예측의 데이터 부족과 기간별 변동 때문에 한 후보가 모든 지표에서 우세하지 않았습니다.</p></div></article><article><b>V20 최종 연구 후보</b><div><h3>ExtraTrees + HGB / seasonal anchor</h3><p>D+1은 V11 ExtraTrees, D+2/D+3은 HGB 잔차와 과거 7·14·21·28일 동일 시간 SMP 중앙값 anchor의 5% 혼합을 선택했습니다. 공통 275일 fold에서 MAE와 RMSE를 우선하고 EV regret을 함께 확인했습니다. 이 값은 반복된 과거 fold 재현이며 당시 수신 vintage·모델 가용성이 완전히 증명된 운영 성능이 아닙니다.</p></div></article></div>
       <p class="table-caption research-source-note">근거와 수식·평가 한계: <a href="./smp_improvement_ml_lgbm/FINAL_RESEARCH_REPORT.md">최종 모델 연구 보고서</a> · <a href="./WEB_V20_PUBLIC_README.md">시연 및 데이터 안내</a>. V5 92일 테스트와 V20 275일 fold 결과는 서로 다른 집단으로 유지합니다.</p>
-      <div class="fineprint panel"><h3>사용 전 꼭 알아주세요</h3><p>기본 화면은 V20의 <b>과거 fold 연구 시연</b>입니다. 저장된 예측과 과거 SMP를 비교하며, 당시 최초 수신 시각과 모델 가용성은 완전히 검증되지 않았으므로 운영 성능으로 해석하지 않습니다. 신규 운영 예측은 별도 메뉴에서 원래 원점과 지평을 보존해 표시합니다. 275일 연구의 23시 cutoff는 유지합니다. 현재 운영 후보도 23시 SMP와 직전 168시간을 쓰므로 기준시각을 앞당기면 입력 정의가 달라져 재검증이 필요합니다. 기준시각 전 공식 SMP 공개가 관측되거나 공개 여부를 확인할 수 없는 대상일은 사전예측 성능에서 제외합니다. 사전 수집 일정을 여러 번 두더라도 Actions 시작 지연이나 EPSIS 공개시각을 보장하지 않으며, 23시 입력이 나중에 도착하면 소급 예측하지 않습니다. 충전 비용은 도매 SMP 기반 가상 비용이지 가정용 전기요금이나 V2G 수익이 아닙니다.</p><a href="./smp_improvement_ml_lgbm/FINAL_RESEARCH_REPORT.md">최종 연구 보고서 보기 ↗</a></div>
+      <div class="fineprint panel"><h3>자료를 해석할 때</h3><p>날짜 화면은 V20 275일 fold, V5 자체 테스트, V20 42일 재현, 보존 발급 예측, 추가 historical replay, 향후 자동 운영 이력을 하나의 날짜 축에 연결합니다. 각 예측의 원래 D+1/D+2/D+3 지평과 자료 유형을 유지하며, 평가 기간이 다른 점수는 합산하지 않습니다. 과거 입력 수신 vintage 또는 그 당시 모델 이용 가능성이 입증되지 않은 재현 결과는 운영 성능으로 표시하지 않습니다. 현재 자동 발급 gate는 유지됩니다. 275일 연구의 23시 기준은 바꾸지 않았으며, 23시 입력이 이후 확보되더라도 소급 발급하지 않습니다. 공식 공개 SMP와 대상일 경과 후 EPSIS 관측은 구분하고, 후자의 확정 실적 여부는 별도로 확인되지 않으면 미검증으로 표시합니다. 충전 비용은 도매 SMP 기반 가상 비용이지 소매 전기요금이 아닙니다.</p><a href="./smp_improvement_ml_lgbm/FINAL_RESEARCH_REPORT.md">최종 연구 보고서 보기 ↗</a></div>
     </section>
   </main>
   <footer><div class="wrap footer-inner"><span class="footer-brand">↗ 전력예보</span><span>SMP 기반 EV 충전 의사결정 연구</span><span>V20 과거 검증 시연 · 2026</span></div></footer>

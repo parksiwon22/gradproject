@@ -11,11 +11,11 @@
 - 총 275개 검증일, 모델 성능표와 연구용 시연 한계 명시
 
 HTML/CSS/JavaScript로 브라우저에서 직접 처리합니다. 과거 시연은 기존 저장소의
-`docs/smp_improvement_ml_lgbm/final_fold_demo.csv.gz`를 읽고, 이 브랜치에서는 Actions가 생성하는 `docs/live/latest.json`을 별도 최신 예측 탭에서 읽습니다. 신규 예측은 공식 발급과 분리된 연구용 경로이며 gate를 호출하거나 변경하지 않습니다. 과거 평가 데이터의 최초 수신시각과 당시 모델 존재시각은 미검증입니다.
+`docs/index.html`은 날짜 선택 하나로 자료를 연결합니다. `docs/smp_improvement_ml_lgbm/final_fold_demo.csv.gz`의 275일 fold, `docs/live/historical_archive.json.gz`의 보존된 V5 92일/V20 42일/저장 발급 예측, `docs/live/historical_replay.json.gz`의 추가 재현, Actions가 갱신하는 `docs/live/latest.json`의 향후 날짜별 운영 이력을 같은 날짜 화면에 불러옵니다. 날짜를 고르면 복수의 예측 원점·모델·원래 지평을 선택할 수 있습니다. 자료 유형은 문장으로 표시하며, 과거 연구·재현·운영 이력의 통계를 합산하지 않습니다. 운영 예측은 공식 발급과 분리된 연구용 경로이며 기존 gate를 호출하거나 변경하지 않습니다.
 
 ## 현재 공개와 자동화 배포
 
-기존 공개 URL은 `https://parksiwon22.github.io/gradproject/`입니다. 기본 화면은 과거 V20 fold 연구 시연입니다. 날짜별 신규 운영 예측은 별도 메뉴에 있으며 기록이 아직 0건이어도 과거 시연·평가 기능은 계속 사용할 수 있습니다. 실제 최신 실행 상태는 해당 URL의 `live/latest.json` 및 신규 운영 예측 화면에서 확인합니다.
+기존 공개 URL은 `https://parksiwon22.github.io/gradproject/`입니다. 과거 연구에서 신규 운영 이력까지 하나의 날짜 선택 화면을 사용합니다. 운영 이력이 아직 0건이어도 과거 자료는 그대로 열리며, 최신 자동 실행 상태와 보존된 예측은 같은 화면의 선택 기록으로 확인합니다.
 
 Pages의 공개 결과는 **Settings → Pages → Build and deployment → Source → GitHub Actions** 설정 및 workflow `deploy` 성공 이후에만 갱신됩니다. V5 Streamlit 웹은 별도 코드로 보존됩니다.
 
@@ -42,7 +42,7 @@ G2V 알고리즘은 1시간 슬롯을 가격 오름차순으로 고르고 마지
 - [원본 V20 Streamlit 앱](../../app_v20.py)
 # Automated public research forecast (this branch)
 
-The new `docs/live/` view is an optional **research-only** mode. The previous fold-based V20 demo and its MAE/RMSE figures remain intact as a separate tab. This automation does not invoke or relax the V20 official publication gate.
+The `docs/live/` files are data sources for the unified target-date screen, not a separate mode. The previous fold-based V20 demo and its MAE/RMSE figures remain intact in the same date-based system. This automation does not invoke or relax the V20 official publication gate.
 
 ## Server-side run
 
@@ -58,7 +58,11 @@ Forecast rows are append-only by issue origin and target date. Re-running an ori
 
 An issue is created only when the full 23:00 KST input hour and all preceding 168 hourly inputs have `first_seen` no later than the scheduled origin, the KPX target-day availability probe was received before origin, and all 24 features for each horizon are complete. If the 23:00 SMP arrives later, the run is withheld; the data is not backdated. The existing 23:00 time is retained because it is the historical fold cutoff and the current candidates explicitly use the 23:00 observation and its preceding 168-hour window. Moving operations earlier would change feature availability and requires a new time-aligned evaluation; it is not used as a shortcut to increase issuance counts. If target-day prices were already shown on the official page, or if publication status is unverified, the target is excluded from prospective evaluation. A zero-placeholder result means only that SMP was not observed on that KPX page at probe time; it does not prove that no other publication channel existed. GitHub schedule delay is recorded separately from origin and issue time.
 
-The live screen is keyed by target date. It lists all saved origin forecasts for that date, with the original D+1/D+2/D+3 lead, generated time, model family and hash. The main preforecast view favors D+2/D+3; D+1 ExtraTrees remains available as a reference when present. KPX public-page prices and EPSIS observations collected after the target day are shown as separate price references. EPSIS post-target observations are not claimed to be final-settlement prices unless that status is independently verified.
+The combined date screen lists every retained forecast origin for a target date, with original D+1/D+2/D+3 lead, generated time, model family and hash when recorded. Fold study, V5 test, V20 42-day replay, saved issue records, retrospective replay and future live records remain textually distinguished. KPX published prices and EPSIS observations collected after the target day are separate references. EPSIS post-target observations are not claimed to be final-settlement prices unless that status is independently verified. Missing dates remain empty and explain the available source ranges; the UI does not synthesize a forecast to fill a gap.
+
+`historical_archive.json.gz` was derived from the retained V20 research comparison CSV and manifest. It contains the 92-day V5 test, 42-day V20 comparison and saved 2026 issue forecasts without overwriting the original research files. `historical_replay.json.gz` contains a further as-of input replay using the existing checkpoint trained through 2026-10-26. The checkpoint artifact was created on 2026-11-09, so earlier replay origins are not claimed to have been as-issued; historic `first_seen` does not prove original market publication availability. The replay is a separate research reference, not validated operation. The checkpoint's 275-day fold score is not applied to its predictions.
+
+As of 2026-11-11, retained date coverage is: the 275-day fold from 2024-10-01 through 2025-12-31; the V20 weekly 42-day replay from 2026-01-01 through 2026-10-15; stored complete issue predictions on 2026-10-17, 18, 19, 21 and 22; and 33 additional replay forecasts over 2026-10-28 through 2026-11-13. In the added replay, 11 of 15 tested origins issued all three horizons; the 2026-10-30, 10-31, 11-01 and 11-06 origins were withheld because the input at the fixed 23:00 cutoff was absent. Thirty replay records currently have a full post-target SMP reference; the three forecasts targeting 2026-11-12/13 remain without a complete target-day reference. No saved complete prediction bridges 2026-10-23 through 10-27, and 2026-10-16 is also unrepresented. The daily SMP database having observations for a date does not itself supply an archived forecast for that date. `docs/live/latest.json` is still `not_run` with zero live forecast history in this PR branch; the replay records are not actual operating records.
 
 D+2/D+3 seasonal anchors use the same-hour median of the prior 7, 14, 21 and 28 days. This matches the final fold study; the `weekly` feature remains a separate 7-day HGB input feature. The committed refit weights are separate model fits through 2026-10-26 and are not the original fold models. Changing the anchor blend does not change the reported fold CV scores.
 
