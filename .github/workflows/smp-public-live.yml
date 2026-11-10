@@ -41,7 +41,7 @@ jobs:
           node --check docs/live_forecast.js
           node --check docs/web_v20_public.js
       - name: Parse forecast and pre-collection workflow YAML
-        run: ruby -e 'require "yaml"; ARGV.each { |path| YAML.load_file(path); puts "validated #{path}" }' .github/workflows/smp-public-live.yml .github/workflows/smp-prefetch.yml
+        run: ruby -e "require 'yaml'; ARGV.each { |path| YAML.load_file(path); puts path }" .github/workflows/smp-public-live.yml .github/workflows/smp-prefetch.yml
       - name: Upload PR validation log
         if: always()
         uses: actions/upload-artifact@v4
