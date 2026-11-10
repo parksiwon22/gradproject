@@ -1,0 +1,46 @@
+[
+  {
+    "market": "land",
+    "year": 2023,
+    "hours": 8760,
+    "days": 365,
+    "expected_full_year": 8760,
+    "missing_between_endpoints": 0,
+    "latest": "2023-12-31T23:00:00+09:00",
+    "exogenous_status": "SMP-only",
+    "publication_time": "unknown; first_seen is current collection time"
+  },
+  {
+    "market": "land",
+    "year": 2024,
+    "hours": 8784,
+    "days": 366,
+    "expected_full_year": 8784,
+    "missing_between_endpoints": 0,
+    "latest": "2024-12-31T23:00:00+09:00",
+    "exogenous_status": "SMP-only",
+    "publication_time": "unknown; first_seen is current collection time"
+  },
+  {
+    "market": "land",
+    "year": 2025,
+    "hours": 8760,
+    "days": 365,
+    "expected_full_year": 8760,
+    "missing_between_endpoints": 0,
+    "latest": "2025-12-31T23:00:00+09:00",
+    "exogenous_status": "SMP-only",
+    "publication_time": "unknown; first_seen is current collection time"
+  },
+  {
+    "market": "land",
+    "year": 2026,
+    "hours": 7536,
+    "days": 314,
+    "expected_full_year": 8760,
+    "missing_between_endpoints": 0,
+    "latest": "2026-11-10T23:00:00+09:00",
+    "exogenous_status": "SMP-only",
+    "publication_time": "unknown; first_seen is current collection time"
+  }
+]

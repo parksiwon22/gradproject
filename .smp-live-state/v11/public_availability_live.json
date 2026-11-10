@@ -1,0 +1,32 @@
+{
+  "origin_kst": "2026-11-10T23:00:00+09:00",
+  "results": [
+    {
+      "horizon_days": 1,
+      "target_date": "2026-11-11",
+      "checked_at_kst": "2026-11-10T23:06:33.039650+09:00",
+      "checked_at_utc": "2026-11-10T14:06:33.039650+00:00",
+      "status": "official_available",
+      "attempts": 1,
+      "before_origin": false
+    },
+    {
+      "horizon_days": 2,
+      "target_date": "2026-11-12",
+      "checked_at_kst": "2026-11-10T23:06:34.472350+09:00",
+      "checked_at_utc": "2026-11-10T14:06:34.472350+00:00",
+      "status": "not_observed_on_this_page",
+      "attempts": 1,
+      "before_origin": false
+    },
+    {
+      "horizon_days": 3,
+      "target_date": "2026-11-13",
+      "checked_at_kst": "2026-11-10T23:06:36.013314+09:00",
+      "checked_at_utc": "2026-11-10T14:06:36.013314+00:00",
+      "status": "not_observed_on_this_page",
+      "attempts": 1,
+      "before_origin": false
+    }
+  ]
+}
