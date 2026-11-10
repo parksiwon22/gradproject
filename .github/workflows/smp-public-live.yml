@@ -1,0 +1,257 @@
+name: SMP public forecast and Pages refresh
+
+on:
+  schedule:
+    - cron: '45 13 * * *' # 22:45 Asia/Seoul prefetch; issue origin remains 23:00
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: smp-pages
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: parksiwon22/gradproject
+          ref: fb6fc173d682b5cce2657b65c0b97c11e26ebd32
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: automation/smp_auto/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned inference dependencies
+        run: python -m pip install -r automation/smp_auto/requirements.txt
+      - name: Verify vintages, de-duplication, checkpoints and anchor
+        shell: bash
+        env:
+          SMP_SOURCE: ${{ github.workspace }}/source
+        run: python -m unittest discover -s tests/smp_auto -v 2>&1 | tee "$RUNNER_TEMP/smp-unit-tests.log"
+      - name: Compile Python and check public JavaScript
+        run: |
+          python -m py_compile automation/smp_auto/*.py
+          node --check docs/live_forecast.js
+      - name: Upload PR validation log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smp-pr-validation-${{ github.run_id }}
+          path: ${{ runner.temp }}/smp-unit-tests.log
+          if-no-files-found: ignore
+
+  integration-smoke:
+    needs: validate
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: parksiwon22/gradproject
+          ref: fb6fc173d682b5cce2657b65c0b97c11e26ebd32
+          path: source
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: automation/smp_auto/requirements.txt
+      - name: Install pinned inference dependencies
+        run: python -m pip install -r automation/smp_auto/requirements.txt
+      - name: Collect keyless EPSIS data and replay the fixed 23:00 forecast
+        env:
+          SMP_SOURCE: ${{ github.workspace }}/source
+          SMP_TEST_OUTPUT: ${{ runner.temp }}/smp-integration
+        run: python automation/smp_auto/integration_smoke.py
+      - name: Upload collection and prediction replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smp-keyless-integration-${{ github.run_id }}
+          path: ${{ runner.temp }}/smp-integration/**
+          if-no-files-found: warn
+          retention-days: 90
+
+
+  forecast:
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: parksiwon22/gradproject
+          ref: fb6fc173d682b5cce2657b65c0b97c11e26ebd32
+          path: source
+          persist-credentials: false
+      - name: Checkout durable state workspace
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: durable
+          fetch-depth: 1
+          sparse-checkout: .smp-live-state
+          sparse-checkout-cone-mode: false
+      - name: Restore persistent price and forecast history branch
+        id: restore-durable
+        shell: bash
+        run: |
+          git -C durable config user.name "github-actions[bot]"
+          git -C durable config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git -C durable fetch --depth=1 origin smp-live-data; then
+            git -C durable checkout -B smp-live-data FETCH_HEAD
+            echo "state_branch=existing" >> "$GITHUB_OUTPUT"
+          else
+            git -C durable checkout -B smp-live-data origin/main
+            echo "state_branch=initialized" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: automation/smp_auto/requirements.txt
+      - name: Install pinned inference dependencies
+        run: python -m pip install -r automation/smp_auto/requirements.txt
+      - name: Resolve the scheduled 23:00 KST origin date
+        shell: bash
+        run: |
+          python - <<'PY' >> "$GITHUB_ENV"
+          from datetime import datetime, timedelta
+          from zoneinfo import ZoneInfo
+          now = datetime.now(ZoneInfo("Asia/Seoul"))
+          day = now.date()
+          if "${{ github.event_name }}" == "schedule" and now.hour < 12:
+              day -= timedelta(days=1)
+          print(f"SMP_ORIGIN_DATE={day.isoformat()}")
+          PY
+      - name: Set public forecast history recovery URL
+        run: echo "SMP_PUBLISHED_HISTORY_URL=https://parksiwon22.github.io/gradproject/live/latest.json" >> "$GITHUB_ENV"
+      - name: Restore append-only EPSIS and forecast history
+        uses: actions/cache@v4
+        with:
+          path: |
+            source/artifacts/v11
+            automation/state
+          key: smp-epsis-v2-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            smp-epsis-v2-${{ runner.os }}-
+      - name: Restore persistent data over the disposable cache
+        run: |
+          if [ -f durable/.smp-live-state/v11/prices.sqlite ]; then
+            mkdir -p source/artifacts/v11
+            cp -a durable/.smp-live-state/v11/. source/artifacts/v11/
+          fi
+          if [ -f durable/.smp-live-state/automation/state/forecast_history.json ]; then
+            mkdir -p automation/state
+            cp durable/.smp-live-state/automation/state/forecast_history.json automation/state/forecast_history.json
+          fi
+      - name: Collect or recheck public mainland SMP
+        continue-on-error: true
+        working-directory: source
+        shell: bash
+        run: python -m v11.collect --market land 2>&1 | tee "$RUNNER_TEMP/smp-epsis-collection.log"
+      - name: Probe target-day KPX public price availability before issue
+        env:
+          SMP_SOURCE: ${{ github.workspace }}/source
+          SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
+        shell: bash
+        run: python automation/smp_auto/probe_target_publication.py 2>&1 | tee "$RUNNER_TEMP/smp-publication-probe.log"
+      - name: Wait until the fixed 23:00 KST origin
+        if: github.event_name != 'pull_request'
+        env:
+          SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
+        run: |
+          python - <<'PY'
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          import os, time
+          origin = datetime.fromisoformat(os.environ['SMP_ORIGIN_DATE']+'T23:00:00').replace(tzinfo=ZoneInfo('Asia/Seoul'))
+          time.sleep(max(0, (origin-datetime.now(ZoneInfo('Asia/Seoul'))).total_seconds()))
+          PY
+      - name: Generate research-only forecasts or withheld status
+        env:
+          SMP_SOURCE: ${{ github.workspace }}/source
+          SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
+        shell: bash
+        run: python automation/smp_auto/publish_forecast.py 2>&1 | tee "$RUNNER_TEMP/smp-forecast-generation.log"
+      - name: Persist price vintages and forecast history to smp-live-data
+        if: always() && steps.restore-durable.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            if [ -f source/artifacts/v11/prices.sqlite ]; then
+              python - <<'PY'
+          import sqlite3
+          db = sqlite3.connect('source/artifacts/v11/prices.sqlite')
+          db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
+          db.close()
+          PY
+            fi
+            mkdir -p durable/.smp-live-state/v11/raw durable/.smp-live-state/automation/state
+            if [ -f source/artifacts/v11/prices.sqlite ]; then cp source/artifacts/v11/prices.sqlite durable/.smp-live-state/v11/; fi
+            if [ -d source/artifacts/v11/raw ]; then cp -a source/artifacts/v11/raw/. durable/.smp-live-state/v11/raw/; fi
+            for f in collection_status.json coverage.json public_availability_live.json public_availability.json; do
+              if [ -f "source/artifacts/v11/$f" ]; then cp "source/artifacts/v11/$f" durable/.smp-live-state/v11/; fi
+            done
+            if [ -f automation/state/forecast_history.json ]; then cp automation/state/forecast_history.json durable/.smp-live-state/automation/state/; fi
+            git -C durable add .smp-live-state
+            if git -C durable diff --cached --quiet; then echo "No persistent state changes"; exit 0; fi
+            git -C durable commit -m "Persist SMP live collection and forecast state"
+            git -C durable push origin smp-live-data
+          } 2>&1 | tee "$RUNNER_TEMP/smp-state-persist.log"
+      - name: Save execution logs and latest forecast evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smp-live-run-${{ github.run_id }}
+          path: |
+            docs/live/latest.json
+            source/artifacts/v11/collection_status.json
+            source/artifacts/v11/coverage.json
+            source/artifacts/v11/public_availability_live.json
+            automation/state/forecast_history.json
+            ${{ runner.temp }}/smp-epsis-collection.log
+            ${{ runner.temp }}/smp-publication-probe.log
+            ${{ runner.temp }}/smp-forecast-generation.log
+            ${{ runner.temp }}/smp-state-persist.log
+          if-no-files-found: warn
+          retention-days: 90
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: forecast
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Deploy Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@v4

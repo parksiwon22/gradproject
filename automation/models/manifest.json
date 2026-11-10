@@ -1,0 +1,63 @@
+{
+  "created_utc": "2026-11-09T11:24:40.350804+00:00",
+  "source_db_sha256": "9fdbae7425f44c4cb082f94d05d6984e7ef66a21d4bd0ee93ed8cd4c9b7afb4d",
+  "source_commit": "fb6fc173d682b5cce2657b65c0b97c11e26ebd32",
+  "data_cutoff": "2026-10-26T23:00:00+09:00",
+  "model_origin": "new refit; not the serialized fold model files",
+  "models": {
+    "1": {
+      "file": "d1_selected_refit.joblib",
+      "sha256": "aed24fdc634f405c21072ab77f6dcae4b585850eb6ec090f0a3ac5a7943cca48",
+      "family": "V11-style ExtraTrees residual refit",
+      "trained_through": "2026-10-26",
+      "train_start": "2023-01-09",
+      "training_days": 1387,
+      "training_hours": 33288,
+      "anchor_weight": 0.0,
+      "vintage_verified": false,
+      "research_metrics_applied": false,
+      "anchor_method": "none",
+      "anchor_days": []
+    },
+    "2": {
+      "file": "d2_selected_refit.joblib",
+      "sha256": "80ea421aac1fd8fcff23cfaf6ce2c55d42a0c8c63df3e94d73f221facd71f10c",
+      "family": "HGB residual + seasonal anchor refit",
+      "trained_through": "2026-10-26",
+      "train_start": "2023-01-10",
+      "training_days": 1386,
+      "training_hours": 33264,
+      "anchor_weight": 0.05,
+      "vintage_verified": false,
+      "research_metrics_applied": false,
+      "anchor_method": "median_same_hour_days_7_14_21_28",
+      "anchor_days": [
+        7,
+        14,
+        21,
+        28
+      ]
+    },
+    "3": {
+      "file": "d3_selected_refit.joblib",
+      "sha256": "b3f2f596577e8f4720b7cdfe22bda82089be348375c0b13e795ce5d3136c28a1",
+      "family": "HGB residual + seasonal anchor refit",
+      "trained_through": "2026-10-26",
+      "train_start": "2023-01-11",
+      "training_days": 1385,
+      "training_hours": 33240,
+      "anchor_weight": 0.05,
+      "vintage_verified": false,
+      "research_metrics_applied": false,
+      "anchor_method": "median_same_hour_days_7_14_21_28",
+      "anchor_days": [
+        7,
+        14,
+        21,
+        28
+      ]
+    }
+  },
+  "warning": "The published 275-day CV metrics do not apply to these refit weights. Historical first_seen/vintage is unverified.",
+  "note": "Checkpoint estimator files and weights are retained unchanged. D+2/D+3 inference now uses the final-study 7/14/21/28-day same-hour median anchor; historical 275-day metrics remain fold-model results and are not performance claims for these refits."
+}
