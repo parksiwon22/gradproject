@@ -66,7 +66,8 @@ function valid(g){
 }
 function selectHorizon(){
  $('date').max=today();
- if(!$('date').value)$('date').value=today();
+ const dates=[...cache.values()].filter(g=>g.h===Number($('horizon').value)&&valid(g)&&g.day<=today()).map(g=>g.day).sort();
+ if(!cache.get($('horizon').value+'|'+$('date').value)||!valid(cache.get($('horizon').value+'|'+$('date').value)))$('date').value=dates.at(-1)||today();
  update();
 }
 function selected(){
