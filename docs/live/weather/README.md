@@ -2,26 +2,21 @@
 
 ## 구분 및 가용성 규칙
 
-- `forecast` 레코드는 KMA 단기예보의 발행 vintage입니다. `issued_at_kst`, `received_at_utc`, `forecast_origin_kst`, `target_at_kst`, 격자·권역·category·원본 API 출처를 함께 기록합니다. 예측 입력으로 쓰려면 발표와 수신 모두 해당 SMP forecast origin 이전이어야 합니다.
-- ASOS는 실제 관측입니다. 관측시각과 실제 수신시각을 별도 보관해야 하며 `forecast` vintage로 재분류하지 않습니다. 관측된 대상일 날씨를 과거 D+3 예보 대신 쓰지 않습니다.
-- 기본 HGB와 2026 예측 결과는 SMP/달력 입력만 사용했습니다. 현재 기상 피처가 들어간 최종 모델은 없습니다.
+- `forecast`는 KMA API Hub 단기예보 vintage입니다. 발표시각, 응답 수신시각, SMP 예측 원점, 대상 유효시각, 격자·권역·category·API 경로를 보존합니다. 입력 자격은 예보 발표와 수신이 모두 SMP 원점 이전일 때만 인정합니다.
+- ASOS는 관측 자료입니다. 관측시각과 수신시각을 별도 저장하며 예보 vintage로 취급하지 않습니다. 대상일의 사후 관측으로 과거 D+3 예보를 대체하지 않습니다.
+- 기존 HGB와 보존된 2026 예측은 SMP/달력 변수만 사용합니다. 기상 피처 모델은 아직 없습니다.
 
 ## 권역 표본
 
-`collect_weather.py`는 강릉(ASOS 105), 서울(108), 대전(133), 대구(143), 광주(156), 부산(159)에 대응하는 5km 단기예보 격자 여섯 곳을 사용합니다. 섬 지역 제주를 제외한 지리 분산 샘플이며, 전국 부하량·발전량으로 가중하지 않았고 국토 대표성도 검증하지 않았습니다. 기상 입력 후보의 누락률/상관/계절별 안정성을 확인할 때 쓸 시작점입니다. 지역 평균 또는 aggregate를 모델에 넣으려면 별도 검증이 필요합니다.
+수집기는 강릉(ASOS 105), 서울(108), 대전(133), 대구(143), 광주(156), 부산(159)의 육지 격자 여섯 곳을 사용합니다. 지리 분산 탐색 표본이며 전국 부하량·발전량 가중 대표값으로 검증하지 않았습니다. 모델 입력으로 승격하려면 추가 공간 대표성 검토가 필요합니다.
 
-## 호출과 저장
+## API, 저장 및 Actions
 
-- API: `VilageFcstInfoService_2.0/getVilageFcst`, data.go.kr 서비스 ID `15084084`. 공식 설명은 5km 격자, 시간별 상세 단기예보를 글피까지 제공하고 이용료는 무료라고 안내합니다.
-- 수집 호출량: 각 발표 vintage당 6개 격자 요청(기본 지역 세트 기준). 응답 페이지당 `numOfRows=1000`을 요청합니다. 이번 실행 환경은 data.go.kr 단기예보용 서비스 키가 없어 실 API 수집, 계정별 요청한도, API 응답 지연 검증은 보류했습니다. 기존 KMA API Hub 경로는 계정 유형에 따라 일반회원 하루 20,000건/5GB(시스템 상황에 따라 변경)라고 안내하지만, 이 한도는 data.go.kr 단기예보 서비스의 쿼터로 간주하지 않습니다.
-- 인증: 환경변수 `KMA_DATA_GO_KR_SERVICE_KEY` 또는 `KMA_SERVICE_KEY`. 키는 쿼리로 API에만 전송하고 상태 로그/응답 파일/예외 텍스트로 기록하지 않습니다. Actions에서는 repository/environment secret으로 같은 이름을 설정할 수 있습니다.
-- ASOS 조회 API도 별도 `collect_asos_hourly`로 구현되어 있으며 자료는 `docs/live/weather/asos_observations.jsonl`에 `record_type=observation`, 관측시각과 수신시각을 저장합니다. forecast JSONL과 파일을 분리합니다.
-- 저장: 기본 forecast 경로 `docs/live/weather/forecast_vintages.jsonl`. 한 줄에 하나의 forecast category/유효시각 값. 인증 키, 요청 URL, 원문 응답은 저장하지 않습니다.
-- 예보 범위: KMA 단기예보는 발표시각에 따라 대상 유효기간이 다릅니다. 응답으로 받은 `fcstDate/fcstTime`만 저장하고 기간을 외삽하지 않습니다.
-- 결측: 실패한 격자가 있으면 해당 수집을 `failed`로 중지하고 부분 결과를 성공으로 보고하지 않습니다. 모델 측 결측값 보간은 아직 없습니다. 입력이 불완전하면 기상 후보 적용을 보류하고 SMP-only 모델로 계속 동작해야 합니다.
+- 단기예보 API Hub 경로: `typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst`; ASOS 시간 자료 경로: `typ01/url/kma_sfctm3.php`.
+- 인증은 환경변수 `KMA_APIHUB_AUTH_KEY`만 사용합니다. 데이터.go.kr `serviceKey`와 혼용하지 않습니다. GitHub Actions에서는 `KMA_APIHUB_AUTH_KEY` repository 또는 environment secret을 전달합니다.
+- 하루의 예보 수집은 격자별 6회, ASOS 기간 수집은 6개 지점 지정 1회입니다. 응답 실패/권한 거부는 인증키나 응답 본문을 노출하지 않고 안전한 상태 사유만 남깁니다. 예보와 관측은 한 API 실패가 다른 요청을 막지 않도록 별도로 처리합니다.
+- 2026-11-14 실제 호출: 기존 API Hub 키로 ASOS 기간 API가 HTTP 200을 반환했고 6개 지점 합계 144 관측행을 새 collector가 파싱했습니다. 단기예보 API Hub 경로는 HTTP 403이며 안전하게 `service_application_or_approval`로 분류됐습니다. 동일한 자격증명이 ASOS에서 승인된 사실로 키 자체의 무효 문제와 예보 서비스별 접근 제한을 구분했습니다. 응답 본문은 보존/출력하지 않았습니다.
+- Actions의 비공개 저장 위치는 `automation/state/weather/forecast_vintages.jsonl` 및 `asos_observations.jsonl`이며, `smp-live-data` 상태 브랜치에 이어 저장합니다. 공개 Pages 자료에는 날씨 원자료를 넣지 않습니다.
+- 2026년 당시 발행된 단기예보 원본이 없어 2026 D+3의 기상 모델 평가는 보류합니다. 실제 Actions 수집 결과가 생긴 뒤 서비스별 승인과 결측률을 확인해야 합니다.
 
-## 과거 데이터와 이번 검증 상태
-
-기존 V11 연구에는 여러 ASOS 관측지점의 과거 관측 자료가 있고, 일부 시점의 기상 파생량이 실험됐습니다. 관측값은 미래 대상일의 사전예보 vintage가 아닙니다. 이전 단기예보 API 접근 기록은 최근/과거 요청 모두 HTTP 403의 서비스 신청/승인 제한이었습니다. 보존된 2026년 과거 단기예보 원본과 각 issue 시점의 수신기록은 확보되지 않았으므로, 과거 관측으로 대신 채운 2026 D+3 평가를 만들지 않았습니다.
-
-원본 API: [KMA 단기예보](https://www.data.go.kr/data/15084084/openapi.do), [KMA ASOS 지상관측](https://www.data.go.kr/data/15139432/openapi.do), [KMA API Hub 이용안내](https://apihub.kma.go.kr/apiInfo.do).
+공식 안내: [KMA 단기예보 API](https://www.data.go.kr/data/15084084/openapi.do), [KMA ASOS API](https://www.data.go.kr/data/15139432/openapi.do), [KMA API Hub](https://apihub.kma.go.kr/apiList.do).

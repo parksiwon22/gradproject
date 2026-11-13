@@ -32,7 +32,7 @@ python -m http.server 8765 --directory docs
 
 2026 D+3 재현 집계와 한계는 [별도 결과 보고서](./live/WALKFORWARD_D3_2026.md)를 참고하세요. G2V regret은 고정 예측 계획의 실제 SMP 비용에서 실제 SMP oracle 비용을 빼도록 수정했습니다. 수정 산식에서 이 평가 집단의 HGB-anchor regret은 122.32원/일, seasonal anchor는 154.27원/일입니다. 이 값은 316일 historical replay이며 과거 원본 `first_seen`은 예측 당시 수신을 입증하지 않아 실제 운영 성능으로 표시하지 않습니다. 가상 V2G의 판매 수익은 시장 정산 사실이 아닌 사용자가 바꿀 수 있는 가정입니다.
 
-기상 수집기와 forecast vintage 규칙은 [기상 데이터 메모](./live/weather/README.md)에 있습니다. 이번 환경에 data.go.kr 키가 없고 기존 API Hub forecast 요청도 서비스 승인 제한에 걸려 기상 변수를 HGB 또는 2026 replay에 반영하지 않았습니다.
+기상 수집기와 forecast vintage 규칙은 [기상 데이터 메모](./live/weather/README.md)에 있습니다. 수집기는 `KMA_APIHUB_AUTH_KEY`와 API Hub `authKey` 경로를 사용하며 GitHub Actions에서 비공개 상태 저장으로 연결했습니다. 기상 변수는 HGB나 2026 replay 입력에 반영하지 않았습니다.
 
 ## 검증과 한계
 
