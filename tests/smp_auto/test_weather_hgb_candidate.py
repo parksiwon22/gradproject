@@ -10,7 +10,7 @@ from research.smp_weather.weather_features import (
     target_weather_features,
 )
 from research.smp_weather.train_weather_hgb import fit_weather_hgb
-from research.smp_weather.walkforward_weather import run
+from research.smp_weather.walkforward_weather import _origin_week_training_window, run
 
 
 class WeatherHGBCandidateTests(unittest.TestCase):
@@ -76,6 +76,17 @@ class WeatherHGBCandidateTests(unittest.TestCase):
                 fit_weather_hgb(X, pd.Series([0.0]), target_dates=["2025-01-01"],
                     trained_through="2025-01-01", output_dir=Path(folder))
             self.assertEqual(list(Path(folder).iterdir()), [])
+
+    def test_weekly_model_fit_precedes_every_origin_in_its_week(self):
+        first_origin = pd.Timestamp("2026-10-26T23:00:00+09:00")
+        cutoff, trained_at = _origin_week_training_window(first_origin)
+        self.assertEqual(cutoff, "2026-10-26")
+        self.assertEqual(trained_at, first_origin)
+        sunday_origin = pd.Timestamp("2026-11-01T23:00:00+09:00")
+        later_cutoff, later_fit = _origin_week_training_window(sunday_origin)
+        self.assertEqual(later_cutoff, cutoff)
+        self.assertEqual(later_fit, trained_at)
+        self.assertLessEqual(trained_at, sunday_origin)
 
     def test_current_artifact_is_read_only_and_weather_score_is_withheld(self):
         with tempfile.TemporaryDirectory() as folder:

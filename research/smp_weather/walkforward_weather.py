@@ -35,6 +35,23 @@ OUT = ROOT / "research/smp_weather/results/walkforward_d3_2026.json"
 ANCHOR_WEIGHT = 0.05
 
 
+def _origin_week_training_window(origin: pd.Timestamp) -> tuple[str, pd.Timestamp]:
+    """Return the exclusive training-date cutoff and fit time for an origin week.
+
+    One checkpoint is shared by forecast origins in an ISO week. It is trained
+    at that week's Monday 23:00 origin using labels strictly before Monday, so
+    even the earliest scored forecast in the week cannot see later target SMP.
+    """
+    origin = pd.Timestamp(origin)
+    if origin.tzinfo is None:
+        raise ValueError("forecast origin must be timezone-aware")
+    monday = origin.normalize() - pd.Timedelta(days=origin.dayofweek)
+    trained_at = monday + pd.Timedelta(hours=23)
+    if trained_at > origin:
+        raise ValueError("forecast origin precedes the weekly model fit time")
+    return monday.strftime("%Y-%m-%d"), trained_at
+
+
 def _load_saved_smp_only(path: Path = BASELINE_ARTIFACT) -> dict:
     with gzip.open(path, "rt", encoding="utf-8") as stream:
         data = json.load(stream)
@@ -136,8 +153,9 @@ def run(*, source: Path = SOURCE, weather_path: Path = DEFAULT_WEATHER_DATA,
             test_frame, origin = target_feature_frame(prices, weather_index, day)
             week_key = origin.strftime("%G-W%V")
             if week_key not in checkpoints:
-                monday = origin.normalize() - pd.Timedelta(days=origin.dayofweek)
-                X_train, y_train = training_examples(prices, weather_index, monday.strftime("%Y-%m-%d"))
+                train_before, trained_at = _origin_week_training_window(origin)
+                monday = pd.Timestamp(train_before, tz=KST)
+                X_train, y_train = training_examples(prices, weather_index, train_before)
                 training_days = int(len(X_train) / 24)
                 if training_days < MIN_TRAIN_DAYS:
                     raise ValueError(f"only {training_days} complete vintage training days; requires {MIN_TRAIN_DAYS}")
@@ -152,16 +170,21 @@ def run(*, source: Path = SOURCE, weather_path: Path = DEFAULT_WEATHER_DATA,
                 joblib.dump({"model": model, "features": list(WEATHER_MODEL_FEATURES),
                     "horizon_days": 3, "anchor_weight": ANCHOR_WEIGHT,
                     "trained_through": (monday - pd.Timedelta(days=1)).strftime("%Y-%m-%d"),
-                    "trained_at_kst": monday.isoformat(), "training_days": training_days,
+                    "trained_at_kst": trained_at.isoformat(), "training_days": training_days,
                     "training_rows": len(y_train), "model_sha256": model_sha,
                     "weather_vintage_rule": "issue and receipt both no later than each training target's D-3 origin",
                     "model_family": "research-only SMP + KMA forecast HGB"}, fold_path, compress=3)
                 checkpoints[week_key] = {"model": model, "sha256": model_sha,
                     "train_rows": len(y_train), "train_days": training_days,
                     "trained_through": (monday - pd.Timedelta(days=1)).strftime("%Y-%m-%d"),
-                    "trained_at_kst": monday.isoformat(),
+                    "trained_at_kst": trained_at.isoformat(),
                     "checkpoint": str(fold_path.relative_to(ROOT)).replace("\\", "/")}
             checkpoint = checkpoints[week_key]
+            if pd.Timestamp(checkpoint["trained_at_kst"]) > origin:
+                raise ValueError("weekly HGB checkpoint was trained after this forecast origin")
+            if pd.Timestamp(checkpoint["trained_through"], tz=KST) >= pd.Timestamp(
+                    checkpoint["trained_at_kst"]).normalize():
+                raise ValueError("weekly HGB training labels extend through its fit date")
             # The immutable SMP-only artifact supplies the common seasonal anchor.
             anchor = np.asarray(saved["baseline_predictions"], dtype=float)
             base = test_frame.daily.to_numpy(float) + checkpoint["model"].predict(
