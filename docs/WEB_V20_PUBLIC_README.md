@@ -11,7 +11,7 @@
 - 총 275개 검증일, 모델 성능표와 연구용 시연 한계 명시
 
 HTML/CSS/JavaScript로 브라우저에서 직접 처리합니다. 과거 시연은 기존 저장소의
-`docs/index.html`은 날짜 선택 하나로 자료를 연결합니다. `docs/smp_improvement_ml_lgbm/final_fold_demo.csv.gz`의 275일 fold, `docs/live/historical_archive.json.gz`의 보존된 V5 92일/V20 42일/저장 발급 예측, `docs/live/historical_replay.json.gz`의 추가 재현, Actions가 갱신하는 `docs/live/latest.json`의 향후 날짜별 운영 이력을 같은 날짜 화면에 불러옵니다. 날짜를 고르면 복수의 예측 원점·모델·원래 지평을 선택할 수 있습니다. 자료 유형은 문장으로 표시하며, 과거 연구·재현·운영 이력의 통계를 합산하지 않습니다. 운영 예측은 공식 발급과 분리된 연구용 경로이며 기존 gate를 호출하거나 변경하지 않습니다.
+`docs/index.html`은 날짜 선택 하나로 자료를 연결합니다. `docs/smp_improvement_ml_lgbm/final_fold_demo.csv.gz`의 275일 fold, `docs/live/historical_archive.json.gz`의 보존된 V5 92일/V20 42일/저장 발급 예측, `docs/live/historical_replay.json.gz`의 추가 재현, `docs/live/walkforward_d3_2026.json.gz`의 2026년 1월~11월 12일 D+3 재현, Actions가 갱신하는 `docs/live/latest.json`의 향후 날짜별 운영 이력을 같은 날짜 화면에 불러옵니다. 날짜를 고르면 복수의 예측 원점·모델·원래 지평을 선택할 수 있습니다. 자료 유형은 문장으로 표시하며, 과거 연구·재현·운영 이력의 통계를 합산하지 않습니다. 운영 예측은 공식 발급과 분리된 연구용 경로이며 기존 gate를 호출하거나 변경하지 않습니다.
 
 ## 현재 공개와 자동화 배포
 
@@ -29,6 +29,8 @@ python -m http.server 8765 --directory docs
 접속: `http://localhost:8765/`.
 
 주의: `file:///...`로 HTML을 직접 열면 브라우저가 gzip 파일 fetch를 차단할 수 있으므로 HTTP 서버로 여세요.
+
+2026 D+3 재현 집계와 한계는 [별도 결과 보고서](./live/WALKFORWARD_D3_2026.md)를 참고하세요. 가격 MAE/RMSE가 seasonal anchor보다 낮아졌지만 EV G2V 평균 regret은 높아져, 충전 효과까지 개선된 결과는 아닙니다. 원본 데이터의 과거 `first_seen`은 입증되지 않아 2026 재현을 실제 운영 성능으로 표시하지 않습니다.
 
 ## 검증과 한계
 
