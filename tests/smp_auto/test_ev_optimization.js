@@ -53,6 +53,9 @@ function testVirtualV2gConstraintsAndConnectionWindow() {
   assert.ok(plan.socPct.at(-1)>=cfg.targetSoc-1e-8);
   const actualOracle = ev.realizedRegret(ev.v2gPlan(prices,cfg,7,22),prices,cfg,7,22,'V2G');
   assert.ok(Math.abs(actualOracle.regret)<1e-8);
+  const noSettlement = ev.v2gPlan(Array(24).fill(100), {...cfg,sellRatio:0,degradation:1000});
+  assert.equal(noSettlement.gridExportKwh,0,
+    'V2G should leave battery energy unused for export when sale value is zero and wear is high');
 }
 
 testFrozenRegretAndPythonParity();
