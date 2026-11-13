@@ -55,6 +55,28 @@ class WalkForwardD3Tests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, "MAE mismatch"):
             validate_payload(payload)
 
+    def test_g2v_regret_uses_frozen_prediction_plan_at_actual_prices(self):
+        actual = np.array([40 + 2 * h for h in range(24)], dtype=float)
+        pred = actual[::-1].copy()  # forecast orders the expensive hours first
+        metrics = _metrics(pred, actual, actual, include_v2g=False)
+        self.assertGreater(metrics["g2v_regret_won"], 0)
+        self.assertAlmostEqual(
+            metrics["g2v_regret_won"],
+            metrics["g2v_predicted_plan_actual_cost_won"] - metrics["g2v_oracle_actual_cost_won"],
+            places=9,
+        )
+        self.assertAlmostEqual(metrics["baseline_g2v_regret_won"], 0, places=9)
+        # 30 kWh of battery energy at 90% efficiency is not an integer
+        # number of 7 kW charging slots, so the last selected interval is partial.
+        selected = np.asarray(metrics["predicted_charge_kw"])
+        self.assertTrue(np.any((selected > 1e-8) & (selected < 7 - 1e-8)))
+
+    def test_matching_prediction_and_actual_has_zero_regret(self):
+        actual = np.array([80 + 3 * np.sin(h) for h in range(24)])
+        metrics = _metrics(actual, actual, actual, include_v2g=False)
+        self.assertAlmostEqual(metrics["g2v_regret_won"], 0, places=8)
+        self.assertAlmostEqual(metrics["baseline_g2v_regret_won"], 0, places=8)
+
     def test_duplicate_evaluation_day_is_rejected(self):
         pred = np.full(24, 100.0)
         actual = np.full(24, 101.0)
@@ -85,6 +107,10 @@ class WalkForwardD3Tests(unittest.TestCase):
             np.asarray(r["baseline_predictions"]) - np.asarray(r["actual_smp"]) for r in rows
         ])
         summary = payload["summary"]
+        self.assertIn("realized_cost(forecast_decision_schedule", payload["regret_formula"])
+        self.assertEqual(summary["v2g_vs_g2v_days_better"], 93)
+        self.assertEqual(summary["v2g_vs_g2v_days_worse"], 50)
+        self.assertEqual(summary["v2g_vs_g2v_days_equal_0_01_won"], 173)
         self.assertAlmostEqual(float(np.mean(np.abs(errors))), summary["mae"], places=8)
         self.assertAlmostEqual(float(np.sqrt(np.mean(errors ** 2))), summary["rmse"], places=8)
         self.assertAlmostEqual(float(np.mean(np.abs(baseline_errors))), summary["baseline_mae"], places=8)

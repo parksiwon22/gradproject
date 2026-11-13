@@ -7,7 +7,7 @@
 - D+1 V11 ExtraTrees, D+2/D+3 HGB + seasonal anchor의 **과거 검증 fold 예측값**을 실제 SMP와 전일 가격 기준선에 맞춰 그림
 - 선택한 과거 날짜의 24시간 MAE, RMSE, 가장 저렴한 시간, 기준선 대비 MAE 표시
 - 차량 배터리 용량, SOC, 충전 전력, 충전 효율, 연결 시간 설정
-- 24시간 구간 내 예측가격 저가순 G2V 충전 시뮬레이션 및 실제 SMP 기준 사후 비용, oracle 대비 regret, 즉시 충전 대비 비용 계산
+- 즉시 충전, 예측가격 기반 G2V, 가상 SMP 정산 가정 V2G의 시간별 dispatch/SOC·예측/사후 비용·regret 비교
 - 총 275개 검증일, 모델 성능표와 연구용 시연 한계 명시
 
 HTML/CSS/JavaScript로 브라우저에서 직접 처리합니다. 과거 시연은 기존 저장소의
@@ -30,7 +30,9 @@ python -m http.server 8765 --directory docs
 
 주의: `file:///...`로 HTML을 직접 열면 브라우저가 gzip 파일 fetch를 차단할 수 있으므로 HTTP 서버로 여세요.
 
-2026 D+3 재현 집계와 한계는 [별도 결과 보고서](./live/WALKFORWARD_D3_2026.md)를 참고하세요. 가격 MAE/RMSE가 seasonal anchor보다 낮아졌지만 EV G2V 평균 regret은 높아져, 충전 효과까지 개선된 결과는 아닙니다. 원본 데이터의 과거 `first_seen`은 입증되지 않아 2026 재현을 실제 운영 성능으로 표시하지 않습니다.
+2026 D+3 재현 집계와 한계는 [별도 결과 보고서](./live/WALKFORWARD_D3_2026.md)를 참고하세요. G2V regret은 고정 예측 계획의 실제 SMP 비용에서 실제 SMP oracle 비용을 빼도록 수정했습니다. 수정 산식에서 이 평가 집단의 HGB-anchor regret은 122.32원/일, seasonal anchor는 154.27원/일입니다. 이 값은 316일 historical replay이며 과거 원본 `first_seen`은 예측 당시 수신을 입증하지 않아 실제 운영 성능으로 표시하지 않습니다. 가상 V2G의 판매 수익은 시장 정산 사실이 아닌 사용자가 바꿀 수 있는 가정입니다.
+
+기상 수집기와 forecast vintage 규칙은 [기상 데이터 메모](./live/weather/README.md)에 있습니다. 이번 환경에 data.go.kr 키가 없고 기존 API Hub forecast 요청도 서비스 승인 제한에 걸려 기상 변수를 HGB 또는 2026 replay에 반영하지 않았습니다.
 
 ## 검증과 한계
 

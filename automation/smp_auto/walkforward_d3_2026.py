@@ -24,6 +24,7 @@ SOURCE = Path(os.environ.get("SMP_SOURCE", ROOT.parent / "gradproject")).resolve
 sys.path.insert(0, str(SOURCE))
 from v11.store import connect, latest
 from v17.features import FEATURES, build
+from v12.ev import EV as ResearchEV, optimize as optimize_ev, score as score_ev
 try:
     from .publish_forecast import seasonal_anchor
 except ImportError:  # direct script execution from the automation runner
@@ -32,7 +33,15 @@ except ImportError:  # direct script execution from the automation runner
 KST = "Asia/Seoul"
 OUT = ROOT / "docs" / "live" / "walkforward_d3_2026.json.gz"
 EV = {"battery_kwh": 60.0, "soc_start_pct": 30.0, "soc_goal_pct": 80.0,
-      "charge_kw": 7.0, "efficiency": 0.9, "start_hour": 0, "end_hour": 24}
+      "min_soc_pct": 20.0, "max_soc_pct": 90.0, "charge_kw": 7.0,
+      "discharge_kw": 7.0, "charge_efficiency": 0.9,
+      "discharge_efficiency": 0.9, "degradation_won_per_battery_kwh": 5.0,
+      "sell_ratio": 1.0, "start_hour": 0, "end_hour": 24, "purchase_adder_won_per_kwh": 0.0}
+RESEARCH_EV = ResearchEV(capacity=EV["battery_kwh"], initial_soc=EV["soc_start_pct"],
+    target_soc=EV["soc_goal_pct"], charge_kw=EV["charge_kw"], discharge_kw=EV["discharge_kw"],
+    charge_eff=EV["charge_efficiency"], discharge_eff=EV["discharge_efficiency"],
+    min_soc=EV["min_soc_pct"], max_soc=EV["max_soc_pct"],
+    degradation=EV["degradation_won_per_battery_kwh"], sell_ratio=EV["sell_ratio"])
 
 
 def _vector(prices: pd.DataFrame, day: str) -> np.ndarray | None:
@@ -43,27 +52,39 @@ def _vector(prices: pd.DataFrame, day: str) -> np.ndarray | None:
     return values if np.isfinite(values).all() else None
 
 
-def _charge_plan(prices: np.ndarray) -> tuple[list[int], float] | None:
-    need = max(0.0, (EV["soc_goal_pct"] - EV["soc_start_pct"]) * EV["battery_kwh"] / 100.0)
-    left, cost, hours = need, 0.0, []
+def _charge_plan(prices: np.ndarray) -> dict | None:
+    """Fixed-price-order G2V schedule; returns grid kW for every one-hour slot."""
+    need_grid = max(0.0, (EV["soc_goal_pct"] - EV["soc_start_pct"]) * EV["battery_kwh"] /
+                    (100.0 * EV["charge_efficiency"]))
+    left, charge_kw, hours = need_grid, np.zeros(24), []
     for hour in sorted(range(EV["start_hour"], EV["end_hour"]), key=lambda h: (float(prices[h]), h)):
         if left <= 1e-9:
             break
-        grid_kwh = min(EV["charge_kw"], left / EV["efficiency"])
-        cost += grid_kwh * float(prices[hour])
-        left -= grid_kwh * EV["efficiency"]
+        charge_kw[hour] = min(EV["charge_kw"], left)
+        left -= charge_kw[hour]
         hours.append(hour)
-    return (hours, float(cost)) if left <= 1e-6 else None
+    if left > 1e-6:
+        return None
+    expected_cost = float(np.dot(prices, charge_kw))
+    degradation = float(np.sum(charge_kw) * EV["charge_efficiency"] * EV["degradation_won_per_battery_kwh"])
+    return {"hours": hours, "charge_kw": charge_kw, "expected_cost_won": expected_cost + degradation,
+            "energy_purchase_cost_won": expected_cost, "degradation_cost_won": degradation}
 
 
-def _metrics(pred: np.ndarray, actual: np.ndarray, baseline: np.ndarray) -> dict:
+def _metrics(pred: np.ndarray, actual: np.ndarray, baseline: np.ndarray,
+             include_v2g: bool = True) -> dict:
+    pred, actual, baseline = (np.asarray(x, dtype=float) for x in (pred, actual, baseline))
     err = actual - pred
     pred_plan, base_plan, oracle = _charge_plan(pred), _charge_plan(baseline), _charge_plan(actual)
     if not pred_plan or not base_plan or not oracle:
         raise ValueError("EV 충전 에너지 조건을 충족할 수 없습니다.")
+    dt = np.ones(24)
+    g2v_pred_realized = score_ev(actual, pred_plan["charge_kw"], np.zeros(24), dt, RESEARCH_EV)
+    g2v_base_realized = score_ev(actual, base_plan["charge_kw"], np.zeros(24), dt, RESEARCH_EV)
+    g2v_oracle_realized = score_ev(actual, oracle["charge_kw"], np.zeros(24), dt, RESEARCH_EV)
     peak_hour = int(np.argmax(actual))
     base_error = actual - baseline
-    return {
+    out = {
         "n_hours": 24,
         "mae": float(np.mean(np.abs(err))),
         "rmse": float(np.sqrt(np.mean(err ** 2))),
@@ -74,13 +95,48 @@ def _metrics(pred: np.ndarray, actual: np.ndarray, baseline: np.ndarray) -> dict
         "peak_prediction": float(pred[peak_hour]),
         "peak_price_error": float(pred[peak_hour] - actual[peak_hour]),
         "peak_time_error_hours": abs(int(np.argmax(pred)) - peak_hour),
-        "g2v_regret_won": float(max(0.0, pred_plan[1] - oracle[1])),
-        "baseline_g2v_regret_won": float(max(0.0, base_plan[1] - oracle[1])),
-        "predicted_charge_hours": pred_plan[0], "baseline_charge_hours": base_plan[0],
-        "oracle_charge_hours": oracle[0], "predicted_plan_cost_won": pred_plan[1],
-        "baseline_plan_cost_won": base_plan[1], "oracle_plan_cost_won": oracle[1],
+        # Regret is the realized cost of the frozen forecast-based dispatch
+        # minus the realized cost of the actual-price oracle dispatch.
+        "g2v_regret_won": float(g2v_pred_realized["net_cost"] - g2v_oracle_realized["net_cost"]),
+        "baseline_g2v_regret_won": float(g2v_base_realized["net_cost"] - g2v_oracle_realized["net_cost"]),
+        "predicted_charge_hours": pred_plan["hours"], "baseline_charge_hours": base_plan["hours"],
+        "oracle_charge_hours": oracle["hours"], "predicted_charge_kw": np.round(pred_plan["charge_kw"], 6).tolist(),
+        "baseline_charge_kw": np.round(base_plan["charge_kw"], 6).tolist(),
+        "oracle_charge_kw": np.round(oracle["charge_kw"], 6).tolist(),
+        "predicted_plan_cost_won": pred_plan["expected_cost_won"],
+        "baseline_plan_cost_won": base_plan["expected_cost_won"],
+        "oracle_plan_cost_won": oracle["expected_cost_won"],
+        "g2v_predicted_plan_actual_cost_won": float(g2v_pred_realized["net_cost"]),
+        "g2v_baseline_plan_actual_cost_won": float(g2v_base_realized["net_cost"]),
+        "g2v_oracle_actual_cost_won": float(g2v_oracle_realized["net_cost"]),
         "ev_conditions": EV,
     }
+    if include_v2g:
+        times = pd.date_range("2026-01-01", periods=24, freq="h", tz=KST)
+        pred_v2g = optimize_ev(pred, times, RESEARCH_EV, v2g=True)
+        actual_v2g_plan_cost = score_ev(actual, pred_v2g["schedule"].charge_kw.to_numpy(),
+                                         pred_v2g["schedule"].discharge_kw.to_numpy(), dt, RESEARCH_EV)
+        oracle_v2g = optimize_ev(actual, times, RESEARCH_EV, v2g=True)
+        v = pred_v2g["schedule"]
+        out.update({
+            "v2g_charge_kw": np.round(v.charge_kw.to_numpy(), 6).tolist(),
+            "v2g_discharge_kw": np.round(v.discharge_kw.to_numpy(), 6).tolist(),
+            "v2g_soc_start_pct": np.round(v.soc_start.to_numpy(), 6).tolist(),
+            "v2g_soc_end_pct": np.round(v.soc_end.to_numpy(), 6).tolist(),
+            "v2g_predicted_cost_won": float(pred_v2g["net_cost"]),
+            "v2g_actual_cost_won": float(actual_v2g_plan_cost["net_cost"]),
+            "v2g_oracle_cost_won": float(oracle_v2g["net_cost"]),
+            "v2g_regret_won": float(actual_v2g_plan_cost["net_cost"] - oracle_v2g["net_cost"]),
+            "v2g_oracle_charge_kw": np.round(oracle_v2g["schedule"].charge_kw.to_numpy(), 6).tolist(),
+            "v2g_oracle_discharge_kw": np.round(oracle_v2g["schedule"].discharge_kw.to_numpy(), 6).tolist(),
+            "v2g_grid_import_kwh": float(pred_v2g["grid_import_kwh"]),
+            "v2g_grid_export_kwh": float(pred_v2g["grid_export_kwh"]),
+            "v2g_degradation_cost_won": float(pred_v2g["degradation_cost"]),
+            "v2g_ending_soc_pct": float(pred_v2g["ending_soc"]),
+            "v2g_gain_vs_g2v_actual_won": float(g2v_pred_realized["net_cost"] - actual_v2g_plan_cost["net_cost"]),
+            "v2g_settlement_label": "virtual SMP-linked scenario; market eligibility and settlement are unverified",
+        })
+    return out
 
 
 def validate_payload(payload: dict, atol: float = 1e-5) -> None:
@@ -117,7 +173,7 @@ def validate_payload(payload: dict, atol: float = 1e-5) -> None:
             raise AssertionError(f"RMSE mismatch: {day}")
         if not np.allclose(-e, m["hourly_signed_error"], atol=atol):
             raise AssertionError(f"hourly error mismatch: {day}")
-        recomputed = _metrics(pred, actual, baseline)
+        recomputed = _metrics(pred, actual, baseline, include_v2g=False)
         for key in ("g2v_regret_won", "baseline_g2v_regret_won"):
             if not np.isclose(recomputed[key], m[key], atol=atol):
                 raise AssertionError(f"G2V regret mismatch ({key}): {day}")
@@ -125,6 +181,35 @@ def validate_payload(payload: dict, atol: float = 1e-5) -> None:
             raise AssertionError(f"baseline MAE mismatch: {day}")
         if not np.isclose(float(np.sqrt(np.mean(be ** 2))), m["baseline_rmse"], atol=atol):
             raise AssertionError(f"baseline RMSE mismatch: {day}")
+        for plan_key, actual_key, regret_key in (
+            ("predicted_charge_kw", "g2v_predicted_plan_actual_cost_won", "g2v_regret_won"),
+            ("baseline_charge_kw", "g2v_baseline_plan_actual_cost_won", "baseline_g2v_regret_won"),
+        ):
+            c = np.asarray(m[plan_key], dtype=float)
+            if c.shape != (24,):
+                raise AssertionError(f"G2V dispatch vector is not 24 hours: {day}")
+            realized = score_ev(actual, c, np.zeros(24), np.ones(24), RESEARCH_EV)["net_cost"]
+            if not np.isclose(realized, m[actual_key], atol=atol):
+                raise AssertionError(f"G2V realized cost mismatch: {day}")
+            if m[regret_key] < -atol:
+                raise AssertionError(f"negative G2V regret: {day}")
+        if "v2g_charge_kw" in m:
+            c = np.asarray(m["v2g_charge_kw"], dtype=float)
+            d = np.asarray(m["v2g_discharge_kw"], dtype=float)
+            oc = np.asarray(m["v2g_oracle_charge_kw"], dtype=float)
+            od = np.asarray(m["v2g_oracle_discharge_kw"], dtype=float)
+            if any(x.shape != (24,) for x in (c, d, oc, od)):
+                raise AssertionError(f"V2G dispatch vector is not 24 hours: {day}")
+            if (np.minimum(c, d) > atol).any() or (np.minimum(oc, od) > atol).any():
+                raise AssertionError(f"simultaneous V2G charging and discharging: {day}")
+            realized = score_ev(actual, c, d, np.ones(24), RESEARCH_EV)["net_cost"]
+            oracle_actual = score_ev(actual, oc, od, np.ones(24), RESEARCH_EV)["net_cost"]
+            if not np.isclose(realized, m["v2g_actual_cost_won"], atol=atol):
+                raise AssertionError(f"V2G realized cost mismatch: {day}")
+            if not np.isclose(oracle_actual, m["v2g_oracle_cost_won"], atol=atol):
+                raise AssertionError(f"V2G oracle cost mismatch: {day}")
+            if not np.isclose(realized - oracle_actual, m["v2g_regret_won"], atol=atol):
+                raise AssertionError(f"V2G regret mismatch: {day}")
 
 
 def _fit_checkpoint(prices: pd.DataFrame, train_asof: pd.Timestamp) -> dict:
@@ -256,10 +341,19 @@ def run(source: Path = SOURCE, out: Path = OUT, now: pd.Timestamp | None = None)
                    "baseline_rmse": float(np.sqrt(np.mean(baseline_errs ** 2))),
                    "mean_daily_g2v_regret_won": float(np.mean([r["metrics"]["g2v_regret_won"] for r in records])),
                    "baseline_mean_daily_g2v_regret_won": float(np.mean([r["metrics"]["baseline_g2v_regret_won"] for r in records])),
+                   "mean_daily_v2g_regret_won": float(np.mean([r["metrics"]["v2g_regret_won"] for r in records])),
+                   "mean_v2g_actual_cost_won": float(np.mean([r["metrics"]["v2g_actual_cost_won"] for r in records])),
+                   "mean_v2g_oracle_cost_won": float(np.mean([r["metrics"]["v2g_oracle_cost_won"] for r in records])),
+                   "mean_v2g_gain_vs_g2v_won": float(np.mean([r["metrics"]["v2g_gain_vs_g2v_actual_won"] for r in records])),
+                   "mean_v2g_grid_export_kwh": float(np.mean([r["metrics"]["v2g_grid_export_kwh"] for r in records])),
+                   "v2g_vs_g2v_days_better": int(sum(r["metrics"]["v2g_gain_vs_g2v_actual_won"] > 0.01 for r in records)),
+                   "v2g_vs_g2v_days_worse": int(sum(r["metrics"]["v2g_gain_vs_g2v_actual_won"] < -0.01 for r in records)),
+                   "v2g_vs_g2v_days_equal_0_01_won": int(sum(abs(r["metrics"]["v2g_gain_vs_g2v_actual_won"]) <= 0.01 for r in records)),
+                   "g2v_regret_reduction_vs_anchor_pct": float(100*(1-np.mean([r["metrics"]["g2v_regret_won"] for r in records])/np.mean([r["metrics"]["baseline_g2v_regret_won"] for r in records]))),
                    "first_target_date": records[0]["target_date"], "last_target_date": records[-1]["target_date"]}
     else:
         summary = {"successful_days": 0, "mae": None, "rmse": None, "mean_daily_g2v_regret_won": None}
-    payload = {"schema_version": 1, "evaluation_cohort": "2026 D+3 time-ordered historical replay",
+    payload = {"schema_version": 2, "evaluation_cohort": "2026 D+3 time-ordered historical replay",
                "horizon_days": 3, "model_family": "HGB residual + 7/14/21/28-day seasonal anchor",
                "algorithm": {"estimator": "HistGradientBoostingRegressor", "max_iter": 250,
                              "max_leaf_nodes": 31, "learning_rate": 0.05,
@@ -274,6 +368,10 @@ def run(source: Path = SOURCE, out: Path = OUT, now: pd.Timestamp | None = None)
                "prediction_availability_claim": "Historical timestamp-causal replay only; not verified operational availability",
                "actual_price_status": "last fully elapsed target date only; final settlement status not independently verified",
                "ev_conditions": EV, "summary": summary, "records": records,
+               "v2g_scenario": "virtual SMP-linked sale settlement; not a claim of Korean market eligibility or actual retail revenue",
+               "regret_formula": "realized_cost(forecast_decision_schedule, actual_SMP) - realized_cost(actual_SMP_oracle_schedule, actual_SMP)",
+               "weather_extension_status": "not included in these 2026 results; no historical forecast-vintage weather source available",
+               "weather_feature_eval_status": "withheld because original D+3 forecast vintages for 2026 are unavailable",
                "excluded_target_count": len(exclusions), "exclusions": exclusions}
     validate_payload(payload)
     out.parent.mkdir(parents=True, exist_ok=True)

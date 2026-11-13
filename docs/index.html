@@ -7,6 +7,7 @@
   <meta name="description" content="전력예보 V20 연구 결과 기반 육지 SMP 24시간 예측과 전기차 충전 계획 비교">
   <title>전력예보 | SMP 예측과 스마트 충전</title>
   <link rel="stylesheet" href="./web_v20_public.css">
+  <script defer src="./ev_optimization.js"></script>
   <script defer src="./web_v20_public.js"></script>
 </head>
 <body>
@@ -79,9 +80,16 @@
               <div class="field"><label for="power">충전기 출력 <span>kW</span></label><input id="power" type="number" min=".1" max="350" value="7" step=".1"></div>
               <div class="field"><label for="socInitial">현재 SOC <span>%</span></label><input id="socInitial" type="number" min="0" max="100" value="30" step="1"></div>
               <div class="field"><label for="socTarget">목표 SOC <span>%</span></label><input id="socTarget" type="number" min="0" max="100" value="80" step="1"></div>
+              <div class="field"><label for="minSoc">최소 SOC <span>%</span></label><input id="minSoc" type="number" min="0" max="100" value="20" step="1"></div>
+              <div class="field"><label for="maxSoc">최대 SOC <span>%</span></label><input id="maxSoc" type="number" min="0" max="100" value="90" step="1"></div>
               <div class="field"><label for="start">충전 시작 <span>시</span></label><select id="start"></select></div>
               <div class="field"><label for="end">충전 종료 <span>시</span></label><select id="end"></select></div>
+              <div class="field"><label for="dischargePower">방전 최대 출력 <span>kW</span></label><input id="dischargePower" type="number" min="0" max="350" value="7" step=".1"></div>
+              <div class="field"><label for="degradation">열화비용 <span>원/배터리 kWh</span></label><input id="degradation" type="number" min="0" max="1000" value="5" step=".5"></div>
+              <div class="field"><label for="purchaseAdder">구매단가 가산 <span>원/kWh · SMP+</span></label><input id="purchaseAdder" type="number" min="0" max="1000" value="0" step="1"></div>
+              <div class="field"><label for="sellRatio">가상 판매 정산비율 <span>% · SMP×</span></label><input id="sellRatio" type="number" min="0" max="100" value="100" step="1"></div>
               <div class="field wide"><label for="eff">충전 효율 <span id="effLabel">90%</span></label><input type="range" min="50" max="100" value="90" id="eff"></div>
+              <div class="field wide"><label for="dischargeEff">방전 효율 <span id="dischargeEffLabel">90%</span></label><input type="range" min="50" max="100" value="90" id="dischargeEff"></div>
             </div>
             <p class="helper">선택한 날짜의 00~24시 안에서 시간 단위로 계획합니다. 연결 시간을 벗어난 충전은 하지 않습니다.</p>
             <button id="calculate" class="primary-button" type="button">내 충전 계획 계산하기 <span>↗</span></button>
@@ -93,6 +101,7 @@
             <div class="charging-visual"><p class="mini-label">추천 충전 시간대 (24시간)</p><div id="chargingSlots" class="charging-slots" aria-label="시간별 충전시간 표시"></div><div class="slots-legend"><span><i></i>선택한 충전 시간</span><span id="energyNote">—</span></div></div>
             <div id="planMessage" class="plan-message">데이터를 불러오면 충전 계획이 표시됩니다.</div>
             <div class="saving-row"><span>같은 조건의 즉시 충전 대비 사후 비용 차이</span><strong id="saving">—</strong></div>
+            <div class="v2g-results"><h4>즉시 충전 · 스마트 G2V · 가상 V2G 비교</h4><p class="helper">최적화에는 예측 SMP만 사용합니다. V2G는 0.1kWh SOC 격자 시뮬레이션이며, 실제 시장참여 자격·구매요금·판매 정산수익을 뜻하지 않습니다.</p><div id="dispatchCosts" class="table-scroll"></div><div id="dispatchTable" class="table-scroll dispatch-hourly"></div><p id="dispatchNote" class="fineprint-text"></p></div>
           </div>
         </div>
       </div>
