@@ -38,6 +38,12 @@ class CheckpointContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"7·14·21·28일"):
             seasonal_anchor(prices,target)
 
+    def test_anchor_reports_empty_asof_snapshot_as_missing_input(self):
+        prices=pd.DataFrame(columns=["timestamp","smp"])
+        target=pd.date_range(pd.Timestamp("2026-11-10",tz="Asia/Seoul"),periods=24,freq="h")
+        with self.assertRaisesRegex(ValueError,"비어 있거나"):
+            seasonal_anchor(prices,target)
+
     def test_publication_probe_only_calls_explicit_zero_placeholder_unpublished(self):
         day="2026-11-11"
         def page(values):

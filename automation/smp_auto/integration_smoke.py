@@ -36,7 +36,10 @@ def run():
     try:
         snapshot=latest(db,"land",as_of=origin.tz_convert("UTC").isoformat())
     finally: db.close()
-    indexed=snapshot.drop_duplicates("timestamp").set_index("timestamp").smp.sort_index()
+    if snapshot.empty:
+        indexed=pd.Series(dtype=float,index=pd.DatetimeIndex([],tz="Asia/Seoul"))
+    else:
+        indexed=snapshot.drop_duplicates("timestamp").set_index("timestamp").smp.sort_index()
     recent=pd.date_range(origin-pd.Timedelta(hours=167),origin,freq="h")
     recent_missing=int(len(recent.difference(indexed.index)))
     anchor_coverage={}
@@ -58,8 +61,12 @@ def run():
     generated=generate(source=source,model_dir=ROOT/"automation"/"models",
         out_path=test_dir/"generator_output.json",state_path=test_dir/"forecast_history.json",
         now=simulated_issue,origin_date=day)
-    forecast=generated.get("last_successful_forecast") or {}
+    forecast=next((x for x in generated.get("forecast_history",[])
+                   if x.get("origin_kst")==origin.isoformat() and x.get("status")=="issued_research_only"),{})
     vectors=forecast.get("horizons",[])
+    inputs_ready=(recent_missing==0 and all(v["present_hours"]==24
+        for by_lag in anchor_coverage.values() for v in by_lag.values())
+        and not anchor_errors)
     for item in vectors:
         values=np.asarray(item.get("predictions",[]),dtype=float)
         item["point_count_check"]=(len(values)==24)
@@ -91,10 +98,15 @@ def run():
       "notice":"재생 테스트이며 실제 23:00 운영 발급이 아닙니다. 백필 당시의 원본 first_seen 및 과거 가격 수정 이력은 증명하지 않습니다."}
     (test_dir/"integration_report.json").write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")
     print(json.dumps({k:result[k] for k in ("test_type","live_forecast_issued","api_key_required","collection_exit_code","epsis_coverage","scheduled_origin_kst","simulated_issue_at_kst","recent_168h_present","recent_168h_missing","seasonal_anchor_coverage","horizons")},ensure_ascii=False,indent=2))
-    if proc.returncode or collection_status.get("failures") or recent_missing or anchor_errors or any(
-        v["present_hours"]!=24 for by_lag in anchor_coverage.values() for v in by_lag.values()):
+    if proc.returncode or collection_status.get("failures"):
         raise SystemExit(1)
-    if generated.get("run",{}).get("status")!="issued_research_only" or len(vectors)!=3 or any(not x.get("finite_check") for x in vectors):
+    run_status=generated.get("run",{}).get("status")
+    if inputs_ready:
+        if run_status!="issued_research_only" or len(vectors)!=3 or any(not x.get("finite_check") for x in vectors):
+            raise SystemExit(1)
+    elif run_status not in ("withheld", "already_issued_for_origin") or vectors:
+        # A PR runner that starts after the fixed 23:00 origin may only see
+        # receipts collected later. The expected, safe result is a withheld run.
         raise SystemExit(1)
     return result
 

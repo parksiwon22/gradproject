@@ -19,9 +19,15 @@ STATE=ROOT/"automation"/"state"/"forecast_history.json"
 def sha256(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 def seasonal_anchor(prices, targets):
-    series=prices.set_index("timestamp").smp.sort_index()
-    if series.index.tz is None or series.index.duplicated().any():
+    if prices.empty or not {"timestamp", "smp"}.issubset(prices.columns):
+        raise ValueError("seasonal anchor 입력이 비어 있거나 timestamp/SMP 열이 없습니다.")
+    try:
+        index=pd.DatetimeIndex(prices.timestamp)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("seasonal anchor timestamp 형식이 유효하지 않습니다.") from exc
+    if index.tz is None or index.duplicated().any():
         raise ValueError("seasonal anchor 입력의 시간대 또는 시간 중복이 유효하지 않습니다.")
+    series=pd.Series(prices.smp.to_numpy(float),index=index).sort_index()
     weeks=np.vstack([series.reindex(targets-pd.Timedelta(days=7*k)).to_numpy(float) for k in (1,2,3,4)])
     if weeks.shape!=(4,len(targets)) or not np.isfinite(weeks).all():
         raise ValueError("7·14·21·28일 seasonal anchor 입력 중 결측 또는 비정상 값이 있습니다.")
