@@ -1,0 +1,8 @@
+model,reference,n_days,mean_daily_mae_delta_vs_hgb,bootstrap_95pct_low,bootstrap_95pct_high,bootstrap_repetitions,interpretation
+LSTM,HGB,275,0.5759646241333238,0.04940199455505327,1.1389825505352253,2000,paired retrospective interval; not independent test evidence
+GRU,HGB,275,0.5443062790055431,0.0008466571754938255,1.1454748825840486,2000,paired retrospective interval; not independent test evidence
+LightGBM,HGB,275,-0.08211057771541853,-0.2392288384762143,0.08458292804748536,2000,paired retrospective interval; not independent test evidence
+ExtraTrees,HGB,275,-1.0562094105126119,-1.3454646573004827,-0.7772008871235572,2000,paired retrospective interval; not independent test evidence
+LinearRegression,HGB,275,-0.6856303884671497,-1.2510057372306846,-0.12061842518527273,2000,paired retrospective interval; not independent test evidence
+RandomForest,HGB,275,-0.16624814376034164,-0.41236212977746983,0.07807547146435674,2000,paired retrospective interval; not independent test evidence
+XGBoost,HGB,275,0.010367010281965999,-0.19193950599686124,0.21609331368377083,2000,paired retrospective interval; not independent test evidence

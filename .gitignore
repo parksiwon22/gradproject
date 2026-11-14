@@ -2,3 +2,4 @@
 # Python test caches
 tests/smp_auto/__pycache__/
 __pycache__/
+.venv-smp-benchmark/

@@ -7,17 +7,17 @@
 - D+1 V11 ExtraTrees, D+2/D+3 HGB + seasonal anchor의 **과거 검증 fold 예측값**을 실제 SMP와 전일 가격 기준선에 맞춰 그림
 - 선택한 과거 날짜의 24시간 MAE, RMSE, 가장 저렴한 시간, 기준선 대비 MAE 표시
 - 차량 배터리 용량, SOC, 충전 전력, 충전 효율, 연결 시간 설정
-- 24시간 구간 내 예측가격 저가순 G2V 충전 시뮬레이션 및 실제 SMP 기준 사후 비용, oracle 대비 regret, 즉시 충전 대비 비용 계산
+- 즉시 충전, 예측가격 기반 G2V, 가상 SMP 정산 가정 V2G의 시간별 dispatch/SOC·예측/사후 비용·regret 비교
 - 총 275개 검증일, 모델 성능표와 연구용 시연 한계 명시
 
 HTML/CSS/JavaScript로 브라우저에서 직접 처리합니다. 과거 시연은 기존 저장소의
-`docs/smp_improvement_ml_lgbm/final_fold_demo.csv.gz`를 읽고, 이 브랜치에서는 Actions가 생성하는 `docs/live/latest.json`을 별도 최신 예측 탭에서 읽습니다. 신규 예측은 공식 발급과 분리된 연구용 경로이며 gate를 호출하거나 변경하지 않습니다. 과거 평가 데이터의 최초 수신시각과 당시 모델 존재시각은 미검증입니다.
+`docs/index.html`은 날짜 선택 하나로 자료를 연결합니다. `docs/smp_improvement_ml_lgbm/final_fold_demo.csv.gz`의 275일 fold, `docs/live/historical_archive.json.gz`의 보존된 V5 92일/V20 42일/저장 발급 예측, `docs/live/historical_replay.json.gz`의 추가 재현, `docs/live/walkforward_d3_2026.json.gz`의 2026년 1월~11월 12일 D+3 재현, Actions가 갱신하는 `docs/live/latest.json`의 향후 날짜별 운영 이력을 같은 날짜 화면에 불러옵니다. 날짜를 고르면 복수의 예측 원점·모델·원래 지평을 선택할 수 있습니다. 자료 유형은 문장으로 표시하며, 과거 연구·재현·운영 이력의 통계를 합산하지 않습니다. 운영 예측은 공식 발급과 분리된 연구용 경로이며 기존 gate를 호출하거나 변경하지 않습니다.
 
 ## 현재 공개와 자동화 배포
 
-기존 공개 URL은 `https://parksiwon22.github.io/gradproject/`입니다. 새 자동화 브랜치는 아직 기본 `main`에 반영되지 않았으므로, 현재 URL에서 신규 최신예측 탭이나 Actions 발급을 production 검증한 상태가 아닙니다.
+기존 공개 URL은 `https://parksiwon22.github.io/gradproject/`입니다. 과거 연구에서 신규 운영 이력까지 하나의 날짜 선택 화면을 사용합니다. 운영 이력이 아직 0건이어도 과거 자료는 그대로 열리며, 최신 자동 실행 상태와 보존된 예측은 같은 화면의 선택 기록으로 확인합니다.
 
-자동화를 활성화할 때는 이 브랜치를 `main`에 반영한 뒤 **Settings → Pages → Build and deployment → Source → GitHub Actions**로 전환해야 합니다. 아래 관리자 절차를 먼저 완료하고 Actions 수동 실행의 Pages 배포가 성공한 뒤 공개 URL의 `live/latest.json` 및 화면을 확인하세요. V5 Streamlit 웹은 별도로 보존됩니다.
+Pages의 공개 결과는 **Settings → Pages → Build and deployment → Source → GitHub Actions** 설정 및 workflow `deploy` 성공 이후에만 갱신됩니다. V5 Streamlit 웹은 별도 코드로 보존됩니다.
 
 ## 로컬 정적 웹 미리보기
 
@@ -29,6 +29,10 @@ python -m http.server 8765 --directory docs
 접속: `http://localhost:8765/`.
 
 주의: `file:///...`로 HTML을 직접 열면 브라우저가 gzip 파일 fetch를 차단할 수 있으므로 HTTP 서버로 여세요.
+
+2026 D+3 재현 집계와 한계는 [별도 결과 보고서](./live/WALKFORWARD_D3_2026.md)를 참고하세요. G2V regret은 고정 예측 계획의 실제 SMP 비용에서 실제 SMP oracle 비용을 빼도록 수정했습니다. 수정 산식에서 이 평가 집단의 HGB-anchor regret은 122.32원/일, seasonal anchor는 154.27원/일입니다. 이 값은 316일 historical replay이며 과거 원본 `first_seen`은 예측 당시 수신을 입증하지 않아 실제 운영 성능으로 표시하지 않습니다. 가상 V2G의 판매 수익은 시장 정산 사실이 아닌 사용자가 바꿀 수 있는 가정입니다.
+
+기상 수집기와 forecast vintage 규칙은 [기상 데이터 메모](./live/weather/README.md)에 있습니다. 수집기는 `KMA_APIHUB_AUTH_KEY`와 API Hub `authKey` 경로를 사용하며 GitHub Actions에서 비공개 상태 저장으로 연결했습니다. 기상 변수는 HGB나 2026 replay 입력에 반영하지 않았습니다.
 
 ## 검증과 한계
 
@@ -42,23 +46,31 @@ G2V 알고리즘은 1시간 슬롯을 가격 오름차순으로 고르고 마지
 - [원본 V20 Streamlit 앱](../../app_v20.py)
 # Automated public research forecast (this branch)
 
-The new `docs/live/` view is an optional **research-only** mode. The previous fold-based V20 demo and its MAE/RMSE figures remain intact as a separate tab. This automation does not invoke or relax the V20 official publication gate.
+The `docs/live/` files are data sources for the unified target-date screen, not a separate mode. The previous fold-based V20 demo and its MAE/RMSE figures remain intact in the same date-based system. This automation does not invoke or relax the V20 official publication gate.
 
 ## Server-side run
 
-`.github/workflows/smp-public-live.yml` precollects at 22:45 KST, checks the scheduled origin's target-day official price page, then retains the fixed 23:00 KST issue origin. The public EPSIS input and KPX target publication probes are keyless. PR validation has its own unprivileged job; only the separate deploy job uses the `github-pages` environment and Pages OIDC permissions. The V20 research source is pinned to `fb6fc173d682b5cce2657b65c0b97c11e26ebd32`. No KPX or KMA secrets are required or read. Weather is not a feature of these saved price-only candidates.
+`.github/workflows/smp-prefetch.yml` performs collection-only runs at 20:00, 21:00, and 22:00 KST. `.github/workflows/smp-public-live.yml` performs another collection at 22:45, checks target-day official-price visibility, refreshes EPSIS shortly before the fixed 23:00 issue origin, then issues only from eligible origin-time inputs. Prefetch runs never generate forecasts. The workflows share a lock while writing durable state. GitHub Actions schedule events are best-effort; additional pre-collection increases opportunities to capture late data but cannot guarantee a start time or EPSIS publication. No run may backfill an origin with later receipts. The public EPSIS input and KPX target publication probes are keyless. PR validation has its own unprivileged job; only the separate deploy job uses the `github-pages` environment and Pages OIDC permissions. The V20 research source is pinned to `fb6fc173d682b5cce2657b65c0b97c11e26ebd32`. No KPX or KMA secrets are required or read. Weather is not a feature of these saved price-only candidates.
 
-The EPSIS SQLite store is cached for speed and also persisted, with raw public responses and forecast history, on the separate `smp-live-data` branch. A missing cache restores that branch; if the branch does not yet exist, a cache miss triggers the existing collector's historical fill and the workflow initializes the branch. This keeps Actions cache from being the only durable copy. Each operational run also uploads JSON, coverage, status and logs as a 90-day Actions artifact. If both the state branch and cache are absent, public EPSIS history can be re-collected, but the original historical `first_seen` vintages cannot be reconstructed. The workflow records its current run status separately from the last successful forecast. The web never presents a previous run as a current forecast.
+The EPSIS SQLite store is cached for speed and also persisted, with raw public responses and forecast history, on the separate `smp-live-data` branch. A missing cache restores that branch; if the branch does not yet exist, a cache miss triggers the existing collector's historical fill and the workflow initializes the branch. This keeps Actions cache from being the only durable copy. Each operational run also uploads JSON, coverage, status and logs as a 90-day Actions artifact. If both the state branch and cache are absent, public EPSIS history can be re-collected, but the original historical `first_seen` vintages cannot be reconstructed. The workflow records current run status separately from saved forecasts. A withheld run still shows earlier forecasts under their original target dates and origin times; it does not relabel an old forecast as a new issue.
+
+Forecast rows are append-only by issue origin and target date. Re-running an origin that already has a successful issue reuses its stored vectors and does not append a duplicate. Distinct origins for the same target remain selectable in the web page.
 
 ## Model and timing limits
 
 `automation/models/` contains refit weights for V11-style D+1 ExtraTrees and D+2/D+3 HGB residual plus 5% seasonal-anchor blend. D+2/D+3 use the same-hour median at lags 7/14/21/28 days. They were trained through 2026-10-26 from saved land SMP. They are not the historical fold checkpoint files, and the public 275-day CV metrics do not apply to them. The historical source's original first-seen vintages are not verified. Checkpoints are deployed with the workflow code and are not served to the browser.
 
-An issue is created only when the full 23:00 KST input hour and all preceding 168 hourly inputs have `first_seen` no later than the scheduled origin, the KPX target-day availability probe was received before origin, and all 24 features for each horizon are complete. If 23:00 SMP arrives later, the run is withheld; the data is not backdated. If target-day prices were already shown on the official page, that horizon is marked ineligible as a prospective forecast. A negative page probe means only “not observed on that page at probe time,” not proof that no other publication channel existed. GitHub schedule delay is recorded separately from origin and issue time.
+An issue is created only when the full 23:00 KST input hour and all preceding 168 hourly inputs have `first_seen` no later than the scheduled origin, the KPX target-day availability probe was received before origin, and all 24 features for each horizon are complete. If the 23:00 SMP arrives later, the run is withheld; the data is not backdated. The existing 23:00 time is retained because it is the historical fold cutoff and the current candidates explicitly use the 23:00 observation and its preceding 168-hour window. Moving operations earlier would change feature availability and requires a new time-aligned evaluation; it is not used as a shortcut to increase issuance counts. If target-day prices were already shown on the official page, or if publication status is unverified, the target is excluded from prospective evaluation. A zero-placeholder result means only that SMP was not observed on that KPX page at probe time; it does not prove that no other publication channel existed. GitHub schedule delay is recorded separately from origin and issue time.
+
+The combined date screen lists every retained forecast origin for a target date, with original D+1/D+2/D+3 lead, generated time, model family and hash when recorded. Fold study, V5 test, V20 42-day replay, saved issue records, retrospective replay and future live records remain textually distinguished. KPX published prices and EPSIS observations collected after the target day are separate references. EPSIS post-target observations are not claimed to be final-settlement prices unless that status is independently verified. Missing dates remain empty and explain the available source ranges; the UI does not synthesize a forecast to fill a gap.
+
+`historical_archive.json.gz` was derived from the retained V20 research comparison CSV and manifest. It contains the 92-day V5 test, 42-day V20 comparison and saved 2026 issue forecasts without overwriting the original research files. `historical_replay.json.gz` contains a further as-of input replay using the existing checkpoint trained through 2026-10-26. The checkpoint artifact was created on 2026-11-09, so earlier replay origins are not claimed to have been as-issued; historic `first_seen` does not prove original market publication availability. The replay is a separate research reference, not validated operation. The checkpoint's 275-day fold score is not applied to its predictions.
+
+As of 2026-11-11, retained date coverage is: the 275-day fold from 2024-10-01 through 2025-12-31; the V20 weekly 42-day replay from 2026-01-01 through 2026-10-15; stored complete issue predictions on 2026-10-17, 18, 19, 21 and 22; and 33 additional replay forecasts targeting 2026-10-28 through 2026-11-13 (not every target date). In the added replay, 11 of 15 tested origins issued all three horizons; the 2026-10-30, 10-31, 11-01 and 11-06 origins were withheld because the input at the fixed 23:00 cutoff was absent. This leaves 2026-11-02 without a forecast. Thirty replay records currently have a full post-target SMP reference; the three forecasts targeting 2026-11-12/13 remain without a complete target-day reference. No saved complete prediction bridges 2026-10-23 through 10-27, and 2026-10-16 is also unrepresented. The daily SMP database having observations for a date does not itself supply an archived forecast for that date. `docs/live/latest.json` is still `not_run` with zero live forecast history in this PR branch; the replay records are not actual operating records.
 
 D+2/D+3 seasonal anchors use the same-hour median of the prior 7, 14, 21 and 28 days. This matches the final fold study; the `weekly` feature remains a separate 7-day HGB input feature. The committed refit weights are separate model fits through 2026-10-26 and are not the original fold models. Changing the anchor blend does not change the reported fold CV scores.
 
-Until target SMP is observed, post-hoc actual cost and regret cannot be computed for a live forecast. The historical study tab retains the existing same-day retrospective G2V analysis. All displayed costs use wholesale SMP as a research proxy, not retail charging bills.
+Until a post-target price is collected, hindsight cost and regret cannot be computed. Evaluation metadata includes MAE, RMSE and a fixed G2V comparison (60kWh, SOC 30→80%, 7kW, 90% efficiency, 24-hour availability) for comparable runs. User-entered vehicle conditions recalculate the displayed charging plan and regret. All displayed costs use wholesale SMP as a research proxy, not retail charging bills.
 
 ## One-time repository administrator setup
 
@@ -67,6 +79,6 @@ After merging this branch into the default `main` branch:
 1. Open **Settings → Pages**.
 2. Under **Build and deployment → Source**, select **GitHub Actions**.
 3. Open **Settings → Actions → General → Workflow permissions** and select **Read and write permissions** for `GITHUB_TOKEN`. PR validation and integration request only `contents: read`; the scheduled forecast job needs `contents: write` to persist public source and forecast history on `smp-live-data`; the separate deployment job requests `pages: write` and `id-token: write`. No EPSIS/KPX API-key secrets are needed.
-4. Open **Actions** and confirm the `github-pages` environment exists or is created by the first Pages deployment. Prefer the scheduled run at 22:45 KST. For a manual check, select the `main` branch and start **SMP public forecast and Pages refresh** at 22:45–22:59 KST; it will collect/probe and wait for the fixed 23:00 origin. Starting much earlier can exceed the hosted runner time limit, and starting after 23:00 can correctly withhold when 23:00 SMP was only received late. Inspect collection status, prediction status, state-branch persistence and deployment URL.
+4. Open **Actions** and confirm the `github-pages` environment exists or is created by the first Pages deployment. Prefer the scheduled run at 22:45 KST; it precollects, refreshes input/publication status shortly before 23:00, then issues only from the fixed origin. For a manual run, start **SMP public forecast and Pages refresh** shortly before 23:00 KST; starting after 23:00 may correctly withhold if the 23:00 price was received late. Inspect the issuance status, target-date history, `smp-live-data` persistence and deployment URL.
 
-Scheduled workflows run only from the default branch. Until this branch is merged and Pages source is switched to Actions, its workflow is not the public site's production updater. The existing branch-based Pages site should not be switched before the Pages workflow is present on `main`.
+Scheduled workflows run only from the default `main` branch. Once a change reaches `main`, the 22:45 KST forecast job runs on schedule; Pages updates when the separate `deploy` job succeeds. Keep Pages set to **GitHub Actions** for the generated `docs/` artifact to become public.
