@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+data/raw/*
+!data/raw/README.md
+data/monthly/*
+!data/monthly/README.md
+artifacts/*
+!artifacts/README.md

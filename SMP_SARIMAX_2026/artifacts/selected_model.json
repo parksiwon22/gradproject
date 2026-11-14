@@ -1,0 +1,22 @@
+{
+  "candidate": {
+    "candidate": "SARIMAX_100_100_24",
+    "order": [
+      1,
+      0,
+      0
+    ],
+    "seasonal_order": [
+      1,
+      0,
+      0,
+      24
+    ],
+    "validation_mae": 16.742690315048122,
+    "fit_seconds": 116.14518740000494,
+    "elapsed_seconds": 126.87453660000756,
+    "converged": false
+  },
+  "final_fit_seconds": 117.1699193999957,
+  "state_update_rule": "daily extend observed actuals through forecast origin using filtered states; refit disabled"
+}
