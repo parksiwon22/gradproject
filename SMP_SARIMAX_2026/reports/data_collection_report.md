@@ -4,6 +4,8 @@
 
 **NOT READY — no SARIMAX training, Validation, or Final Test was run for this full-input experiment.** The processed SMP target covers 2023-01-01 00:00 through 2025-12-31 23:00 (26,304 hourly rows), but the selected exogenous input set does not. Existing results from the calendar-only implementation are an incomplete exploratory experiment, not the requested validation.
 
+See the separate [fuel price collection report](fuel_price_collection_report.md) for the WTI/Brent/Japan LNG/Australia coal and domestic EPSIS/KPX collection status, including the current DNS error and exact export steps.
+
 The required complete hourly panel is `data/processed/model_inputs_2023_2025.csv`. It must contain all field columns listed in `feature_selection_report.md`, `timestamp`, and `max_source_available_at`. Every row must contain all selected values and must pass the as-of check. Observed actuals after forecast origin D must not appear in D+1..D+3 features; prior actuals must be represented as lags. Forecast inputs must be historical vintages available by D.
 
 ## Failure diagnosis

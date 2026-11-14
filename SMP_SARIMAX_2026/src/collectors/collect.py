@@ -14,12 +14,34 @@ from src.config import MONTHLY, RAW, external_dir, external_file
 from src.excel_fallback import read_first_sheet
 
 PERIOD_START, PERIOD_END = "2023-01-01", "2025-12-31"
+FRED_VINTAGE_FETCH_START = "2022-10-01"  # prior-period warm-up for Jan-2023 origin snapshots
 FRED_SERIES = {
     "DCOILWTICO": ("WTI crude oil", "USD/barrel", "daily"),
     "DCOILBRENTEU": ("Brent crude oil", "USD/barrel", "daily"),
     "PNGASJPUSDM": ("Japan LNG import price", "USD/million Btu", "monthly"),
     "PCOALAUUSDM": ("Australia coal price", "USD/metric ton", "monthly"),
 }
+
+
+def _safe_request_error(exc: requests.RequestException) -> str:
+    """Return exception classes and numeric resolver/socket codes only.
+
+    Requests exception strings may contain a fully rendered request URL, so
+    never store or print their message (the URL can include an API key).
+    """
+    parts = []
+    current: BaseException | None = exc
+    seen: set[int] = set()
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        code = getattr(current, "errno", None)
+        winerror = getattr(current, "winerror", None)
+        item = type(current).__name__
+        if code is not None: item += f" errno={code}"
+        if winerror is not None: item += f" winerror={winerror}"
+        parts.append(item)
+        current = current.__cause__ or current.__context__ or getattr(current, "reason", None)
+    return " -> ".join(parts)
 
 
 def _copy_sources(source: Path | None, label: str) -> list[dict]:
@@ -81,52 +103,102 @@ def _copy_sources(source: Path | None, label: str) -> list[dict]:
     return records
 
 
-def collect_fred() -> list[dict]:
+def collect_fred_alfred() -> list[dict]:
+    """Collect revised-value vintages and conservative daily as-of snapshots.
+
+    output_type=3 returns only new/revised observations per vintage. We carry
+    each value forward only from vintages strictly earlier than the local
+    forecast-origin date; ALFRED dates have day granularity, not intraday time.
+    """
     key = os.getenv("FRED_API_KEY", "").strip()
     records = []
     if not key:
-        return [{"dataset": sid, "source": "FRED", "status": "blocked", "reason": "FRED_API_KEY not set", "frequency": meta[2], "unit": meta[1], "series_page": f"https://fred.stlouisfed.org/series/{sid}"} for sid, meta in FRED_SERIES.items()]
+        return [{"dataset": sid, "source": "FRED/ALFRED", "status": "blocked", "reason": "FRED_API_KEY not set", "frequency": meta[2], "unit": meta[1], "series_page": f"https://fred.stlouisfed.org/series/{sid}"} for sid, meta in FRED_SERIES.items()]
+    vintage_frames: dict[str, pd.DataFrame] = {}
     for sid, (name, unit, cadence) in FRED_SERIES.items():
         target_dir = MONTHLY if cadence == "monthly" else RAW
-        target = target_dir / f"fred_{sid}_{PERIOD_START[:4]}_{PERIOD_END[:4]}.csv"
-        if target.exists():
-            df = pd.read_csv(target)
-            status = "reused_cache"
-        else:
-            try:
-                response = requests.get(
-                    "https://api.stlouisfed.org/fred/series/observations",
-                    params={"series_id": sid, "api_key": key, "file_type": "json", "observation_start": PERIOD_START, "observation_end": PERIOD_END}, timeout=(3, 10),
-                )
-                if response.status_code != 200:
-                    records.append({"dataset": sid, "name": name, "source": "FRED API", "status": "http_error", "api_status": "not_confirmed", "http_status": response.status_code, "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
+        target = target_dir / f"fred_{sid}_alfred_vintages_{PERIOD_START[:4]}_{PERIOD_END[:4]}.csv"
+        try:
+            if target.exists():
+                df = pd.read_csv(target)
+                status = "reused_vintage_cache"
+            else:
+                pages = []
+                offset = 0
+                total = None
+                while total is None or offset < total:
+                    response = requests.get(
+                        "https://api.stlouisfed.org/fred/series/observations",
+                        params={
+                            "series_id": sid, "api_key": key, "file_type": "json",
+                            "observation_start": FRED_VINTAGE_FETCH_START, "observation_end": PERIOD_END,
+                            "realtime_start": FRED_VINTAGE_FETCH_START, "realtime_end": PERIOD_END,
+                            "output_type": 3, "limit": 100000, "offset": offset,
+                        }, timeout=(5, 20),
+                    )
+                    if response.status_code != 200:
+                        records.append({"dataset": sid, "name": name, "source": "FRED/ALFRED API", "status": "http_error", "http_status": response.status_code, "api_status": "not_confirmed", "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
+                        pages = []
+                        break
+                    payload = response.json()
+                    if "error_code" in payload:
+                        records.append({"dataset": sid, "name": name, "source": "FRED/ALFRED API", "status": "api_error", "api_status": "api_error", "reason": payload.get("error_message", "FRED API error"), "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
+                        pages = []
+                        break
+                    observations = payload.get("observations", [])
+                    total = int(payload.get("count", len(observations)))
+                    pages.extend(observations)
+                    offset += len(observations)
+                    if not observations or offset >= total:
+                        break
+                if not pages:
+                    if not any(r.get("dataset") == sid for r in records):
+                        records.append({"dataset": sid, "name": name, "source": "FRED/ALFRED API", "status": "empty", "api_status": "success_empty", "reason": "No vintage observations returned", "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
                     continue
-                payload = response.json()
-                if "error_code" in payload:
-                    records.append({"dataset": sid, "name": name, "source": "FRED API", "status": "api_error", "api_status": "api_error", "reason": payload.get("error_message", "FRED API error"), "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
+                df = pd.DataFrame(pages)
+                expected = {"date", "value", "realtime_start"}
+                if not expected.issubset(df.columns):
+                    records.append({"dataset": sid, "name": name, "source": "FRED/ALFRED API", "status": "response_error", "api_status": "invalid_response", "reason": "Required observation/vintage fields missing", "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
                     continue
-                df = pd.DataFrame(payload.get("observations", []))
-                if df.empty:
-                    records.append({"dataset": sid, "name": name, "source": "FRED API", "status": "empty", "api_status": "success_empty", "reason": "No observations returned", "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
-                    continue
-                df = df[["date", "value"]].rename(columns={"date": "observation_date", "value": sid})
+                df = df[[c for c in ["date", "value", "realtime_start", "realtime_end"] if c in df.columns]]
+                df = df.rename(columns={"date": "observation_date", "value": sid, "realtime_start": "vintage_date"})
                 df[sid] = pd.to_numeric(df[sid].replace(".", pd.NA), errors="coerce")
+                target_dir.mkdir(parents=True, exist_ok=True)
                 df.to_csv(target, index=False)
                 status = "success"
             except requests.RequestException as exc:
-                records.append({"dataset": sid, "name": name, "source": "FRED API", "status": "connection_error", "api_status": "unverified_network_unavailable", "reason": type(exc).__name__, "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
-                if isinstance(exc, requests.ConnectionError):
-                    for remaining in list(FRED_SERIES)[list(FRED_SERIES).index(sid) + 1:]:
-                        rem_name, rem_unit, rem_cadence = FRED_SERIES[remaining]
-                        records.append({"dataset": remaining, "name": rem_name, "source": "FRED API", "status": "connection_error", "api_status": "unverified_network_unavailable", "reason": "network unavailable after first connection failure", "frequency": rem_cadence, "unit": rem_unit, "series_page": f"https://fred.stlouisfed.org/series/{remaining}"})
-                    break
-                continue
+                safe_reason = _safe_request_error(exc)
+                records.append({"dataset": sid, "name": name, "source": "FRED/ALFRED API", "status": "connection_error", "api_status": "unverified_network_unavailable", "reason": safe_reason, "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
+                for remaining in list(FRED_SERIES)[list(FRED_SERIES).index(sid) + 1:]:
+                    rem_name, rem_unit, rem_cadence = FRED_SERIES[remaining]
+                    records.append({"dataset": remaining, "name": rem_name, "source": "FRED/ALFRED API", "status": "connection_error", "api_status": "unverified_network_unavailable", "reason": safe_reason, "frequency": rem_cadence, "unit": rem_unit, "series_page": f"https://fred.stlouisfed.org/series/{remaining}"})
+                return records
             except (ValueError, KeyError) as exc:
-                records.append({"dataset": sid, "name": name, "source": "FRED API", "status": "response_error", "api_status": "invalid_response", "reason": type(exc).__name__, "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
+                records.append({"dataset": sid, "name": name, "source": "FRED/ALFRED API", "status": "response_error", "api_status": "invalid_response", "reason": type(exc).__name__, "frequency": cadence, "unit": unit, "series_page": f"https://fred.stlouisfed.org/series/{sid}"})
                 continue
+        vintage_frames[sid] = df
         dates = pd.to_datetime(df.get("observation_date", pd.Series(dtype=str)), errors="coerce")
         vals = pd.to_numeric(df.get(sid, pd.Series(dtype=float)), errors="coerce")
-        records.append({"dataset": sid, "name": name, "source": "FRED API", "status": status, "api_status": "successful_call" if status == "success" else status, "official_series_metadata_confirmed": True, "series_page": f"https://fred.stlouisfed.org/series/{sid}", "period_start": dates.min().date().isoformat() if dates.notna().any() else None, "period_end": dates.max().date().isoformat() if dates.notna().any() else None, "rows": int(len(df)), "frequency": cadence, "unit": unit, "missing_rate": float(vals.isna().mean()) if len(vals) else None, "path": str(target.relative_to(target.parents[1]))})
+        records.append({"dataset": sid, "name": name, "source": "FRED/ALFRED API", "status": status, "api_status": "successful_call" if status == "success" else status, "official_series_metadata_confirmed": True, "vintage_history": True, "series_page": f"https://fred.stlouisfed.org/series/{sid}", "period_start": dates.min().date().isoformat() if dates.notna().any() else None, "period_end": dates.max().date().isoformat() if dates.notna().any() else None, "rows": int(len(df)), "frequency": cadence, "unit": unit, "missing_rate": float(vals.isna().mean()) if len(vals) else None, "path": str(target.relative_to(target.parents[1]))})
+    if len(vintage_frames) == len(FRED_SERIES):
+        origins = pd.date_range(PERIOD_START, PERIOD_END, freq="D")
+        asof = pd.DataFrame({"forecast_origin_date": origins.date.astype(str), "vintage_cutoff_date": (origins - pd.Timedelta(days=1)).date.astype(str)})
+        for sid, vintages in vintage_frames.items():
+            history = vintages.copy()
+            history["observation_date"] = pd.to_datetime(history.observation_date, errors="coerce")
+            history["vintage_date"] = pd.to_datetime(history.vintage_date, errors="coerce")
+            history[sid] = pd.to_numeric(history[sid], errors="coerce")
+            history = history.dropna(subset=["observation_date", "vintage_date", sid]).sort_values(["vintage_date", "observation_date"])
+            values = []
+            for origin in origins:
+                known = history[history.vintage_date < origin]
+                latest_by_obs = known.drop_duplicates("observation_date", keep="last").sort_values("observation_date")
+                eligible = latest_by_obs[latest_by_obs.observation_date < origin]
+                values.append(eligible.iloc[-1][sid] if not eligible.empty else pd.NA)
+            asof[sid] = values
+        asof_path = RAW / f"fred_alfred_asof_daily_{PERIOD_START[:4]}_{PERIOD_END[:4]}.csv"
+        asof.to_csv(asof_path, index=False)
+        records.append({"dataset": "FRED all-series conservative daily ALFRED as-of panel", "source": "FRED/ALFRED", "status": "success", "rows": len(asof), "period_start": PERIOD_START, "period_end": PERIOD_END, "frequency": "daily forecast-origin snapshots; underlying source cadence preserved", "vintage_rule": "latest value vintage whose realtime_start and observation date are both strictly before forecast origin date", "path": str(asof_path.relative_to(RAW.parent.parent))})
     return records
 
 
@@ -267,7 +339,7 @@ def collect() -> list[dict]:
     records += _copy_sources(external_dir("EXISTING_SMP_DATA_DIR"), "existing")
     records += _copy_sources(external_dir("EPSIS_EXPORT_DIR"), "epsis")
     records += collect_existing_kpx_target()
-    records += collect_fred()
+    records += collect_fred_alfred()
     records += collect_kma_asos()
     # Official catalog confirms the base URLs but not operation paths/field schemas.
     # Keep these sources explicit; never construct a guessed request URL.
