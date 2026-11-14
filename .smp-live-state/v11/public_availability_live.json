@@ -1,29 +1,29 @@
 {
-  "origin_kst": "2026-11-13T23:00:00+09:00",
+  "origin_kst": "2026-11-14T23:00:00+09:00",
   "results": [
     {
       "horizon_days": 1,
-      "target_date": "2026-11-14",
-      "checked_at_kst": "2026-11-14T05:40:48.665386+09:00",
-      "checked_at_utc": "2026-11-13T20:40:48.665386+00:00",
+      "target_date": "2026-11-15",
+      "checked_at_kst": "2026-11-15T03:53:14.145205+09:00",
+      "checked_at_utc": "2026-11-14T18:53:14.145205+00:00",
       "status": "official_available",
       "attempts": 1,
       "before_origin": false
     },
     {
       "horizon_days": 2,
-      "target_date": "2026-11-15",
-      "checked_at_kst": "2026-11-14T05:40:49.999263+09:00",
-      "checked_at_utc": "2026-11-13T20:40:49.999263+00:00",
+      "target_date": "2026-11-16",
+      "checked_at_kst": "2026-11-15T03:53:15.809568+09:00",
+      "checked_at_utc": "2026-11-14T18:53:15.809568+00:00",
       "status": "not_observed_on_this_page",
       "attempts": 1,
       "before_origin": false
     },
     {
       "horizon_days": 3,
-      "target_date": "2026-11-16",
-      "checked_at_kst": "2026-11-14T05:40:51.485398+09:00",
-      "checked_at_utc": "2026-11-13T20:40:51.485398+00:00",
+      "target_date": "2026-11-17",
+      "checked_at_kst": "2026-11-15T03:53:17.505458+09:00",
+      "checked_at_utc": "2026-11-14T18:53:17.505458+00:00",
       "status": "not_observed_on_this_page",
       "attempts": 1,
       "before_origin": false
