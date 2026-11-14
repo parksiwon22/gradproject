@@ -1,44 +1,44 @@
-# Data collection report
+# Data collection and readiness report
 
-Collection used read-only copies of existing sources; API keys are not printed.
+## Decision
 
-| Data | Status | Period / rows | Frequency | Unit | Missing rate | Notes |
-|---|---|---|---|---|---:|---|
-| aligned_hourly_all_features_2023 | copied_read_only | 2023-01-01T00:00:00 – 2023-12-31T23:00:00 / 8760 rows | 0 days 01:00:00 | KRW/kWh (SMP) | 0.00% | readable |
-| HOME_전력거래_계통한계가격_시간별SMP | copied_read_only | 2023-01-01T00:00:00 – 2023-12-31T00:00:00 / 365 rows | hourly (wide date x 01–24 columns) | KRW/kWh (hourly SMP) | 0.00% | readable |
-| HOME_전력거래_계통한계가격_연료원별SMP결정 | copied_read_only | 2026-01-23T00:00:00 – 2026-12-23T00:00:00 / 12 rows | 31 days 00:00:00 | unknown | 0.00% | readable |
-| HOME_전력거래_전력거래량(전력시장·PPA)_연료원별 | copied_read_only | None – None / 265 rows | unknown | unknown | 95.26% | readable |
-| kr_holidays_2023_events | copied_read_only | 2023-01-01T00:00:00 – 2023-12-25T00:00:00 / 18 rows | 6 days 00:00:00 | unknown | 21.48% | readable |
-| powerDemandPerform_2023 | copied_read_only | None – None / 367 rows | unknown | unknown | 0.23% | readable |
-| pssInLand_2023 | copied_read_only | None – None / 366 rows | unknown | unknown | 0.00% | readable |
-| 태양광발전량,풍력발전량 | copied_read_only | None – None / 367 rows | unknown | MWh (source column labels) | 0.00% | readable |
-| 한국가스공사_월별 발전용 천연가스 요금_23 | copied_read_only | None – None / 8 rows | unknown | unknown | 0.00% | readable |
-| 한국서부발전(주)_신재생에너지발전량_20231231 | copied_read_only | 2023-01-01T00:00:00 – 2023-12-31T00:00:00 / 2189 rows | hourly (wide date x 01–24 columns) | unknown | 0.00% | readable |
-| 한국전력거래소_시간별 전국 전력수요량 | copied_read_only | 2023-01-01T00:00:00 – 2023-12-31T00:00:00 / 365 rows | hourly (wide date x 01–24 columns) | unknown | 0.00% | readable |
-| 지역별 시간대별 태양광 및 풍력 발전량(2309_2311) (1) | copied_read_only | 2023-09-01T00:00:00 – 2023-11-30T23:00:00 / 37128 rows | 0 days 01:00:00 | MWh (source column labels) | 7.06% | readable |
-| 지역별 시간별 태양광 및 풍력 발전량_20230601_20230831 | copied_read_only | 2023-06-01T00:00:00 – 2023-08-31T23:00:00 / 37536 rows | 0 days 01:00:00 | MWh (source column labels) | 0.00% | readable |
-| epsis | unavailable | — – — / — rows | unknown | unknown | — | directory not configured or not found |
-| Existing project land SMP actual series (actual_smp only) | success | 2023-01-09T00:00:00 – 2025-12-31T23:00:00 / 26112 rows | hourly | KRW/kWh | 0.00% | Only timestamp and actual_smp were extracted; existing model features and predictions were not imported. |
-| DCOILWTICO | connection_error | — – — / — rows | daily | USD/barrel | — | [official FRED page](https://fred.stlouisfed.org/series/DCOILWTICO); API=unverified_network_unavailable; ConnectionError |
-| DCOILBRENTEU | connection_error | — – — / — rows | daily | USD/barrel | — | [official FRED page](https://fred.stlouisfed.org/series/DCOILBRENTEU); API=unverified_network_unavailable; network unavailable after first connection failure |
-| PNGASJPUSDM | connection_error | — – — / — rows | monthly | USD/million Btu | — | [official FRED page](https://fred.stlouisfed.org/series/PNGASJPUSDM); API=unverified_network_unavailable; network unavailable after first connection failure |
-| PCOALAUUSDM | connection_error | — – — / — rows | monthly | USD/metric ton | — | [official FRED page](https://fred.stlouisfed.org/series/PCOALAUUSDM); API=unverified_network_unavailable; network unavailable after first connection failure |
-| KMA ASOS hourly at Seoul station 108 | connection_error | 2023-01-01 – 2025-12-31 / 0 rows | hourly observations | {'TA': 'C', 'SI': 'MJ/m2', 'WS': 'm/s'} | — | First failed request: connection_error (ConnectionError) |
-| KPX SMP and day-ahead demand | manual_export_required | — – — / — rows | unknown | unknown | — | Official page confirms service and interval semantics but omits operation path and schema; import EPSIS CSV/Excel until official detailed guide is available. |
-| KMA short-range forecast archive | not_used | — – — / — rows | unknown | unknown | — | Forecast API returns issue-time forecasts; historical vintage availability has not been verified, so it is excluded from historical model inputs. |
-| East-West day-ahead solar forecast | credential_required | — – — / — rows | unknown | unknown | — | Requires a separate data.go.kr credential, not supplied; historical forecast vintage availability also needs validation. |
+**NOT READY — no SARIMAX training, Validation, or Final Test was run for this full-input experiment.** The processed SMP target covers 2023-01-01 00:00 through 2025-12-31 23:00 (26,304 hourly rows), but the selected exogenous input set does not. Existing results from the calendar-only implementation are an incomplete exploratory experiment, not the requested validation.
 
-## Official specifications confirmed
+The required complete hourly panel is `data/processed/model_inputs_2023_2025.csv`. It must contain all field columns listed in `feature_selection_report.md`, `timestamp`, and `max_source_available_at`. Every row must contain all selected values and must pass the as-of check. Observed actuals after forecast origin D must not appear in D+1..D+3 features; prior actuals must be represented as lags. Forecast inputs must be historical vintages available by D.
 
-- [KPX SMP and day-ahead demand](https://www.data.go.kr/data/15131225/openapi.do): hourly interval values are labeled by interval end; updated daily around 23:00 KST. The public page currently does not expose the operation path/schema in its page text, so automated historical querying is not attempted.
-- [KMA APIHub ASOS interval endpoint](https://apihub.kma.go.kr/apiList.do?apiSeq=5): `kma_sfctm3.php`, maximum 31-day query; selected fields are `TA` (°C), `SI` (MJ/m²), `WS` (m/s). Collection uses Seoul station 108 as a single-station weather proxy.
-- [FRED observations API documentation](https://fred.stlouisfed.org/docs/api/fred/series_observations.html) confirms the observations API method. The local execution environment could not resolve external hosts, so API-key validity/callability remains unverified.
-- Official FRED pages confirm WTI and Brent are daily USD/barrel, and Japan LNG and Australian coal are monthly USD/million metric Btu and USD/metric ton respectively. Series pages are linked in the table above.
+## Failure diagnosis
 
-## Important data notes
+- **Network:** probes to official FRED, KMA, KPX, and KASI service/catalog hosts failed with connection errors before an HTTP response. This is a network/connection failure in the current environment.
+- **Authentication:** because no HTTP response was received, key acceptance/rejection could not be tested. There is no evidence that any configured key is invalid. No key value is recorded in this report.
+- **API specification:** some KPX catalog pages expose a base URL and summary but not the concrete operation route/output schema needed to implement the selected fields (notably `mlfd` and fuel-code series). This is a separate specification gap.
+- **Historical archive:** historical vintages/retention for day-ahead forecasts and the East-West forecast API were not verified. Connection failure is not evidence that historical querying is impossible. No complete archive is present locally.
 
-- EPSIS hourly SMP uses the 2023 read-only local file when available. Official EPSIS CSV/Excel can be added under `EPSIS_EXPORT_DIR`; missing 2024–2025 intervals are not synthesized.
-- The documented KPX day-ahead API refreshes once daily around 23:00 and timestamps each interval by its end. Only archived forecast vintages available at the forecast origin may be used.
-- KMA observed weather is retained as raw data, but excluded from future exogenous variables to prevent use of post-origin observations.
-- KMA forecast vintages and East-West solar prediction vintages are not used unless their historical issue-time availability can be demonstrated.
-- FRED monthly series retain monthly frequency and original units. A one-month publication delay is assumed for any later model use.
+## Required inputs, current coverage, and action
+
+| Selected input | Current local coverage/status | Missing period / issue | Required action and official source |
+|---|---|---|
+| Actual hourly land SMP (target) | Complete 2023-01-01–2025-12-31, 26,304/26,304 | None for target | Preserve; source/export reference: [EPSIS hourly SMP](https://epsis.kpx.or.kr/epsisnew/selectEkmaSmpShdChart.do?menuId=040202.) |
+| Actual hourly nationwide demand (lag only) | Local aligned 2023 file only, 8,760 hours; source mapping needs verification | 2024-01-01–2025-12-31 | Download 2024 and 2025 from [KPX nationwide hourly demand file](https://www.data.go.kr/data/15065266/fileData.do); verify source fields before import |
+| Day-ahead demand forecast `mlfd` | 2023 local daily demand forecast workbook exists; no verified issue-time vintage; none for 2024–2025 | 2023 vintage timestamps; all 2024-01-01–2025-12-31 | Obtain archived forecast vintages and exact operation/field mapping from [KPX SMP and demand forecast API](https://www.data.go.kr/data/15131225/openapi.do); API page alone does not prove 2023–25 vintage availability |
+| Generation by fuel: `tradeYmd`, `tradeNo`, `fuelTpCd`, `amgo` (actuals lagged) | 2023 aligned fuel columns exist but mapping to required raw fields unverified | 2024-01-01–2025-12-31 and 2023 field provenance | Import exact selected fuel codes and hourly intervals via [KPX fuel generation API](https://www.data.go.kr/data/15106744/openapi.do); obtain official operation schema if route is not supplied |
+| Nationwide hourly solar and wind generation (actuals lagged) | Regional CSV fragments only 2023-06-01–2023-11-30; one fragment has ~7.06% missing; existing Seoul/West columns are not nationwide substitutes | 2023-01-01–2023-05-31, 2023-12-01–2025-12-31, plus gaps | Obtain exact nationwide/regional solar and wind source exports; [KPX solar API](https://www.data.go.kr/data/15103243/openapi.do) documents solar only; wind requires its separate official dataset |
+| Day-ahead solar forecast `solgenKpx` | No local vintage data | Entire 2023-01-01–2025-12-31; archive availability unknown | Obtain archived KPX forecast vintages and field schema; [KPX SMP/demand API catalog](https://www.data.go.kr/data/15131225/openapi.do) or official KPX data contact |
+| Supply reserve and operating reserve, separately | 2023 daily supply reserve/rate workbook only; not hourly; no verified operating-reserve series | Hourly 2023-01-01–2025-12-31 | Export both distinct fields from [KPX reserve data](https://www.data.go.kr/data/15099819/fileData.do); if 3-month query limit applies, download 12 chunks: 2023-01-01–03-31, 04-01–06-30, 07-01–09-30, 10-01–12-31; repeat for 2024 and 2025 |
+| LNG generation fuel unit cost (EPSIS) | Local KOGAS monthly generation gas tariff has 8 rows but is not verified as the selected EPSIS field | Full 2023-01–2025-12, exact series unavailable | Download exact LNG generation fuel unit-cost export from [EPSIS fuel unit cost](https://epsis.kpx.or.kr/epsisnew/selectEkmaFucUpfChart.do?menuId=040100) |
+| Monthly fuel cost `fuelType`, `day`, `untpc`, `unit` | No verified exact-field monthly file | 2023-01–2025-12 (36 months) | Download full period from [KPX monthly fuel cost CSV](https://www.data.go.kr/data/15069386/fileData.do), retaining original units and monthly cadence |
+| WTI `DCOILWTICO`, Brent `DCOILBRENTEU` | FRED API not reachable; no complete local series confirmed | 2023-01-01–2025-12-31 | Restore network and retry FRED, or download observations: [WTI](https://fred.stlouisfed.org/series/DCOILWTICO), [Brent](https://fred.stlouisfed.org/series/DCOILBRENTEU) |
+| Japan LNG `PNGASJPUSDM`, Australian coal `PCOALAUUSDM` | FRED API not reachable; no complete local series confirmed | 2023-01–2025-12 (monthly) | Restore network and retry FRED, or download observations: [Japan LNG](https://fred.stlouisfed.org/series/PNGASJPUSDM), [Australian coal](https://fred.stlouisfed.org/series/PCOALAUUSDM) |
+| KMA ASOS observed `TA`, `SI`, `WS` (lag only) | 2023 local proxy has TA complete, WS 8,723/8,760, SI 4,781/8,760; station/source mapping not verified; no 2024–25 | Complete verified hourly records 2023-01-01–2025-12-31 | Retrieve exact variables by station and dates using [KMA ASOS API](https://apihub.kma.go.kr/apiList.do?seqApi=2) (`kma_sfctm3.php`, up to 31 days/query), or official export; 36 monthly chunks cover the period |
+| KMA forecast `TMP`, `WSD` with vintage | No local data | Entire period; historical vintage/archive availability unknown | Obtain issue-time historical forecast archive, or confirm archive export from [KMA short-range forecast spec](https://apihub.kma.go.kr/apiList.do?seqApi=10) (`nph-dfs_shrt_grd`) |
+| East-West forecast `icsrPred`, `temp`, `ws` with vintage | No local data; service key not verified/possibly service-specific | Entire 2023-01-01–2025-12-31; API page created 2025-07-17, earlier history/archive unknown | Request historical vintages from [East-West day-ahead solar forecast API](https://www.data.go.kr/data/15144541/openapi.do); if service requires a separate key, enter it locally as `EAST_WEST_SOLAR_SERVICE_KEY` in `.env` |
+| Holiday `locdate`, `isHoliday` | 2023-only file, 18 listed dates | 2024-01-01–2025-12-31 and validate full 2023 calendar | Collect 2023–25 from [KASI special date API](https://www.data.go.kr/data/15012690/openapi.do) or official annual calendar exports |
+| Calendar hour/weekday/month/season | Derivable for full hourly grid | None | Generate locally; does not replace the required selected inputs |
+
+## Credentials and safe retry
+
+`.env` variable names (values must remain local): `DATA_GO_KR_SERVICE_KEY`, `KMA_APIHUB_KEY`, `FRED_API_KEY`; optional service-specific names are `KMA_DATA_GO_SERVICE_KEY`, `KPX_FORECAST_SERVICE_KEY`, and `EAST_WEST_SOLAR_SERVICE_KEY`. Current connection errors do not justify rotating keys. Never paste keys into source code, logs, reports, or GitHub.
+A manual export should be saved locally under the project data import workflow, with source, exact fields, units, date range, and retrieval date recorded. Do not fill gaps with zero or substitute a different proxy series.
+
+## Execution status
+
+`python -m src.cli check-inputs` checks panel structure, field coverage, and row-level source-time bounds without fitting; it does not establish origin-specific availability for overlapping forecasts. `python -m src.cli backtest` currently refuses all fitting, including calendar-only fitting. Complete origin-specific vintage/leakage validation and full-input SARIMAX integration before producing Validation/Final Test.

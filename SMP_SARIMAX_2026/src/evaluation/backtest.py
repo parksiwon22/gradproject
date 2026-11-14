@@ -12,6 +12,7 @@ from src.config import ARTIFACTS, OUT, PROCESSED
 from src.features.calendar import calendar_features
 from src.evaluation.rows import make_forecast_row
 from src.models.sarimax import CANDIDATES, fit, forecast_72
+from src.data_requirements import require_model_inputs
 
 
 def _metric_rows(df: pd.DataFrame, split: str) -> list[dict]:
@@ -30,6 +31,13 @@ def _metric_rows(df: pd.DataFrame, split: str) -> list[dict]:
 
 
 def run_backtest() -> tuple[pd.DataFrame, pd.DataFrame]:
+    # Fail closed before reading targets or fitting any candidate. The current
+    # calendar-only implementation is deliberately not a full-input run.
+    require_model_inputs()
+    raise RuntimeError(
+        "Full selected-feature SARIMAX integration is not implemented yet. "
+        "This calendar-only experiment is incomplete; no model was fitted."
+    )
     path = PROCESSED / "hourly_smp_2023_2025.csv"
     if not path.exists(): raise FileNotFoundError("Run `python -m src.cli preprocess` first.")
     frame = pd.read_csv(path, parse_dates=["timestamp"]).set_index("timestamp")

@@ -5,7 +5,7 @@ import argparse
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="SARIMAX 72-hour land-SMP research pipeline")
-    parser.add_argument("command", choices=["collect", "preprocess", "backtest", "visualize", "report"])
+    parser.add_argument("command", choices=["collect", "preprocess", "check-inputs", "backtest", "visualize", "report"])
     args = parser.parse_args()
     if args.command == "collect":
         from src.collectors.collect import main as run
@@ -17,17 +17,19 @@ def main() -> None:
         build()
         from src.reports import write_feature_report
         write_feature_report()
+    elif args.command == "check-inputs":
+        from src.data_requirements import inspect_model_inputs
+        result = inspect_model_inputs()
+        if result.ready:
+            print("Input panel passes structural checks only; SARIMAX training remains disabled pending origin-specific leakage validation and full-feature model integration.")
+        else:
+            print("INPUTS NOT READY - no model was run.")
+            for blocker in result.blockers:
+                print(f"- {blocker}")
+            raise SystemExit(2)
     elif args.command == "backtest":
         from src.evaluation.backtest import run_backtest
-        try:
-            run_backtest()
-        except Exception as exc:
-            import traceback
-            traceback.print_exc()
-            print(f"Backtest did not run: {type(exc).__name__}: {exc}")
-            from src.reports import write_model_report, write_final_report
-            write_model_report(); write_final_report()
-            raise SystemExit(2)
+        run_backtest()
         from src.reports import write_model_report, write_final_report
         write_model_report(); write_final_report()
     elif args.command == "visualize":

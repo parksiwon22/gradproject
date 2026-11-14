@@ -1,12 +1,14 @@
-# Final evaluation report
+# Evaluation status
 
-## 1. Research objective and period
+## Full-input experiment: BLOCKED
 
-Forecast land SMP in KRW/kWh at 23:00 KST from D+1 00:00 through D+3 23:00 (72 hours). Requested period: 2023-01-01 through 2025-12-31; train through 2024-12-31, validation 2025-01-01 through 2025-06-30, final test 2025-07-01 through 2025-12-31.
+No Validation or Final Test was run for the selected-input SARIMAX because required explanatory data are incomplete and some forecast-vintage histories remain unverified. This is an intentional fail-closed stop. See [data collection report](data_collection_report.md) for the input-by-input gap table and official retrieval actions.
 
-## 2–3. Data and preprocessing
+## Legacy calendar-only experiment: incomplete, exploratory only
 
-See [data collection report](data_collection_report.md) and [feature selection report](feature_selection_report.md). Missing target SMP is never replaced with zero or model output. Post-origin actual demand, generation, weather, and SMP are not supplied as future exogenous variables.
+The metrics currently stored in the output directory came from the prior calendar-only SARIMAX. They are not complete-input Validation or Final Test results and must not be represented as the requested final model. No new results were generated in this run.
+
+Target SMP is complete from 2023-01-01 through 2025-12-31 (26,304 hourly observations); target availability alone is insufficient to authorize training.
 
 Observed target coverage in processed file: 2023-01-01 00:00:00 through 2025-12-31 23:00:00. Total hourly grid rows: 26304; observed SMP: 26304; missing SMP: 0 (0.00%).
 
@@ -14,9 +16,7 @@ Observed target coverage in processed file: 2023-01-01 00:00:00 through 2025-12-
 - 2024: 8784/8784 observed hourly SMP
 - 2025: 8760/8760 observed hourly SMP
 
-## 4–6. Model and performance
-
-Validation-selected SARIMAX is reported in `artifacts/selected_model.json`. Split metrics are below; D+1/D+2/D+3 details are in the metrics CSV.
+## Archived legacy metrics (calendar-only; not valid full-input results)
 
 | split | group | count | mae | rmse | r2 |
 |---|---|---|---|---|---|
@@ -27,13 +27,11 @@ Validation-selected SARIMAX is reported in `artifacts/selected_model.json`. Spli
 | final_test | previous_day_smp | 13104 | 12.846539224664223 | 19.664118460939168 | 0.2731993901592028 |
 | final_test | previous_week_smp | 13104 | 11.433384462759463 | 17.77151371915934 | 0.4063709279396204 |
 
-The selected candidate did not converge within the configured 25 optimizer iterations. SARIMAX also scored worse than the previous-day and previous-week persistence baselines on both validation and final test, so these results are preliminary and should not be presented as a successful forecast model. Detailed per-day and horizon metrics are saved in `outputs/metrics/metrics_by_split.csv`. Forecast rows remain distinct by `forecast_origin` and `target_timestamp` in `outputs/predictions/`.
+These values are preserved for provenance only. They were produced without the selected exogenous variables and do not satisfy the current input requirements. Do not cite them as the project's Validation or Final Test performance.
 
-## 7. Graphs
+## Figures
 
-Monthly actual-versus-predicted graphs (one per month), six-month hourly overview graphs (interactive HTML and PNG), and error-analysis graphs are in `outputs/figures/`. Daily 72-hour comparison graphs were omitted at the user's request.
-
-## 8. Large-error forecasts
+Existing figures, if any, belong to the archived calendar-only experiment and are not full-input model results.
 
 Largest individual forecast errors across validation and final test (descriptive only; no causal attribution):
 
@@ -50,6 +48,6 @@ Largest individual forecast errors across validation and final test (descriptive
 | validation | 2025-03-08 23:00:00 | 2025-03-09 10:00:00 | D+1 hour 11 | 0.00 | 150.54 | 150.54 |
 | final_test | 2025-11-23 23:00:00 | 2025-11-26 12:00:00 | D+3 hour 61 | 0.00 | 150.27 | 150.27 |
 
-## 9. Limitations and extensions
+## Next step
 
-Current exogenous variables are restricted to deterministic calendar features because historical point-in-time vintages for operating forecasts/weather were not established. The train, validation, and final-test date windows are fixed. Add complete source data, preserve publication vintages, and rerun the same SARIMAX protocol before interpreting performance. XGBoost, LightGBM, LSTM, and web integration are outside this project's scope.
+Complete every field and missing period in the collection report, preserve source publication/issue timestamps, build the full panel, and finish full-input SARIMAX wiring before running `python -m src.cli backtest`. Calendar-only SARIMAX remains an incomplete exploratory experiment.

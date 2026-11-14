@@ -26,13 +26,13 @@ python -m src.cli visualize
 python -m src.cli report
 ```
 
-`backtest` fits the limited candidate set on the fixed training period, chooses by Validation MAE, and uses a fixed-parameter daily state update for Validation and Final Test. It requires all hourly target SMP values in each prescribed split. It never fills missing SMP with zero.
+`check-inputs` checks the complete selected input panel and source-time leakage contract without training. `backtest` is fail-closed and currently disabled: it cannot fit the legacy calendar-only model or produce Validation/Final Test scores. Full-input SARIMAX wiring is required after every selected input is collected. Missing fields are never zero-filled or replaced by proxies.
 
 `visualize` creates monthly comparisons, Validation and Final Test six-month hourly overview graphs, and error-analysis plots. Per-day prediction graphs are omitted per the user's instruction. CSV predictions retain distinct forecast origins, target timestamps, and leads.
 
 ## Input and leakage policy
 
-Calendar features are the only exogenous variables currently included in the model. Actual demand, generation, reserve, weather, and SMP after each origin are never used as future inputs. Observed KMA weather and FRED data are archived separately; they are not included until an auditable point-in-time forecast/publication vintage and lag are available. Monthly values preserve their source cadence, and `src.preprocessing.monthly.merge_monthly_with_conservative_lag` applies a conservative two-month start-of-month availability rule for a one-month release delay.
+All previously selected inputs are required: hourly actual demand and selected generation/reserve series as lagged values; archived KPX demand/solar forecasts; EPSIS/KPX fuel costs; FRED WTI, Brent, Japan LNG, and Australian coal; KMA observed weather as lags and historical forecast vintages; East-West forecast vintages; and KASI holidays. Actual observations after origin D are prohibited for D+1..D+3. Forecast vintages must have been issued by D. Monthly series retain cadence and publication lag. See `reports/data_collection_report.md` for current gaps, exact date ranges, failure diagnosis, credential variable names, and official downloads. Existing calendar-only SARIMAX outputs are incomplete exploratory results.
 
 ## Outputs
 

@@ -1,8 +1,10 @@
 # Model experiment report
 
-SARIMAX seasonal period is fixed at 24 hours. Candidate order space is intentionally small; each model uses the same calendar-only exogenous features.
+**Status: incomplete exploratory calendar-only experiment; not a full-input SARIMAX evaluation.** The project now blocks any new model fitting until all selected inputs are complete and point-in-time safe. Existing experiment artifacts are retained only as historical context.
 
-## Validation candidates
+SARIMAX seasonal period is fixed at 24 hours. The legacy experiment used calendar-only exogenous features and omitted all selected operational and market inputs.
+
+## Legacy Validation candidates
 
 ```json
 [
@@ -45,4 +47,4 @@ SARIMAX seasonal period is fixed at 24 hours. Candidate order space is intention
 ]
 ```
 
-The candidate with the lowest walk-forward validation MAE was selected. During a split, model parameters are fixed; observed SMP is appended only after each 72-hour forecast origin advances, with refitting disabled.
+These are legacy calendar-only metrics. They are not Validation/Final Test results for the selected-input experiment and must not be used as its conclusion.
