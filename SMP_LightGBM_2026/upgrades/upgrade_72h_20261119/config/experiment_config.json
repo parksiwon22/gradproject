@@ -1,0 +1,102 @@
+{
+  "model_name": "LightGBM",
+  "dataset_version": "smp72h_common_v5_generation_v2_lightgbm_20261119",
+  "source_dataset_version": "smp72h_common_v5_generation_v2_xgb_20261119",
+  "dataset_family": "smp72h_common_v5_generation_v2",
+  "features": 458,
+  "validation_candidates": [
+    {
+      "candidate_id": 1,
+      "num_leaves": 15,
+      "max_depth": 5,
+      "learning_rate": 0.03,
+      "min_child_samples": 50,
+      "reg_lambda": 8.0,
+      "reg_alpha": 0.05,
+      "feature_fraction": 0.9,
+      "bagging_fraction": 0.9,
+      "best_iteration": 195,
+      "n": 12888,
+      "mae": 10.310019923610849,
+      "rmse": 14.238329519059315,
+      "r2": 0.5299599153230599,
+      "bias": -0.20540614468250504
+    },
+    {
+      "candidate_id": 2,
+      "num_leaves": 31,
+      "max_depth": 7,
+      "learning_rate": 0.025,
+      "min_child_samples": 80,
+      "reg_lambda": 12.0,
+      "reg_alpha": 0.1,
+      "feature_fraction": 0.9,
+      "bagging_fraction": 0.85,
+      "best_iteration": 155,
+      "n": 12888,
+      "mae": 10.145145756280268,
+      "rmse": 14.09781380526199,
+      "r2": 0.539191631649491,
+      "bias": 0.4408097949407921
+    },
+    {
+      "candidate_id": 3,
+      "num_leaves": 31,
+      "max_depth": -1,
+      "learning_rate": 0.02,
+      "min_child_samples": 120,
+      "reg_lambda": 16.0,
+      "reg_alpha": 0.2,
+      "feature_fraction": 0.85,
+      "bagging_fraction": 0.8,
+      "best_iteration": 181,
+      "n": 12888,
+      "mae": 10.25638825786579,
+      "rmse": 14.126499120438154,
+      "r2": 0.5373144780043729,
+      "bias": 1.0547777239218643
+    }
+  ],
+  "selected_candidate_id": 2,
+  "selected_config": {
+    "num_leaves": 31,
+    "max_depth": 7,
+    "learning_rate": 0.025,
+    "min_child_samples": 80,
+    "reg_lambda": 12.0,
+    "reg_alpha": 0.1,
+    "feature_fraction": 0.9,
+    "bagging_fraction": 0.85
+  },
+  "selected_n_estimators": 155,
+  "E1_blend": {
+    "baseline": "weekly",
+    "alpha_model": 0.8,
+    "mae": 9.761843424975819
+  },
+  "E1_baseline_specific_weights": {
+    "recent_daily": {
+      "alpha_model": 0.9,
+      "validation_mae": 9.812175018332828
+    },
+    "weekly": {
+      "alpha_model": 0.8,
+      "validation_mae": 9.761843424975819
+    }
+  },
+  "E3_blend": {
+    "baseline": "weekly",
+    "alpha_model": 0.8,
+    "mae": 9.84905284545204
+  },
+  "final_selected_experiment_id": "E1_existing_best_validation",
+  "final_prediction_rule": "0.8 * existing LightGBM + 0.2 * causal weekly baseline",
+  "final_model_artifact": "models/final_lightgbm_model.txt (model component used by the selected E1 blend)",
+  "train_validation_refit_artifact": "models/train_validation_refit_lightgbm_model.txt",
+  "fit_splits": [
+    "train",
+    "validation"
+  ],
+  "evaluation_split": "final_test",
+  "seed": 42
+}

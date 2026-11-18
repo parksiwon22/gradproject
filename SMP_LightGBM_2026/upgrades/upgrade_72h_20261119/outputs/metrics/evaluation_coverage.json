@@ -1,0 +1,20 @@
+{
+  "final_test": {
+    "rows": 13104,
+    "forecast_origins": 182,
+    "min_target": "2025-07-01 00:00:00",
+    "max_target": "2025-12-31 23:00:00"
+  },
+  "train": {
+    "rows": 52488,
+    "forecast_origins": 729,
+    "min_target": "2023-01-01 00:00:00",
+    "max_target": "2024-12-31 23:00:00"
+  },
+  "validation": {
+    "rows": 12888,
+    "forecast_origins": 179,
+    "min_target": "2025-01-01 00:00:00",
+    "max_target": "2025-06-30 23:00:00"
+  }
+}
