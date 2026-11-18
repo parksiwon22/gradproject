@@ -1,0 +1,107 @@
+{
+  "status": "passed",
+  "final_selected_experiment_id": "E1_existing_best_validation",
+  "lowest_validation_mae": 9.76184342497582,
+  "checks": [
+    "required prediction fields",
+    "dataset identity",
+    "common 72-hour cutoff",
+    "target-horizon alignment",
+    "causal baseline source-hour verification",
+    "lowest Validation MAE selection",
+    "selected-final output identity",
+    "72 horizons per origin",
+    "final-test MAE recomputation",
+    "saved final and refit LightGBM models"
+  ],
+  "experiments": [
+    {
+      "experiment_id": "E0_existing_lightgbm",
+      "n": 13104,
+      "mae": 20.356744510061844,
+      "rmse": 24.309962276944532,
+      "r2": -0.11079748870416872,
+      "bias": 18.764032382448757,
+      "forecast_origins": 182,
+      "observed_cutoff_passed": true,
+      "72h_horizon_coverage_passed": true
+    },
+    {
+      "experiment_id": "E1_existing_plus_recent_daily",
+      "n": 13104,
+      "mae": 18.795524642232202,
+      "rmse": 22.702119405603007,
+      "r2": 0.03127808090432416,
+      "bias": 16.998586409161145,
+      "forecast_origins": 182,
+      "observed_cutoff_passed": true,
+      "72h_horizon_coverage_passed": true
+    },
+    {
+      "experiment_id": "E1_existing_plus_weekly",
+      "n": 13104,
+      "mae": 17.393312886164576,
+      "rmse": 21.192571654663116,
+      "r2": 0.15582275815565072,
+      "bias": 15.264854568962669,
+      "forecast_origins": 182,
+      "observed_cutoff_passed": true,
+      "72h_horizon_coverage_passed": true
+    },
+    {
+      "experiment_id": "E1_existing_best_validation",
+      "n": 13104,
+      "mae": 17.393312886164576,
+      "rmse": 21.192571654663116,
+      "r2": 0.15582275815565072,
+      "bias": 15.264854568962669,
+      "forecast_origins": 182,
+      "observed_cutoff_passed": true,
+      "72h_horizon_coverage_passed": true
+    },
+    {
+      "experiment_id": "E2_lightgbm_train_validation_refit",
+      "n": 13104,
+      "mae": 16.511106979154707,
+      "rmse": 20.739242129146717,
+      "r2": 0.19155201421344836,
+      "bias": 13.743652195335782,
+      "forecast_origins": 182,
+      "observed_cutoff_passed": true,
+      "72h_horizon_coverage_passed": true
+    },
+    {
+      "experiment_id": "E3_refit_plus_selected_baseline",
+      "n": 13104,
+      "mae": 14.600266319788965,
+      "rmse": 18.54305177800745,
+      "r2": 0.3537080576730586,
+      "bias": 11.248550419272288,
+      "forecast_origins": 182,
+      "observed_cutoff_passed": true,
+      "72h_horizon_coverage_passed": true
+    },
+    {
+      "experiment_id": "baseline_recent_daily",
+      "n": 13104,
+      "mae": 13.087506105006105,
+      "rmse": 19.738052924282027,
+      "r2": 0.2677237689130554,
+      "bias": 1.10957264957265,
+      "forecast_origins": 182,
+      "observed_cutoff_passed": true,
+      "72h_horizon_coverage_passed": true
+    },
+    {
+      "experiment_id": "baseline_weekly",
+      "n": 13104,
+      "mae": 11.433384462759463,
+      "rmse": 17.77151371915934,
+      "r2": 0.40637092793962015,
+      "bias": 1.268143315018315,
+      "forecast_origins": 182,
+      "observed_cutoff_passed": true,
+      "72h_horizon_coverage_passed": true
+    }
+  ]
+}

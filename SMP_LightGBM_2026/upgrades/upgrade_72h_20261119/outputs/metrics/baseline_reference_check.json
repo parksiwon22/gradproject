@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "splits": [
+    "final_test",
+    "validation"
+  ],
+  "checks": [
+    {
+      "baseline": "recent_daily",
+      "rows_verified": 25992,
+      "max_value_difference": 0.0,
+      "all_reference_hours_at_or_before_cutoff": true
+    },
+    {
+      "baseline": "weekly",
+      "rows_verified": 25992,
+      "max_value_difference": 0.0,
+      "all_reference_hours_at_or_before_cutoff": true
+    }
+  ],
+  "recent_daily_source_day_rule": "baseline_origin_day equals observed_cutoff date minus one day; same target hour",
+  "weekly_source_rule": "target timestamp minus 168 hours",
+  "baseline_origin_day_to_cutoff_days": 1
+}

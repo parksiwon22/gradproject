@@ -1,0 +1,81 @@
+{
+  "dataset_version": "smp72h_common_v5_generation_v2_lightgbm_20261119",
+  "model": "LightGBM",
+  "data_gate_passed": false,
+  "github_upload_ready": true,
+  "conditional_result_upload_authorized_by_user": true,
+  "training_authorized_by_user": true,
+  "run_mode": "conditional_research_run",
+  "upload_mode": "user_authorized_conditional_results; do not describe as independently verified mainland-only evaluation",
+  "source_gate_findings": {
+    "all_12_input_groups_present": true,
+    "target_smp_complete": true,
+    "group1_eps_is_verified_mainland_scope": false,
+    "group1_status": "The panel uses the official EPSIS current-load series from the general real-time page. Its source record has no row-level geography; the corresponding KPX file-data description says the series covers both mainland and Jeju. Treat this model run as exploratory until a verified mainland-only series is supplied or source scope is authoritatively resolved.",
+    "group1_scope_unchanged_per_user": true,
+    "group5_override": {
+      "dataset_version": "generation_20261119_v2",
+      "source_url": "https://github.com/gemmanzu-a11y/smp-graduation-2026/tree/main/shared_datasets/kpx_generation/20261119_v2",
+      "selected_file": "generation_2023_2025_hourly.csv",
+      "sha256": "911281bfa5832147f083efa1f5bbcc504757563bd43aca68404ce9b9c1a53821",
+      "unit": "MWh",
+      "timezone": "Asia/Seoul",
+      "interval_label": "start; source trading hour 1..24 => 00..23",
+      "geography": "market-traded sent-out energy; no mainland/Jeju distinction available",
+      "rows_by_year": {
+        "2023": 8760,
+        "2024": 8784,
+        "2025": 8760
+      },
+      "missing_by_year": {
+        "2023": {
+          "lng_generation_mwh": 0,
+          "bituminous_coal_generation_mwh": 0,
+          "anthracite_coal_generation_mwh": 0,
+          "nuclear_generation_mwh": 0,
+          "coal_generation_mwh": 0
+        },
+        "2024": {
+          "lng_generation_mwh": 24,
+          "bituminous_coal_generation_mwh": 24,
+          "anthracite_coal_generation_mwh": 768,
+          "nuclear_generation_mwh": 768,
+          "coal_generation_mwh": 768
+        },
+        "2025": {
+          "lng_generation_mwh": 0,
+          "bituminous_coal_generation_mwh": 0,
+          "anthracite_coal_generation_mwh": 0,
+          "nuclear_generation_mwh": 0,
+          "coal_generation_mwh": 0
+        }
+      },
+      "missing_period_policy": "preserve NaN; 2023 and 2025 complete; 2024 gaps retained without zero-fill",
+      "features_used": [
+        "generation_lng_mwh",
+        "generation_bituminous_coal_mwh",
+        "generation_anthracite_mwh",
+        "generation_nuclear_mwh",
+        "generation_coal_mwh"
+      ],
+      "others_unchanged": true
+    },
+    "all_other_input_groups_unchanged": true
+  },
+  "shared_dataset_checks": {
+    "expected_groups_1_to_12_present": true,
+    "evaluation_origin_count": 1090,
+    "evaluation_target_rows": 78480,
+    "train_validation_final_test_split_present": true,
+    "common_origin_minus_72_hour_cutoff": true,
+    "future_observation_perturbation_check": true,
+    "fred_d2_vintage_check": true,
+    "labels_complete": true,
+    "imputation_fit_on_train_only": true,
+    "final_test_used_for_tuning": false,
+    "non_group5_feature_values_identical_to_v3": true,
+    "evaluation_origins_and_targets_identical_to_v3": true
+  },
+  "upload_note": "LightGBM upgrade run uses the exact shared common v5 data and retains the unresolved Group 1 geography scope as a disclosed conditional limitation.",
+  "source_dataset_version": "smp72h_common_v5_generation_v2_xgb_20261119"
+}
