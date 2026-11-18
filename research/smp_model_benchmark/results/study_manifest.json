@@ -1,0 +1,107 @@
+{
+  "status": "completed",
+  "horizon_days": 3,
+  "origin": "target date - 3 days at 23:00 KST",
+  "evaluation_type": "historical timestamp-causal fold replay; first_seen and contemporaneous model availability unverified",
+  "folds": [
+    {
+      "name": "fall2024",
+      "train_end": "2024-06-30",
+      "cal_start": "2024-07-01",
+      "cal_end": "2024-09-30",
+      "val_start": "2024-10-01",
+      "val_end": "2024-12-31"
+    },
+    {
+      "name": "spring2025",
+      "train_end": "2024-12-31",
+      "cal_start": "2025-01-01",
+      "cal_end": "2025-03-31",
+      "val_start": "2025-04-01",
+      "val_end": "2025-06-30"
+    },
+    {
+      "name": "fall2025",
+      "train_end": "2025-06-30",
+      "cal_start": "2025-07-01",
+      "cal_end": "2025-09-30",
+      "val_start": "2025-10-01",
+      "val_end": "2025-12-31"
+    }
+  ],
+  "evaluation_days": 275,
+  "missing_days": [],
+  "models": [
+    "LSTM",
+    "GRU",
+    "HGB",
+    "LightGBM",
+    "ExtraTrees",
+    "LinearRegression",
+    "RandomForest",
+    "XGBoost"
+  ],
+  "features": [
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
+    "month_sin",
+    "month_cos",
+    "weekend",
+    "daily",
+    "weekly",
+    "spread",
+    "origin_price",
+    "origin_lag1",
+    "origin_lag24",
+    "origin_lag168",
+    "mean24",
+    "std24",
+    "min24",
+    "max24",
+    "mean168",
+    "std168",
+    "change24"
+  ],
+  "target": "hourly residual=actual SMP - D-3 same-hour SMP",
+  "anchor": {
+    "method": "same-hour median from target D-7/D-14/D-21/D-28",
+    "weight": 0.05
+  },
+  "rnn": {
+    "sequence_candidates_hours": [
+      168,
+      672
+    ],
+    "selected_common_sequence_hours": 672,
+    "seeds": [
+      17,
+      42,
+      91
+    ],
+    "input_normalization": "mean/std fitted on training fold inputs only",
+    "target_normalization": "mean/std fitted on training fold residuals only",
+    "calendar_input": "target hour, weekday, month cyclical features known at origin",
+    "early_stopping": "calibration MSE, patience 8, best weights restored"
+  },
+  "ev_conditions": {
+    "capacity": 60,
+    "initial_soc": 30,
+    "target_soc": 80,
+    "charge_kw": 7,
+    "discharge_kw": 7,
+    "charge_eff": 0.9,
+    "discharge_eff": 0.9,
+    "min_soc": 20,
+    "max_soc": 90,
+    "degradation": 5,
+    "sell_ratio": 1
+  },
+  "validation_dates_previously_reviewed": true,
+  "original_first_seen_verified": false,
+  "web_modified": false,
+  "operating_model_replaced": false,
+  "future_leak_mutation_tests": 9,
+  "metrics": "hourly pooled MAE/RMSE; daily mean EV regret; see daily_scores.csv for paired date values"
+}

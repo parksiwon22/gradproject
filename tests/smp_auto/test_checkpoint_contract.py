@@ -18,7 +18,7 @@ sys.path.insert(0,str(SOURCE))
 from v11.features import build as build_d1
 from v17.features import build as build_dx
 from v11.store import connect,ingest
-from automation.smp_auto.publish_forecast import generate,seasonal_anchor,load_history
+from automation.smp_auto.publish_forecast import generate,seasonal_anchor,load_history,_enrich_history,_g2v_regret,_reference_metrics
 from automation.smp_auto.probe_target_publication import parse_public_status
 
 class CheckpointContractTests(unittest.TestCase):
@@ -36,6 +36,12 @@ class CheckpointContractTests(unittest.TestCase):
         target=pd.date_range(pd.Timestamp("2026-11-10",tz="Asia/Seoul"),periods=24,freq="h")
         prices=prices[prices.timestamp!=target[0]-pd.Timedelta(days=21)]
         with self.assertRaisesRegex(ValueError,"7·14·21·28일"):
+            seasonal_anchor(prices,target)
+
+    def test_anchor_reports_empty_asof_snapshot_as_missing_input(self):
+        prices=pd.DataFrame(columns=["timestamp","smp"])
+        target=pd.date_range(pd.Timestamp("2026-11-10",tz="Asia/Seoul"),periods=24,freq="h")
+        with self.assertRaisesRegex(ValueError,"비어 있거나"):
             seasonal_anchor(prices,target)
 
     def test_publication_probe_only_calls_explicit_zero_placeholder_unpublished(self):
@@ -60,6 +66,41 @@ class CheckpointContractTests(unittest.TestCase):
         self.assertEqual(source,"published_pages")
         self.assertIsNone(error)
         self.assertEqual(len(history),1)
+
+    def test_target_date_enrichment_preserves_origin_prediction_and_scores_references(self):
+        origin=pd.Timestamp("2026-11-10T23:00:00+09:00")
+        target="2026-11-12"
+        times=pd.date_range(pd.Timestamp(target,tz="Asia/Seoul"),periods=24,freq="h")
+        received=pd.Timestamp("2026-11-13T00:10:00+09:00").tz_convert("UTC")
+        prices=np.linspace(90,140,24)
+        frame=pd.DataFrame({"timestamp":times,"smp":prices,"first_seen":received.isoformat(),"last_seen":received.isoformat()})
+        forecast={"origin_kst":origin.isoformat(),"issued_at_kst":origin.isoformat(),"issued_at_utc":origin.tz_convert("UTC").isoformat(),
+          "status":"issued_research_only","horizons":[{"horizon_days":2,"target_date":target,"predictions":[100.]*24,
+          "model_family":"test-hgb-anchor","model_sha256":"abc123","prospective_forecast_eligible":True}]}
+        before=list(forecast["horizons"][0]["predictions"])
+        probe={target:{"status":"official_available","checked_at_kst":"2026-11-11T23:00:10+09:00"}}
+        _enrich_history([forecast],frame,frame,probe,pd.Timestamp("2026-11-13T01:00:00+09:00"))
+        item=forecast["horizons"][0]
+        self.assertEqual(item["predictions"],before)
+        self.assertEqual(item["forecast_origin_date"],"2026-11-10")
+        self.assertEqual(item["original_horizon_days"],2)
+        self.assertEqual(item["official_publication"]["source"],"KPX inland SMP public page")
+        self.assertEqual(item["post_target_observation"]["source"],"EPSIS land SMP collection")
+        self.assertEqual(item["post_target_observation"]["price_nature"].split(";")[0],"EPSIS SMP observed again after target end")
+        self.assertTrue(item["official_metrics"]["prospective_evaluation_eligible"])
+        self.assertIn("g2v_regret",item["post_target_metrics"])
+        self.assertEqual(item["post_target_metrics"]["g2v_regret"]["conditions"]["battery_kwh"],60.)
+
+    def test_unverified_publication_status_is_not_marked_evaluation_eligible(self):
+        m=_reference_metrics([100.]*24,[110.]*24,False,"publication status unverified")
+        self.assertFalse(m["prospective_evaluation_eligible"])
+        self.assertEqual(m["exclusion_reason"],"publication status unverified")
+
+    def test_g2v_regret_uses_identical_vehicle_and_connection_conditions(self):
+        regret=_g2v_regret([100.]*24,list(range(100,124)))
+        self.assertEqual(regret["conditions"],{"battery_kwh":60.,"soc_start_pct":30.,"soc_goal_pct":80.,
+            "charge_kw":7.,"efficiency":.9,"start_hour":0,"end_hour":24})
+        self.assertGreaterEqual(regret["regret_won"],0.)
 
     def test_selected_family_checkpoints_make_24_point_vectors(self):
         model_dir=ROOT/"automation"/"models"
@@ -103,5 +144,11 @@ class CheckpointContractTests(unittest.TestCase):
             self.assertFalse(horizons[0]["prospective_forecast_eligible"])
             self.assertTrue(horizons[1]["prospective_forecast_eligible"])
             self.assertTrue(horizons[2]["prospective_forecast_eligible"])
+            original=list(horizons[1]["predictions"])
+            retry=generate(source=source,model_dir=ROOT/"automation"/"models",out_path=source/"retry.json",
+                state_path=source/"history.json",now=pd.Timestamp("2026-11-09T23:02:00+09:00"),origin_date="2026-11-09")
+            self.assertEqual(retry["run"]["status"],"already_issued_for_origin")
+            self.assertEqual(len(retry["forecast_history"]),1)
+            self.assertEqual(retry["last_successful_forecast"]["horizons"][1]["predictions"],original)
 
 if __name__=="__main__": unittest.main()

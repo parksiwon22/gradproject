@@ -1,0 +1,106 @@
+name: SMP durable pre-collection
+
+on:
+  # UTC 11:00, 12:00, 13:00 = 20:00, 21:00, 22:00 KST.
+  # These runs only collect and persist data; they never issue forecasts.
+  schedule:
+    - cron: '0 11,12,13 * * *'
+
+concurrency:
+  group: smp-live-data-state
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  prefetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          repository: parksiwon22/gradproject
+          ref: fb6fc173d682b5cce2657b65c0b97c11e26ebd32
+          path: source
+          persist-credentials: false
+
+      - name: Checkout durable state workspace
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: durable
+          fetch-depth: 1
+          sparse-checkout: .smp-live-state
+          sparse-checkout-cone-mode: false
+
+      - name: Restore persistent price history
+        id: restore-durable
+        shell: bash
+        run: |
+          git -C durable config user.name "github-actions[bot]"
+          git -C durable config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git -C durable fetch --depth=1 origin smp-live-data; then
+            git -C durable checkout -B smp-live-data FETCH_HEAD
+          else
+            git -C durable checkout -B smp-live-data origin/main
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: automation/smp_auto/requirements.txt
+
+      - name: Install pinned inference dependencies
+        run: python -m pip install -r automation/smp_auto/requirements.txt
+
+      - name: Restore durable EPSIS vintages
+        run: |
+          if [ -f durable/.smp-live-state/v11/prices.sqlite ]; then
+            mkdir -p source/artifacts/v11
+            cp -a durable/.smp-live-state/v11/. source/artifacts/v11/
+          fi
+
+      - name: Collect keyless mainland SMP before the 23:00 origin
+        continue-on-error: true
+        working-directory: source
+        shell: bash
+        run: python -m v11.collect --market land 2>&1 | tee "$RUNNER_TEMP/smp-epsis-prefetch.log"
+
+      - name: Persist price vintages to smp-live-data
+        if: always() && steps.restore-durable.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f source/artifacts/v11/prices.sqlite ]; then
+            python - <<'PY'
+          import sqlite3
+          db = sqlite3.connect('source/artifacts/v11/prices.sqlite')
+          db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
+          db.close()
+          PY
+          fi
+          mkdir -p durable/.smp-live-state/v11/raw
+          if [ -f source/artifacts/v11/prices.sqlite ]; then cp source/artifacts/v11/prices.sqlite durable/.smp-live-state/v11/; fi
+          if [ -d source/artifacts/v11/raw ]; then cp -a source/artifacts/v11/raw/. durable/.smp-live-state/v11/raw/; fi
+          for f in collection_status.json coverage.json public_availability_live.json public_availability.json; do
+            if [ -f "source/artifacts/v11/$f" ]; then cp "source/artifacts/v11/$f" durable/.smp-live-state/v11/; fi
+          done
+          git -C durable add .smp-live-state
+          if git -C durable diff --cached --quiet; then echo "No persistent state changes"; exit 0; fi
+          git -C durable commit -m "Prefetch SMP price vintages"
+          git -C durable push origin smp-live-data
+
+      - name: Save pre-collection evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smp-prefetch-${{ github.run_id }}
+          path: |
+            source/artifacts/v11/collection_status.json
+            source/artifacts/v11/coverage.json
+            ${{ runner.temp }}/smp-epsis-prefetch.log
+          if-no-files-found: warn
+          retention-days: 90

@@ -19,9 +19,15 @@ STATE=ROOT/"automation"/"state"/"forecast_history.json"
 def sha256(path): return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 def seasonal_anchor(prices, targets):
-    series=prices.set_index("timestamp").smp.sort_index()
-    if series.index.tz is None or series.index.duplicated().any():
+    if prices.empty or not {"timestamp", "smp"}.issubset(prices.columns):
+        raise ValueError("seasonal anchor 입력이 비어 있거나 timestamp/SMP 열이 없습니다.")
+    try:
+        index=pd.DatetimeIndex(prices.timestamp)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("seasonal anchor timestamp 형식이 유효하지 않습니다.") from exc
+    if index.tz is None or index.duplicated().any():
         raise ValueError("seasonal anchor 입력의 시간대 또는 시간 중복이 유효하지 않습니다.")
+    series=pd.Series(prices.smp.to_numpy(float),index=index).sort_index()
     weeks=np.vstack([series.reindex(targets-pd.Timedelta(days=7*k)).to_numpy(float) for k in (1,2,3,4)])
     if weeks.shape!=(4,len(targets)) or not np.isfinite(weeks).all():
         raise ValueError("7·14·21·28일 seasonal anchor 입력 중 결측 또는 비정상 값이 있습니다.")
@@ -49,6 +55,96 @@ def load_history(state_path):
             history_error=type(exc).__name__
     return [],"empty_after_recovery_attempt",history_error
 
+def _hourly_vector(frame, day):
+    rows=frame[frame.timestamp.dt.strftime("%Y-%m-%d")==str(day)].sort_values("timestamp")
+    if len(rows)!=24 or rows.timestamp.dt.hour.tolist()!=list(range(24)):
+        return None
+    values=rows.smp.to_numpy(float)
+    return values if np.isfinite(values).all() else None
+
+def _g2v_regret(prediction, reference, capacity_kwh=60., soc_start=30., soc_goal=80.,
+                charge_kw=7., efficiency=.9, start_hour=0, end_hour=24):
+    """Fixed comparable 24-hour G2V regret; values are wholesale-SMP proxies."""
+    need=max(0.,(soc_goal-soc_start)*capacity_kwh/100.)
+    slots=list(range(int(start_hour),int(end_hour)))
+    def allocate(prices):
+        left=need; total=0.
+        for hour in sorted(slots,key=lambda h:(float(prices[h]),h)):
+            if left<=1e-9: break
+            grid_kwh=min(charge_kw,left/efficiency)
+            total+=grid_kwh*float(prices[hour])
+            left-=grid_kwh*efficiency
+        return total if left<=1e-6 else None
+    selected=allocate(prediction); oracle=allocate(reference)
+    if selected is None or oracle is None: return None
+    return {"regret_won":float(max(0.,selected-oracle)),"selected_plan_cost_won":float(selected),
+            "oracle_cost_won":float(oracle),"conditions":{"battery_kwh":capacity_kwh,
+            "soc_start_pct":soc_start,"soc_goal_pct":soc_goal,"charge_kw":charge_kw,
+            "efficiency":efficiency,"start_hour":start_hour,"end_hour":end_hour}}
+
+def _reference_metrics(prediction, reference, eligible, exclusion_reason=None):
+    pred=np.asarray(prediction,dtype=float); actual=np.asarray(reference,dtype=float)
+    if pred.shape!=(24,) or actual.shape!=(24,) or not np.isfinite(pred).all() or not np.isfinite(actual).all():
+        return None
+    error=actual-pred
+    return {"n_hours":24,"mae":float(np.abs(error).mean()),"rmse":float(np.sqrt(np.mean(error**2))),
+        "hourly_signed_error":[round(float(x),6) for x in error],
+        "g2v_regret":_g2v_regret(pred,actual),"prospective_evaluation_eligible":bool(eligible),
+        "exclusion_reason":None if eligible else exclusion_reason}
+
+def _enrich_history(history, observed, asof_prices, publication_by_day, now):
+    """Attach later price observations without altering any stored forecast vector."""
+    for forecast in history:
+        origin_text=forecast.get("origin_kst")
+        try: origin=pd.Timestamp(origin_text)
+        except Exception: continue
+        for item in forecast.get("horizons",[]):
+            day=item.get("target_date"); predictions=item.get("predictions")
+            if not day or not isinstance(predictions,list) or len(predictions)!=24: continue
+            h=int(item.get("horizon_days",0) or 0)
+            item.setdefault("forecast_id",f"{origin.isoformat()}|{day}|D+{h}|{item.get('model_sha256','unknown')}")
+            item.setdefault("forecast_origin_kst",origin.isoformat())
+            item.setdefault("forecast_origin_date",origin.strftime("%Y-%m-%d"))
+            item.setdefault("original_horizon_days",h)
+            item.setdefault("generated_at_kst",forecast.get("issued_at_kst"))
+            item.setdefault("generated_at_utc",forecast.get("issued_at_utc"))
+            item.setdefault("model_sha256",item.get("model_sha256"))
+            probe=publication_by_day.get(day)
+            if probe and probe.get("status")=="official_available":
+                values=_hourly_vector(asof_prices,day)
+                if values is not None and pd.Timestamp(probe.get("checked_at_kst"))>origin:
+                    item.setdefault("official_publication",{
+                        "source":"KPX inland SMP public page","status":"published_after_forecast_origin",
+                        "checked_at_kst":probe.get("checked_at_kst"),"values":[round(float(x),6) for x in values],
+                        "price_nature":"published official SMP; final-settlement status is not asserted"})
+            eligible=bool(item.get("prospective_forecast_eligible"))
+            exclusion=(None if eligible else "publication was known or not verified at this forecast origin")
+            official=item.get("official_publication")
+            if official:
+                item.setdefault("official_metrics",_reference_metrics(predictions,official["values"],eligible,exclusion))
+            target_end=pd.Timestamp(day,tz=KST)+pd.Timedelta(hours=23)
+            if target_end>=now: continue
+            values=_hourly_vector(observed,day)
+            if values is None: continue
+            rows=observed[observed.timestamp.dt.strftime("%Y-%m-%d")==str(day)]
+            first_seen=pd.to_datetime(rows.first_seen,utc=True)
+            last_seen=pd.to_datetime(rows.last_seen,utc=True)
+            if last_seen.isna().any() or not (last_seen>target_end.tz_convert("UTC")).all(): continue
+            # Keep the stored prediction immutable and attach the post-target reference separately.
+            item.setdefault("post_target_observation",{
+                "source":"EPSIS land SMP collection","status":"observed_after_target_end",
+                "first_seen_min_utc":str(first_seen.min()),"first_seen_max_utc":str(first_seen.max()),
+                "last_seen_min_utc":str(last_seen.min()),"last_seen_max_utc":str(last_seen.max()),
+                "values":[round(float(x),6) for x in values],
+                "price_nature":"EPSIS SMP observed again after target end; final-settlement status is not independently verified"})
+            item.setdefault("actual_status","post_target_eps_is_observed_finality_unverified")
+            post=item["post_target_observation"]
+            item.setdefault("post_target_metrics",_reference_metrics(predictions,post["values"],eligible,exclusion))
+            # Backward-compatible metric field is explicitly typed as an EPSIS post-target comparison.
+            if item.get("post_target_metrics"):
+                item.setdefault("metrics",item["post_target_metrics"])
+                item.setdefault("evaluation_type","post_target_eps_is_observation_finality_unverified")
+
 def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
              now=None, origin_date=None):
     source=Path(source); model_dir=Path(model_dir); out_path=Path(out_path); state_path=Path(state_path)
@@ -58,7 +154,7 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
     origin_date=origin_date or os.environ.get("SMP_ORIGIN_DATE",now.strftime("%Y-%m-%d"))
     origin=pd.Timestamp(origin_date,tz=KST)+pd.Timedelta(hours=23)
     issued=now.tz_convert("UTC").isoformat()
-    result={"schema_version":1,"market":"land","run":{"status":"withheld","reason":None,
+    result={"schema_version":2,"market":"land","run":{"status":"withheld","reason":None,
              "scheduled_origin_kst":origin.isoformat(),"issued_at_utc":issued,"issued_at_kst":now.isoformat(),
              "schedule_delay_seconds":float((now-origin).total_seconds()) if now>=origin else None,
              "collection_completed_at_utc":None,
@@ -88,29 +184,15 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
             asof_prices=latest(db,"land",as_of=origin.tz_convert("UTC").isoformat())
             observed=latest(db,"land")
         finally: db.close()
-        # Attach later official observations only after the prediction object is fixed.
-        # These values never enter the feature frame or predictor above.
-        for old in history:
-            for item in old.get("horizons",[]):
-                if item.get("actual_smp") is not None: continue
-                day=item.get("target_date")
-                target_end=pd.Timestamp(day,tz=KST)+pd.Timedelta(hours=23)
-                if target_end>=now: continue
-                actual=observed[observed.timestamp.dt.strftime("%Y-%m-%d")==day].sort_values("timestamp")
-                issue=pd.Timestamp(old["origin_kst"])
-                seen_after_issue=pd.to_datetime(actual.last_seen,utc=True).gt(issue.tz_convert("UTC")).all() if len(actual) else False
-                if len(actual)==24 and actual.timestamp.dt.hour.tolist()==list(range(24)) and seen_after_issue:
-                    item["actual_smp"]=[round(float(x),6) for x in actual.smp]
-                    item["actual_status"]="observed_after_issue"
-                    item["actual_first_seen_min_utc"]=str(actual.first_seen.min())
-                    item["actual_first_seen_max_utc"]=str(actual.first_seen.max())
-                    if item.get("prospective_forecast_eligible") and len(item.get("predictions",[]))==24:
-                        errors=actual.smp.to_numpy(float)-pd.Series(item["predictions"],dtype=float).to_numpy()
-                        item["evaluation_type"]="post_issue_official_price_comparison"
-                        item["metrics"]={"n_hours":24,"mae":float(abs(errors).mean()),
-                          "rmse":float((errors**2).mean()**.5),"hourly_signed_error":[round(float(x),6) for x in errors]}
-                    else:
-                        item["evaluation_type"]="excluded_target_smp_observed_at_origin"
+        # Enrichment runs after the issue-time snapshot is fixed. Historical price values
+        # are attached as separate references; prediction vectors are never overwritten.
+        _enrich_history(history,observed,asof_prices,publication_by_day,now)
+        existing=next((x for x in history if x.get("origin_kst")==origin.isoformat()
+                       and x.get("status")=="issued_research_only"),None)
+        if existing is not None:
+            result["run"].update(status="already_issued_for_origin",reason=None,
+              official_target_status="retained_original_forecast_no_duplicate")
+            raise RuntimeError("ALREADY_ISSUED_FOR_ORIGIN")
         prices=asof_prices[asof_prices.timestamp<=origin].drop_duplicates("timestamp").sort_values("timestamp")
         if prices.empty or prices.timestamp.max()<origin:
             raise RuntimeError("23:00 기준 입력 SMP 미확보: 해당 시각 이후 수신된 SMP는 제외했으며 예측 발급을 보류했습니다.")
@@ -157,7 +239,10 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
             anchor=seasonal_anchor(prices,targets)
             pred=base*(1-float(bundle["anchor_weight"]))+anchor*float(bundle["anchor_weight"])
             if not np.isfinite(pred).all(): raise RuntimeError(f"D+{h} 예측에 NaN 또는 무한대가 있어 발급을 보류했습니다.")
-            horizons.append({"horizon_days":h,"target_date":target_date.strftime("%Y-%m-%d"),
+            horizons.append({"forecast_id":f"{origin.isoformat()}|{target_date.strftime('%Y-%m-%d')}|D+{h}|{sha256(path)}",
+              "forecast_origin_kst":origin.isoformat(),"forecast_origin_date":origin.strftime("%Y-%m-%d"),
+              "horizon_days":h,"original_horizon_days":h,"target_date":target_date.strftime("%Y-%m-%d"),
+              "generated_at_utc":issued,"generated_at_kst":now.isoformat(),
               "model_family":bundle["family"],"model_file":path.name,"model_sha256":sha256(path),
               "trained_through":bundle["trained_through"],"predictions":[round(float(x),6) for x in pred],
               "official_smp_at_issue":official_status,"official_smp_at_issue_values":known_smp,
@@ -176,9 +261,13 @@ def generate(source=SOURCE, model_dir=MODEL_DIR, out_path=OUT, state_path=STATE,
         result["run"].update(status="issued_research_only",reason=None,
           official_target_status="target_smp_observed_for_one_or_more_horizons" if any_known else "not_observed_in_eps_is_snapshot")
     except Exception as exc:
-        result["run"].update(status="withheld",reason=f"{type(exc).__name__}: {exc}")
+        if str(exc)=="ALREADY_ISSUED_FOR_ORIGIN":
+            pass
+        else:
+            result["run"].update(status="withheld",reason=f"{type(exc).__name__}: {exc}")
     state_path.write_text(json.dumps(history,ensure_ascii=False,indent=2),encoding="utf-8")
-    result["last_successful_forecast"]=history[-1] if history else None
+    successes=[x for x in history if x.get("status")=="issued_research_only"]
+    result["last_successful_forecast"]=max(successes,key=lambda x:x.get("issued_at_utc", "")) if successes else None
     result["forecast_history"]=history
     out_path.parent.mkdir(parents=True,exist_ok=True)
     out_path.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8")

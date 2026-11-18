@@ -7,10 +7,6 @@ on:
   pull_request:
     branches: [main]
 
-concurrency:
-  group: smp-pages
-  cancel-in-progress: false
-
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -43,6 +39,11 @@ jobs:
         run: |
           python -m py_compile automation/smp_auto/*.py
           node --check docs/live_forecast.js
+          node --check docs/web_v20_public.js
+          node --check docs/ev_optimization.js
+          node tests/smp_auto/test_ev_optimization.js
+      - name: Parse forecast and pre-collection workflow YAML
+        run: ruby -e "require 'yaml'; ARGV.each { |path| YAML.load_file(path); puts path }" .github/workflows/smp-public-live.yml .github/workflows/smp-prefetch.yml
       - name: Upload PR validation log
         if: always()
         uses: actions/upload-artifact@v4
@@ -90,6 +91,11 @@ jobs:
   forecast:
     needs: validate
     if: github.event_name != 'pull_request'
+    concurrency:
+      # Lock only the state-writing job; PR checks and Pages deploy must not
+      # consume the same concurrency slot as scheduled EPSIS pre-collection.
+      group: smp-live-data-state
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -141,6 +147,18 @@ jobs:
               day -= timedelta(days=1)
           print(f"SMP_ORIGIN_DATE={day.isoformat()}")
           PY
+      - name: Collect KMA API Hub forecast vintages and ASOS observations
+        continue-on-error: true
+        env:
+          KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
+          KMA_WEATHER_DATA_DIR: ${{ github.workspace }}/automation/state/weather
+          SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
+        run: |
+          set -o pipefail
+          python automation/smp_auto/collect_weather.py \
+            --mode both \
+            --origin-kst "${SMP_ORIGIN_DATE}T23:00:00+09:00" 2>&1 \
+            | tee "$RUNNER_TEMP/kma-weather-collection.log"
       - name: Set public forecast history recovery URL
         run: echo "SMP_PUBLISHED_HISTORY_URL=https://parksiwon22.github.io/gradproject/live/latest.json" >> "$GITHUB_ENV"
       - name: Restore append-only EPSIS and forecast history
@@ -162,6 +180,10 @@ jobs:
             mkdir -p automation/state
             cp durable/.smp-live-state/automation/state/forecast_history.json automation/state/forecast_history.json
           fi
+          if [ -d durable/.smp-live-state/automation/state/weather ]; then
+            mkdir -p automation/state/weather
+            cp -a durable/.smp-live-state/automation/state/weather/. automation/state/weather/
+          fi
       - name: Collect or recheck public mainland SMP
         continue-on-error: true
         working-directory: source
@@ -173,6 +195,24 @@ jobs:
           SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
         shell: bash
         run: python automation/smp_auto/probe_target_publication.py 2>&1 | tee "$RUNNER_TEMP/smp-publication-probe.log"
+      - name: Refresh SMP immediately before the fixed origin
+        continue-on-error: true
+        env:
+          SMP_SOURCE: ${{ github.workspace }}/source
+          SMP_ORIGIN_DATE: ${{ env.SMP_ORIGIN_DATE }}
+        shell: bash
+        working-directory: source
+        run: |
+          python - <<'PY'
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          import os, time
+          origin = datetime.fromisoformat(os.environ['SMP_ORIGIN_DATE']+'T23:00:00').replace(tzinfo=ZoneInfo('Asia/Seoul'))
+          refresh_at = origin.timestamp() - 90
+          time.sleep(max(0, refresh_at-datetime.now(ZoneInfo('Asia/Seoul')).timestamp()))
+          PY
+          python -m v11.collect --market land 2>&1 | tee "$RUNNER_TEMP/smp-epsis-final-refresh.log" || echo "final collection failed; origin-time vintage checks remain fail-closed"
+          python "$GITHUB_WORKSPACE/automation/smp_auto/probe_target_publication.py" 2>&1 | tee "$RUNNER_TEMP/smp-publication-final-probe.log" || echo "final publication probe failed; horizon remains ineligible"
       - name: Wait until the fixed 23:00 KST origin
         if: github.event_name != 'pull_request'
         env:
@@ -212,6 +252,10 @@ jobs:
               if [ -f "source/artifacts/v11/$f" ]; then cp "source/artifacts/v11/$f" durable/.smp-live-state/v11/; fi
             done
             if [ -f automation/state/forecast_history.json ]; then cp automation/state/forecast_history.json durable/.smp-live-state/automation/state/; fi
+            if [ -d automation/state/weather ]; then
+              mkdir -p durable/.smp-live-state/automation/state/weather
+              cp -a automation/state/weather/. durable/.smp-live-state/automation/state/weather/
+            fi
             git -C durable add .smp-live-state
             if git -C durable diff --cached --quiet; then echo "No persistent state changes"; exit 0; fi
             git -C durable commit -m "Persist SMP live collection and forecast state"
@@ -229,9 +273,12 @@ jobs:
             source/artifacts/v11/public_availability_live.json
             automation/state/forecast_history.json
             ${{ runner.temp }}/smp-epsis-collection.log
+            ${{ runner.temp }}/smp-epsis-final-refresh.log
             ${{ runner.temp }}/smp-publication-probe.log
+            ${{ runner.temp }}/smp-publication-final-probe.log
             ${{ runner.temp }}/smp-forecast-generation.log
             ${{ runner.temp }}/smp-state-persist.log
+            ${{ runner.temp }}/kma-weather-collection.log
           if-no-files-found: warn
           retention-days: 90
       - uses: actions/upload-pages-artifact@v3

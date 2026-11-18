@@ -1,0 +1,10 @@
+# Benchmark runtime on Windows/Python 3.11; CPU TensorFlow, shared system packages.
+numpy==2.1.3
+pandas==2.3.0
+scikit-learn==1.7.0
+tensorflow==2.19.0
+lightgbm==4.7.0
+xgboost==2.1.4
+scipy==1.16.0
+matplotlib==3.10.3
+joblib==1.5.1
