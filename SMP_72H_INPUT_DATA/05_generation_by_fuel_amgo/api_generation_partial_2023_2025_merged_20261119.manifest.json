@@ -1,0 +1,29 @@
+{
+  "team_source": "https://github.com/gemmanzu-a11y/smp-graduation-2026/blob/main/shared_datasets/kpx_generation/api_generation_partial_2023_2025.csv",
+  "team_source_sha256": "4e7cacc9a9f1507ba37fa0ac3d200b05244037eb382c9d37e43f648972ad23ea",
+  "new_addendum_sha256": "5252e7ed748bc1b7a6ecde763b200f1f6fc78af227b7d0156e10f981a1fb6ec8",
+  "merged_file": "api_generation_partial_2023_2025_merged_20261119.csv",
+  "merged_sha256": "3990182d42f8ec60474a1c01d2621b8fe7c65135214e9526350710c0376ec190",
+  "team_rows": 73800,
+  "addendum_rows": 12672,
+  "merged_rows": 86472,
+  "duplicate_keys_between_sources": 0,
+  "unique_dates": 462,
+  "complete_8fuel_dates": 431,
+  "fuel_row_counts": {
+    "LNG": 11088,
+    "무연탄": 10344,
+    "수력": 11088,
+    "신재생·기타": 11088,
+    "양수": 11088,
+    "원자력": 10344,
+    "유연탄": 11088,
+    "유전": 10344
+  },
+  "date_row_count_minmax": [
+    120,
+    192
+  ],
+  "scope": "API amgo; unit remains unconfirmed",
+  "credential_saved": false
+}
