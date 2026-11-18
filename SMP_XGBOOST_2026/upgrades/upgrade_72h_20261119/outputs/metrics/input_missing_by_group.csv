@@ -1,0 +1,46 @@
+split,input_group,indicator_columns,missing_indicator_rate,input_rows
+final_test,all groups with a missing indicator,211,0.017082443622727983,13104
+final_test,1,10,0.023076923076923078,13104
+final_test,10,4,0.0,13104
+final_test,11,33,0.09090909090909091,13104
+final_test,12,31,0.0,13104
+final_test,2,10,0.0,13104
+final_test,3,1,0.0,13104
+final_test,4,15,0.0,13104
+final_test,5,50,0.0,13104
+final_test,6,20,0.0,13104
+final_test,7,20,0.01868131868131868,13104
+final_test,8,1,0.0,13104
+final_test,9,4,0.0,13104
+final_test,target/core,10,0.0,13104
+final_test,target/time,2,0.0,13104
+train,all groups with a missing indicator,211,0.028052451257646976,52488
+train,1,10,0.011385459533607681,52488
+train,10,4,0.0013717421124828531,52488
+train,11,33,0.0974768258718876,52488
+train,12,31,0.0005309969467675561,52488
+train,2,10,0.006858710562414266,52488
+train,3,1,0.0,52488
+train,4,15,0.0,52488
+train,5,50,0.014924554183813443,52488
+train,6,20,0.07818930041152264,52488
+train,7,20,0.008916323731138546,52488
+train,8,1,0.0,52488
+train,9,4,0.0013717421124828531,52488
+train,target/core,10,0.00041152263374485596,52488
+train,target/time,2,0.0,52488
+validation,all groups with a missing indicator,211,0.016124334771902882,12888
+validation,1,10,0.021229050279329607,12888
+validation,10,4,0.0,12888
+validation,11,33,0.09090909090909091,12888
+validation,12,31,0.0,12888
+validation,2,10,0.0,12888
+validation,3,1,0.0,12888
+validation,4,15,0.0,12888
+validation,5,50,0.0,12888
+validation,6,20,0.0,12888
+validation,7,20,0.009497206703910615,12888
+validation,8,1,0.0,12888
+validation,9,4,0.0,12888
+validation,target/core,10,0.0,12888
+validation,target/time,2,0.0,12888
