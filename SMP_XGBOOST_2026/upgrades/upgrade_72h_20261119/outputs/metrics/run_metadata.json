@@ -1,0 +1,18 @@
+{
+  "dataset_version": "smp72h_common_v5_generation_v2_xgb_20261119",
+  "experiment_ids": [
+    "E0_xgb",
+    "E1_recent_daily_blend",
+    "E1_selected_blend",
+    "E1_weekly_blend",
+    "E2_train_plus_validation",
+    "E3_retrained_blend",
+    "baseline_recent_daily",
+    "baseline_weekly"
+  ],
+  "validation_rows_per_experiment": 12888,
+  "final_test_rows_per_experiment": 13104,
+  "model_file": "models\\final_xgboost_model.json",
+  "fit_seconds": 38.31174299999839,
+  "selection_locked_before_final_test_scoring": true
+}
