@@ -1,0 +1,97 @@
+{
+  "dataset_version": "generation_20261119_v2",
+  "input_group": 5,
+  "source_commit": "a90141b81ecd841c524eb75a72f4bcc4f39989f5",
+  "sources_sha256": {
+    "1120gradpj/data/raw/team_training_snapshot/a90141b81ecd841c524eb75a72f4bcc4f39989f5/SMP_72H_INPUT_DATA/05_generation_by_fuel_amgo/api_generation_partial_2023_2025_merged_20261119.csv": "c55c0ba9df3aa5ff8591a4e252f8e6205bb4a5396881301bf9ec1c80d7ed1406",
+    "1120gradpj/data/raw/team_training_snapshot/a90141b81ecd841c524eb75a72f4bcc4f39989f5/SMP_72H_INPUT_DATA/05_generation_by_fuel_amgo/user_provided_annual_csvs/한국전력거래소_연료원별 시간대별 설비용량 및 전력거래량_20231231.csv": "5b7b45fa4651246d2b57dcdb531da4e138351a27c05557bbedfe07f8c4660da4",
+    "1120gradpj/data/raw/team_training_snapshot/a90141b81ecd841c524eb75a72f4bcc4f39989f5/SMP_72H_INPUT_DATA/05_generation_by_fuel_amgo/user_provided_annual_csvs/한국전력거래소_연료원별 시간대별 설비용량 및 전력거래량_20251231.csv": "a4cc6ce6d2f2ca80f66e0707414fa0b1a3906c09258a2acff833a5dea844db26"
+  },
+  "coverage": [
+    {
+      "year": 2023,
+      "rows": 8760,
+      "source_kind": "annual_2023",
+      "missing": {
+        "lng_generation_mwh": 0,
+        "bituminous_coal_generation_mwh": 0,
+        "anthracite_coal_generation_mwh": 0,
+        "nuclear_generation_mwh": 0,
+        "coal_generation_mwh": 0
+      }
+    },
+    {
+      "year": 2024,
+      "rows": 8784,
+      "source_kind": "api_2024",
+      "missing": {
+        "lng_generation_mwh": 24,
+        "bituminous_coal_generation_mwh": 24,
+        "anthracite_coal_generation_mwh": 768,
+        "nuclear_generation_mwh": 768,
+        "coal_generation_mwh": 768
+      }
+    },
+    {
+      "year": 2025,
+      "rows": 8760,
+      "source_kind": "annual_2025",
+      "missing": {
+        "lng_generation_mwh": 0,
+        "bituminous_coal_generation_mwh": 0,
+        "anthracite_coal_generation_mwh": 0,
+        "nuclear_generation_mwh": 0,
+        "coal_generation_mwh": 0
+      }
+    }
+  ],
+  "comparison": {
+    "2023": {
+      "pairs": 9216,
+      "dates": 96,
+      "max_absolute_difference_mwh": 829.2589999999982,
+      "mean_absolute_difference_mwh": 0.8485594618055754,
+      "differences_gt_1_mwh": 369,
+      "policy": "annual whole year retained; API is comparison only, not spliced"
+    },
+    "2025": {
+      "pairs": 96,
+      "dates": 1,
+      "max_absolute_difference_mwh": 0.0005000000019208528,
+      "mean_absolute_difference_mwh": 0.00021182291676306286,
+      "differences_gt_1_mwh": 0,
+      "policy": "annual whole year retained; API is comparison only, not spliced"
+    }
+  },
+  "files": {
+    "generation_2024_hourly.csv": {
+      "bytes": 1041026,
+      "sha256": "a81eea70448f48fb283dfbf6b89798ffd069c89b0df46eaca57c6fb2c861e969"
+    },
+    "missing_intervals.csv": {
+      "bytes": 518,
+      "sha256": "1e72f7051c1ff37f64dbcdd2d67f85dca8762d005ee3a64cd71cf5793e1299fd"
+    },
+    "generation_2023_hourly.csv": {
+      "bytes": 662226,
+      "sha256": "d582fc6dd4f9f9ca0dd4de33706cbf6f33730a5c8a8a81ec022e21266cdb27b2"
+    },
+    "generation_2023_2025_hourly.csv": {
+      "bytes": 3236228,
+      "sha256": "911281bfa5832147f083efa1f5bbcc504757563bd43aca68404ce9b9c1a53821"
+    },
+    "generation_2025_hourly.csv": {
+      "bytes": 1095602,
+      "sha256": "0371438a3870aeb416c14b2392a25bc30d5968289529b6d9b319a785b192571a"
+    }
+  },
+  "unit": "MWh",
+  "timezone": "Asia/Seoul",
+  "interval_label": "start; source trading hour 1..24 => 00..23",
+  "geography": "market-traded sent-out energy; no mainland/Jeju distinction available",
+  "coal_definition": "bituminous + anthracite; both required",
+  "missing_policy": "blank NaN, never filled or zeroed; *_missing=1 means missing",
+  "availability_policy": "unshifted raw measurements; consumers must enforce interval end <= forecast_origin - 72h; historical releases/vintages not reconstructed",
+  "training_performed": false,
+  "previous_dataset_modified": false
+}

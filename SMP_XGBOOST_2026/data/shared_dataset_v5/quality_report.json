@@ -1,0 +1,1118 @@
+{
+  "dataset_version": "smp72h_common_v5_generation_v2_xgb_20261119",
+  "generated_at_kst": "2026-11-19T03:10:01.553040+09:00",
+  "timezone": "Asia/Seoul",
+  "row_counts": {
+    "hourly": 26304,
+    "forecast_inputs": 78480,
+    "evaluation_origins": 1090,
+    "evaluation_targets": 78480
+  },
+  "date_ranges": {
+    "hourly": [
+      "2023-01-01 00:00:00",
+      "2025-12-31 23:00:00"
+    ],
+    "forecast_origin": [
+      "2022-12-31 23:00:00",
+      "2025-12-28 23:00:00"
+    ],
+    "target_timestamp": [
+      "2023-01-01 00:00:00",
+      "2025-12-31 23:00:00"
+    ]
+  },
+  "split_origin_counts": {
+    "final_test": 182,
+    "train": 729,
+    "validation": 179
+  },
+  "split_target_counts": {
+    "final_test": 13104,
+    "train": 52488,
+    "validation": 12888
+  },
+  "split_target_ranges": {
+    "final_test": [
+      "2025-07-01 00:00:00",
+      "2025-12-31 23:00:00"
+    ],
+    "train": [
+      "2023-01-01 00:00:00",
+      "2024-12-31 23:00:00"
+    ],
+    "validation": [
+      "2025-01-01 00:00:00",
+      "2025-06-30 23:00:00"
+    ]
+  },
+  "target_missing_smp_rows": 0,
+  "demand_reserve_missing_overlap": {
+    "comparison_clock": "hourly interval end, Asia/Seoul local-naive timestamps",
+    "demand_incomplete_hours": 1095,
+    "reserve_incomplete_hours": 676,
+    "shared_incomplete_hours": 675,
+    "demand_only_incomplete_hours": 420,
+    "reserve_only_incomplete_hours": 1,
+    "union_incomplete_hours": 1096,
+    "timestamp_detail_file": "demand_reserve_missing_timestamps.csv"
+  },
+  "calendar_source_check": {
+    "path": "./SMP_72H_INPUT_DATA\\04_calendar_features\\04_calendar_features.csv",
+    "sha256": "b6eb8d6d1ac3447df234ff091e8f609072285a8464738c161e5914d00461df32",
+    "rows_checked": 78480,
+    "missing_rows": 0,
+    "mismatches": {
+      "hour": 0,
+      "weekday": 0,
+      "month": 0,
+      "weekend": 0,
+      "holiday": 0
+    }
+  },
+  "feature_missing_before_imputation": {
+    "horizon": 0.0,
+    "forecast_day": 0.0,
+    "calendar_hour": 0.0,
+    "calendar_weekday": 0.0,
+    "calendar_month": 0.0,
+    "calendar_quarter": 0.0,
+    "calendar_is_weekend": 0.0,
+    "calendar_is_official_holiday": 0.0,
+    "calendar_hour_sin": 0.0,
+    "calendar_hour_cos": 0.0,
+    "calendar_weekday_sin": 0.0,
+    "calendar_weekday_cos": 0.0,
+    "calendar_month_sin": 0.0,
+    "calendar_month_cos": 0.0,
+    "domestic_lng_fuel_cost_krw_per_kwh": 0.0,
+    "domestic_lng_fuel_cost_missing": 0.0,
+    "kma_daily_tmin_c": 0.001834862385321101,
+    "kma_daily_tmax_c": 0.001834862385321101,
+    "kma_temp_forecast_available": 0.0,
+    "kma_weather_metro_am_available": 0.0,
+    "kma_weather_metro_am_precip_probability_pct": 0.001834862385321101,
+    "kma_weather_metro_am_class_00": 0.0,
+    "kma_weather_metro_am_class_01": 0.0,
+    "kma_weather_metro_am_class_02": 0.0,
+    "kma_weather_metro_am_class_03": 0.0,
+    "kma_weather_metro_am_class_04": 0.0,
+    "kma_weather_metro_am_class_05": 0.0,
+    "kma_weather_metro_am_class_06": 0.0,
+    "kma_weather_metro_am_class_07": 0.0,
+    "kma_weather_metro_am_class_08": 0.0,
+    "kma_weather_metro_am_class_09": 0.0,
+    "kma_weather_metro_am_class_10": 0.0,
+    "kma_weather_metro_am_lead_days": 0.001834862385321101,
+    "kma_weather_metro_pm_available": 0.0,
+    "kma_weather_metro_pm_precip_probability_pct": 0.001834862385321101,
+    "kma_weather_metro_pm_class_00": 0.0,
+    "kma_weather_metro_pm_class_01": 0.0,
+    "kma_weather_metro_pm_class_02": 0.0,
+    "kma_weather_metro_pm_class_03": 0.0,
+    "kma_weather_metro_pm_class_04": 0.0,
+    "kma_weather_metro_pm_class_05": 0.0,
+    "kma_weather_metro_pm_class_06": 0.0,
+    "kma_weather_metro_pm_class_07": 0.0,
+    "kma_weather_metro_pm_class_08": 0.0,
+    "kma_weather_metro_pm_class_09": 0.0,
+    "kma_weather_metro_pm_class_10": 0.0,
+    "kma_weather_metro_pm_lead_days": 0.001834862385321101,
+    "fred_wti_usd_per_bbl": 0.0009174311926605505,
+    "fred_wti_age_days": 0.0009174311926605505,
+    "fred_brent_usd_per_bbl": 0.0009174311926605505,
+    "fred_brent_age_days": 0.0009174311926605505,
+    "fred_lng_usd_per_mmbtu": 0.0009174311926605505,
+    "fred_lng_age_days": 0.0009174311926605505,
+    "fred_coal_usd_per_tonne": 0.0009174311926605505,
+    "fred_coal_age_days": 0.0009174311926605505,
+    "demand_actual_mw_latest": 0.003669724770642202,
+    "demand_actual_mw_latest_age_hours": 0.003669724770642202,
+    "demand_actual_mw_at_cutoff_missing": 0.0,
+    "demand_actual_mw_lag24": 0.03944954128440367,
+    "demand_actual_mw_lag48": 0.04036697247706422,
+    "demand_actual_mw_lag168": 0.044036697247706424,
+    "demand_actual_mw_mean24": 0.003669724770642202,
+    "demand_actual_mw_std24": 0.003669724770642202,
+    "demand_actual_mw_mean168": 0.003669724770642202,
+    "demand_actual_mw_std168": 0.003669724770642202,
+    "demand_actual_mw_change24": 0.003669724770642202,
+    "demand_forecast_history_mw_latest": 0.003669724770642202,
+    "demand_forecast_history_mw_latest_age_hours": 0.003669724770642202,
+    "demand_forecast_history_mw_at_cutoff_missing": 0.0,
+    "demand_forecast_history_mw_lag24": 0.0045871559633027525,
+    "demand_forecast_history_mw_lag48": 0.005504587155963303,
+    "demand_forecast_history_mw_lag168": 0.010091743119266056,
+    "demand_forecast_history_mw_mean24": 0.003669724770642202,
+    "demand_forecast_history_mw_std24": 0.003669724770642202,
+    "demand_forecast_history_mw_mean168": 0.003669724770642202,
+    "demand_forecast_history_mw_std168": 0.003669724770642202,
+    "demand_forecast_history_mw_change24": 0.003669724770642202,
+    "generation_lng_mwh_latest": 0.003669724770642202,
+    "generation_lng_mwh_latest_age_hours": 0.003669724770642202,
+    "generation_lng_mwh_at_cutoff_missing": 0.0,
+    "generation_lng_mwh_lag24": 0.005504587155963303,
+    "generation_lng_mwh_lag48": 0.006422018348623854,
+    "generation_lng_mwh_lag168": 0.011009174311926606,
+    "generation_lng_mwh_mean24": 0.003669724770642202,
+    "generation_lng_mwh_std24": 0.003669724770642202,
+    "generation_lng_mwh_mean168": 0.003669724770642202,
+    "generation_lng_mwh_std168": 0.003669724770642202,
+    "generation_lng_mwh_change24": 0.003669724770642202,
+    "generation_bituminous_coal_mwh_latest": 0.003669724770642202,
+    "generation_bituminous_coal_mwh_latest_age_hours": 0.003669724770642202,
+    "generation_bituminous_coal_mwh_at_cutoff_missing": 0.0,
+    "generation_bituminous_coal_mwh_lag24": 0.005504587155963303,
+    "generation_bituminous_coal_mwh_lag48": 0.006422018348623854,
+    "generation_bituminous_coal_mwh_lag168": 0.011009174311926606,
+    "generation_bituminous_coal_mwh_mean24": 0.003669724770642202,
+    "generation_bituminous_coal_mwh_std24": 0.003669724770642202,
+    "generation_bituminous_coal_mwh_mean168": 0.003669724770642202,
+    "generation_bituminous_coal_mwh_std168": 0.003669724770642202,
+    "generation_bituminous_coal_mwh_change24": 0.003669724770642202,
+    "generation_anthracite_mwh_latest": 0.003669724770642202,
+    "generation_anthracite_mwh_latest_age_hours": 0.003669724770642202,
+    "generation_anthracite_mwh_at_cutoff_missing": 0.0,
+    "generation_anthracite_mwh_lag24": 0.03394495412844037,
+    "generation_anthracite_mwh_lag48": 0.03486238532110092,
+    "generation_anthracite_mwh_lag168": 0.03944954128440367,
+    "generation_anthracite_mwh_mean24": 0.003669724770642202,
+    "generation_anthracite_mwh_std24": 0.003669724770642202,
+    "generation_anthracite_mwh_mean168": 0.003669724770642202,
+    "generation_anthracite_mwh_std168": 0.003669724770642202,
+    "generation_anthracite_mwh_change24": 0.003669724770642202,
+    "generation_nuclear_mwh_latest": 0.003669724770642202,
+    "generation_nuclear_mwh_latest_age_hours": 0.003669724770642202,
+    "generation_nuclear_mwh_at_cutoff_missing": 0.0,
+    "generation_nuclear_mwh_lag24": 0.03394495412844037,
+    "generation_nuclear_mwh_lag48": 0.03486238532110092,
+    "generation_nuclear_mwh_lag168": 0.03944954128440367,
+    "generation_nuclear_mwh_mean24": 0.003669724770642202,
+    "generation_nuclear_mwh_std24": 0.003669724770642202,
+    "generation_nuclear_mwh_mean168": 0.003669724770642202,
+    "generation_nuclear_mwh_std168": 0.003669724770642202,
+    "generation_nuclear_mwh_change24": 0.003669724770642202,
+    "generation_coal_mwh_latest": 0.003669724770642202,
+    "generation_coal_mwh_latest_age_hours": 0.003669724770642202,
+    "generation_coal_mwh_at_cutoff_missing": 0.0,
+    "generation_coal_mwh_lag24": 0.03394495412844037,
+    "generation_coal_mwh_lag48": 0.03486238532110092,
+    "generation_coal_mwh_lag168": 0.03944954128440367,
+    "generation_coal_mwh_mean24": 0.003669724770642202,
+    "generation_coal_mwh_std24": 0.003669724770642202,
+    "generation_coal_mwh_mean168": 0.003669724770642202,
+    "generation_coal_mwh_std168": 0.003669724770642202,
+    "generation_coal_mwh_change24": 0.003669724770642202,
+    "renewable_solar_mwh_latest": 0.003669724770642202,
+    "renewable_solar_mwh_latest_age_hours": 0.003669724770642202,
+    "renewable_solar_mwh_at_cutoff_missing": 0.0,
+    "renewable_solar_mwh_lag24": 0.05871559633027523,
+    "renewable_solar_mwh_lag48": 0.05963302752293578,
+    "renewable_solar_mwh_lag168": 0.06422018348623854,
+    "renewable_solar_mwh_mean24": 0.003669724770642202,
+    "renewable_solar_mwh_std24": 0.003669724770642202,
+    "renewable_solar_mwh_mean168": 0.003669724770642202,
+    "renewable_solar_mwh_std168": 0.003669724770642202,
+    "renewable_solar_mwh_change24": 0.003669724770642202,
+    "renewable_wind_mwh_latest": 0.05779816513761468,
+    "renewable_wind_mwh_latest_age_hours": 0.05779816513761468,
+    "renewable_wind_mwh_at_cutoff_missing": 0.0,
+    "renewable_wind_mwh_lag24": 0.14220183486238533,
+    "renewable_wind_mwh_lag48": 0.14311926605504588,
+    "renewable_wind_mwh_lag168": 0.14770642201834863,
+    "renewable_wind_mwh_mean24": 0.05779816513761468,
+    "renewable_wind_mwh_std24": 0.05779816513761468,
+    "renewable_wind_mwh_mean168": 0.05779816513761468,
+    "renewable_wind_mwh_std168": 0.05779816513761468,
+    "renewable_wind_mwh_change24": 0.05779816513761468,
+    "supply_reserve_mw_latest": 0.003669724770642202,
+    "supply_reserve_mw_latest_age_hours": 0.003669724770642202,
+    "supply_reserve_mw_at_cutoff_missing": 0.0,
+    "supply_reserve_mw_lag24": 0.024770642201834864,
+    "supply_reserve_mw_lag48": 0.025688073394495414,
+    "supply_reserve_mw_lag168": 0.030275229357798167,
+    "supply_reserve_mw_mean24": 0.003669724770642202,
+    "supply_reserve_mw_std24": 0.003669724770642202,
+    "supply_reserve_mw_mean168": 0.003669724770642202,
+    "supply_reserve_mw_std168": 0.003669724770642202,
+    "supply_reserve_mw_change24": 0.003669724770642202,
+    "supply_reserve_pct_latest": 0.003669724770642202,
+    "supply_reserve_pct_latest_age_hours": 0.003669724770642202,
+    "supply_reserve_pct_at_cutoff_missing": 0.0,
+    "supply_reserve_pct_lag24": 0.024770642201834864,
+    "supply_reserve_pct_lag48": 0.025688073394495414,
+    "supply_reserve_pct_lag168": 0.030275229357798167,
+    "supply_reserve_pct_mean24": 0.003669724770642202,
+    "supply_reserve_pct_std24": 0.003669724770642202,
+    "supply_reserve_pct_mean168": 0.003669724770642202,
+    "supply_reserve_pct_std168": 0.003669724770642202,
+    "supply_reserve_pct_change24": 0.003669724770642202,
+    "asos_temperature_c_latest": 0.003669724770642202,
+    "asos_temperature_c_latest_age_hours": 0.003669724770642202,
+    "asos_temperature_c_at_cutoff_missing": 0.0,
+    "asos_temperature_c_lag24": 0.006422018348623854,
+    "asos_temperature_c_lag48": 0.007339449541284404,
+    "asos_temperature_c_lag168": 0.011926605504587157,
+    "asos_temperature_c_mean24": 0.003669724770642202,
+    "asos_temperature_c_std24": 0.003669724770642202,
+    "asos_temperature_c_mean168": 0.003669724770642202,
+    "asos_temperature_c_std168": 0.003669724770642202,
+    "asos_temperature_c_change24": 0.003669724770642202,
+    "asos_wind_speed_ms_latest": 0.003669724770642202,
+    "asos_wind_speed_ms_latest_age_hours": 0.003669724770642202,
+    "asos_wind_speed_ms_at_cutoff_missing": 0.0,
+    "asos_wind_speed_ms_lag24": 0.006422018348623854,
+    "asos_wind_speed_ms_lag48": 0.007339449541284404,
+    "asos_wind_speed_ms_lag168": 0.011926605504587157,
+    "asos_wind_speed_ms_mean24": 0.003669724770642202,
+    "asos_wind_speed_ms_std24": 0.003669724770642202,
+    "asos_wind_speed_ms_mean168": 0.003669724770642202,
+    "asos_wind_speed_ms_std168": 0.003669724770642202,
+    "asos_wind_speed_ms_change24": 0.003669724770642202,
+    "asos_solar_radiation_mj_m2_latest": 0.003669724770642202,
+    "asos_solar_radiation_mj_m2_latest_age_hours": 0.003669724770642202,
+    "asos_solar_radiation_mj_m2_at_cutoff_missing": 0.0,
+    "asos_solar_radiation_mj_m2_lag24": 1.0,
+    "asos_solar_radiation_mj_m2_lag48": 1.0,
+    "asos_solar_radiation_mj_m2_lag168": 1.0,
+    "asos_solar_radiation_mj_m2_mean24": 0.003669724770642202,
+    "asos_solar_radiation_mj_m2_std24": 0.003669724770642202,
+    "asos_solar_radiation_mj_m2_mean168": 0.003669724770642202,
+    "asos_solar_radiation_mj_m2_std168": 0.003669724770642202,
+    "asos_solar_radiation_mj_m2_change24": 0.003669724770642202,
+    "smp_history_latest": 0.0,
+    "smp_history_latest_age_hours": 0.0,
+    "smp_history_at_cutoff_missing": 0.0,
+    "smp_history_lag24": 0.0,
+    "smp_history_lag48": 0.0,
+    "smp_history_lag168": 0.0027522935779816515,
+    "smp_history_mean24": 0.0,
+    "smp_history_std24": 0.0,
+    "smp_history_mean168": 0.0,
+    "smp_history_std168": 0.0,
+    "smp_history_change24": 0.0,
+    "demand_actual_source_missing": 0.0,
+    "reserve_source_missing": 0.0,
+    "asos_si_night_at_cutoff": 0.005504587155963303,
+    "asos_si_observed_zero_at_cutoff": 0.005504587155963303,
+    "asos_si_missing_at_cutoff": 0.005504587155963303,
+    "calendar_season_winter": 0.0,
+    "calendar_season_spring": 0.0,
+    "calendar_season_summer": 0.0,
+    "calendar_season_autumn": 0.0
+  },
+  "training_imputation_values": {
+    "horizon": 36.5,
+    "forecast_day": 2.0,
+    "calendar_hour": 11.5,
+    "calendar_weekday": 3.0,
+    "calendar_month": 7.0,
+    "calendar_quarter": 3.0,
+    "calendar_is_weekend": 0.0,
+    "calendar_is_official_holiday": 0.0,
+    "calendar_hour_sin": 6.123233995736766e-17,
+    "calendar_hour_cos": -6.123233995736765e-17,
+    "calendar_weekday_sin": 0.0,
+    "calendar_weekday_cos": -0.22252093395631434,
+    "calendar_month_sin": 0.0,
+    "calendar_month_cos": -1.8369701987210297e-16,
+    "domestic_lng_fuel_cost_krw_per_kwh": 148.663,
+    "domestic_lng_fuel_cost_missing": 0.0,
+    "kma_daily_tmin_c": 12.0,
+    "kma_daily_tmax_c": 21.0,
+    "kma_temp_forecast_available": 1.0,
+    "kma_weather_metro_am_available": 1.0,
+    "kma_weather_metro_am_precip_probability_pct": 20.0,
+    "kma_weather_metro_am_class_00": 0.0,
+    "kma_weather_metro_am_class_01": 0.0,
+    "kma_weather_metro_am_class_02": 0.0,
+    "kma_weather_metro_am_class_03": 0.0,
+    "kma_weather_metro_am_class_04": 0.0,
+    "kma_weather_metro_am_class_05": 0.0,
+    "kma_weather_metro_am_class_06": 0.0,
+    "kma_weather_metro_am_class_07": 0.0,
+    "kma_weather_metro_am_class_08": 0.0,
+    "kma_weather_metro_am_class_09": 0.0,
+    "kma_weather_metro_am_class_10": 0.0,
+    "kma_weather_metro_am_lead_days": 3.0,
+    "kma_weather_metro_pm_available": 1.0,
+    "kma_weather_metro_pm_precip_probability_pct": 20.0,
+    "kma_weather_metro_pm_class_00": 0.0,
+    "kma_weather_metro_pm_class_01": 0.0,
+    "kma_weather_metro_pm_class_02": 0.0,
+    "kma_weather_metro_pm_class_03": 0.0,
+    "kma_weather_metro_pm_class_04": 0.0,
+    "kma_weather_metro_pm_class_05": 0.0,
+    "kma_weather_metro_pm_class_06": 0.0,
+    "kma_weather_metro_pm_class_07": 0.0,
+    "kma_weather_metro_pm_class_08": 0.0,
+    "kma_weather_metro_pm_class_09": 0.0,
+    "kma_weather_metro_pm_class_10": 0.0,
+    "kma_weather_metro_pm_lead_days": 3.0,
+    "fred_wti_usd_per_bbl": 77.97,
+    "fred_wti_age_days": 5.0,
+    "fred_brent_usd_per_bbl": 81.91,
+    "fred_brent_age_days": 5.0,
+    "fred_lng_usd_per_mmbtu": 12.7055,
+    "fred_lng_age_days": 58.0,
+    "fred_coal_usd_per_tonne": 150.738311688321,
+    "fred_coal_age_days": 58.0,
+    "demand_actual_mw_latest": 65679.0,
+    "demand_actual_mw_latest_age_hours": 0.0,
+    "demand_actual_mw_at_cutoff_missing": 0.0,
+    "demand_actual_mw_lag24": 65617.0,
+    "demand_actual_mw_lag48": 65599.04166665001,
+    "demand_actual_mw_lag168": 65520.6666667,
+    "demand_actual_mw_mean24": 63965.50347221667,
+    "demand_actual_mw_std24": 5536.426850791432,
+    "demand_actual_mw_mean168": 64817.08127571975,
+    "demand_actual_mw_std168": 7431.6123077137045,
+    "demand_actual_mw_change24": 1857.8514492739123,
+    "demand_forecast_history_mw_latest": 62135.0,
+    "demand_forecast_history_mw_latest_age_hours": 0.0,
+    "demand_forecast_history_mw_at_cutoff_missing": 0.0,
+    "demand_forecast_history_mw_lag24": 62123.5,
+    "demand_forecast_history_mw_lag48": 62112.0,
+    "demand_forecast_history_mw_lag168": 62102.5,
+    "demand_forecast_history_mw_mean24": 60975.541666666664,
+    "demand_forecast_history_mw_std24": 5378.436936885263,
+    "demand_forecast_history_mw_mean168": 61900.232142857145,
+    "demand_forecast_history_mw_std168": 7207.127644884541,
+    "demand_forecast_history_mw_change24": 1231.1666666666715,
+    "generation_lng_mwh_latest": 18434.539,
+    "generation_lng_mwh_latest_age_hours": 0.0,
+    "generation_lng_mwh_at_cutoff_missing": 0.0,
+    "generation_lng_mwh_lag24": 18443.094,
+    "generation_lng_mwh_lag48": 18438.8165,
+    "generation_lng_mwh_lag168": 18434.539,
+    "generation_lng_mwh_mean24": 17476.381791666667,
+    "generation_lng_mwh_std24": 3682.353217112533,
+    "generation_lng_mwh_mean168": 17664.440476190477,
+    "generation_lng_mwh_std168": 4586.399511045664,
+    "generation_lng_mwh_change24": 579.25,
+    "generation_bituminous_coal_mwh_latest": 19638.0,
+    "generation_bituminous_coal_mwh_latest_age_hours": 0.0,
+    "generation_bituminous_coal_mwh_at_cutoff_missing": 0.0,
+    "generation_bituminous_coal_mwh_lag24": 19638.0,
+    "generation_bituminous_coal_mwh_lag48": 19611.5,
+    "generation_bituminous_coal_mwh_lag168": 19583.0,
+    "generation_bituminous_coal_mwh_mean24": 18731.25,
+    "generation_bituminous_coal_mwh_std24": 1095.0861430602797,
+    "generation_bituminous_coal_mwh_mean168": 18518.692535714286,
+    "generation_bituminous_coal_mwh_std168": 2824.8707403099334,
+    "generation_bituminous_coal_mwh_change24": 439.2916666666679,
+    "generation_anthracite_mwh_latest": 167.0,
+    "generation_anthracite_mwh_latest_age_hours": 0.0,
+    "generation_anthracite_mwh_at_cutoff_missing": 0.0,
+    "generation_anthracite_mwh_lag24": 167.0,
+    "generation_anthracite_mwh_lag48": 167.0,
+    "generation_anthracite_mwh_lag168": 167.0,
+    "generation_anthracite_mwh_mean24": 166.91666666666666,
+    "generation_anthracite_mwh_std24": 2.2932636069631456,
+    "generation_anthracite_mwh_mean168": 168.32900595238092,
+    "generation_anthracite_mwh_std168": 22.04848504773168,
+    "generation_anthracite_mwh_change24": 0.0,
+    "generation_nuclear_mwh_latest": 19977.012,
+    "generation_nuclear_mwh_latest_age_hours": 0.0,
+    "generation_nuclear_mwh_at_cutoff_missing": 0.0,
+    "generation_nuclear_mwh_lag24": 19998.5,
+    "generation_nuclear_mwh_lag48": 19998.0,
+    "generation_nuclear_mwh_lag168": 19994.0,
+    "generation_nuclear_mwh_mean24": 19973.830166666663,
+    "generation_nuclear_mwh_std24": 10.36875532982004,
+    "generation_nuclear_mwh_mean168": 19971.60714285714,
+    "generation_nuclear_mwh_std168": 216.62443404118292,
+    "generation_nuclear_mwh_change24": -0.3333333333321207,
+    "generation_coal_mwh_latest": 20283.197,
+    "generation_coal_mwh_latest_age_hours": 0.0,
+    "generation_coal_mwh_at_cutoff_missing": 0.0,
+    "generation_coal_mwh_lag24": 19995.461499999998,
+    "generation_coal_mwh_lag48": 19977.0,
+    "generation_coal_mwh_lag168": 19969.0,
+    "generation_coal_mwh_mean24": 19439.125,
+    "generation_coal_mwh_std24": 1106.2104048342142,
+    "generation_coal_mwh_mean168": 19241.223339285712,
+    "generation_coal_mwh_std168": 2791.51115398783,
+    "generation_coal_mwh_change24": 590.1118749999987,
+    "renewable_solar_mwh_latest": 71.19307699999999,
+    "renewable_solar_mwh_latest_age_hours": 0.0,
+    "renewable_solar_mwh_at_cutoff_missing": 0.0,
+    "renewable_solar_mwh_lag24": 65.21298,
+    "renewable_solar_mwh_lag48": 65.2554265,
+    "renewable_solar_mwh_lag168": 65.482032,
+    "renewable_solar_mwh_mean24": 1132.0616486666665,
+    "renewable_solar_mwh_std24": 1192.788929404147,
+    "renewable_solar_mwh_mean168": 1113.9068616250001,
+    "renewable_solar_mwh_std168": 1303.8592871527112,
+    "renewable_solar_mwh_change24": -973.8955147083332,
+    "renewable_wind_mwh_latest": 230.55368950000002,
+    "renewable_wind_mwh_latest_age_hours": 0.0,
+    "renewable_wind_mwh_at_cutoff_missing": 0.0,
+    "renewable_wind_mwh_lag24": 283.45860700000003,
+    "renewable_wind_mwh_lag48": 283.72379,
+    "renewable_wind_mwh_lag168": 281.97321,
+    "renewable_wind_mwh_mean24": 206.11105779166667,
+    "renewable_wind_mwh_std24": 73.88433911732497,
+    "renewable_wind_mwh_mean168": 269.5979892232143,
+    "renewable_wind_mwh_std168": 185.0620764989692,
+    "renewable_wind_mwh_change24": -4.406493916666662,
+    "supply_reserve_mw_latest": 25718.025000000005,
+    "supply_reserve_mw_latest_age_hours": 0.0,
+    "supply_reserve_mw_at_cutoff_missing": 0.0,
+    "supply_reserve_mw_lag24": 25708.158333333336,
+    "supply_reserve_mw_lag48": 25701.654166666667,
+    "supply_reserve_mw_lag168": 25617.28333333333,
+    "supply_reserve_mw_mean24": 27005.43224637681,
+    "supply_reserve_mw_std24": 5014.242637821098,
+    "supply_reserve_mw_mean168": 27119.47063492064,
+    "supply_reserve_mw_std168": 6200.915895417335,
+    "supply_reserve_mw_change24": -1623.9350694444438,
+    "supply_reserve_pct_latest": 38.094541666666665,
+    "supply_reserve_pct_latest_age_hours": 0.0,
+    "supply_reserve_pct_at_cutoff_missing": 0.0,
+    "supply_reserve_pct_lag24": 38.13215,
+    "supply_reserve_pct_lag48": 38.113345833333334,
+    "supply_reserve_pct_lag168": 38.055166666666665,
+    "supply_reserve_pct_mean24": 41.972521875,
+    "supply_reserve_pct_std24": 11.905197195547577,
+    "supply_reserve_pct_mean168": 43.10479553571428,
+    "supply_reserve_pct_std168": 14.853910133688153,
+    "supply_reserve_pct_change24": -4.4562634057971025,
+    "asos_temperature_c_latest": 15.1,
+    "asos_temperature_c_latest_age_hours": 0.0,
+    "asos_temperature_c_at_cutoff_missing": 0.0,
+    "asos_temperature_c_lag24": 15.3,
+    "asos_temperature_c_lag48": 15.3,
+    "asos_temperature_c_lag168": 15.350000000000001,
+    "asos_temperature_c_mean24": 16.158333333333335,
+    "asos_temperature_c_std24": 2.7242037794343847,
+    "asos_temperature_c_mean168": 16.189285714285713,
+    "asos_temperature_c_std168": 3.5382409252562796,
+    "asos_temperature_c_change24": -1.0499999999999998,
+    "asos_wind_speed_ms_latest": 1.8,
+    "asos_wind_speed_ms_latest_age_hours": 0.0,
+    "asos_wind_speed_ms_at_cutoff_missing": 0.0,
+    "asos_wind_speed_ms_lag24": 1.8,
+    "asos_wind_speed_ms_lag48": 1.8,
+    "asos_wind_speed_ms_lag168": 1.8,
+    "asos_wind_speed_ms_mean24": 2.1666666666666665,
+    "asos_wind_speed_ms_std24": 0.8316105380263809,
+    "asos_wind_speed_ms_mean168": 2.2369047619047615,
+    "asos_wind_speed_ms_std168": 1.009049444425075,
+    "asos_wind_speed_ms_change24": -0.39999999999999947,
+    "asos_solar_radiation_mj_m2_latest": 0.03,
+    "asos_solar_radiation_mj_m2_latest_age_hours": 4.0,
+    "asos_solar_radiation_mj_m2_at_cutoff_missing": 1.0,
+    "asos_solar_radiation_mj_m2_lag24": null,
+    "asos_solar_radiation_mj_m2_lag48": null,
+    "asos_solar_radiation_mj_m2_lag168": null,
+    "asos_solar_radiation_mj_m2_mean24": 1.1099999999999999,
+    "asos_solar_radiation_mj_m2_std24": 0.8052249826770609,
+    "asos_solar_radiation_mj_m2_mean168": 1.0520253164556963,
+    "asos_solar_radiation_mj_m2_std168": 0.9147342134842638,
+    "asos_solar_radiation_mj_m2_change24": -1.0453333333333334,
+    "smp_history_latest": 141.64,
+    "smp_history_latest_age_hours": 0.0,
+    "smp_history_at_cutoff_missing": 0.0,
+    "smp_history_lag24": 141.73,
+    "smp_history_lag48": 141.85,
+    "smp_history_lag168": 142.005,
+    "smp_history_mean24": 136.61791666666667,
+    "smp_history_std24": 19.55620143311623,
+    "smp_history_mean168": 134.55125,
+    "smp_history_std168": 21.87428156659669,
+    "smp_history_change24": 3.8841666666666583,
+    "demand_actual_source_missing": 0.0,
+    "reserve_source_missing": 0.0,
+    "asos_si_night_at_cutoff": 1.0,
+    "asos_si_observed_zero_at_cutoff": 0.0,
+    "asos_si_missing_at_cutoff": 1.0,
+    "calendar_season_winter": 0.0,
+    "calendar_season_spring": 0.0,
+    "calendar_season_summer": 0.0,
+    "calendar_season_autumn": 0.0
+  },
+  "observed_cutoff_check": {
+    "passed": true,
+    "rule": "all group 1/5/6/7/11 and SMP history statistics use observations whose interval end/time is <= forecast_origin - 72 hours; a single cutoff is shared across the 72 target hours"
+  },
+  "future_observation_perturbation_check": {
+    "passed": true,
+    "history_source_series": 15,
+    "origin_cutoff_probes_per_series": 3,
+    "comparisons": 45,
+    "rule": "all future observations after each sampled cutoff were replaced by a large sentinel; historical features remained unchanged"
+  },
+  "fred_d2_vintage_check": {
+    "passed": true,
+    "oil_asof_unique": 1089,
+    "energy_asof_unique": 1089
+  },
+  "kma_issue_time_check": {
+    "passed": true,
+    "note": "Latest exact-target-day archived issue no later than each forecast origin; selected issue timestamps are retained in forecast_inputs.csv. Exact-target forecasts may have been issued several days earlier; lead days are retained. No target-day observations are used to fill an absent forecast.",
+    "coverage_by_forecast_day": {
+      "1": {
+        "kma_temp_forecast_available": 0.9972477064220183,
+        "kma_weather_metro_am_available": 0.9972477064220183,
+        "kma_weather_metro_pm_available": 0.9972477064220183,
+        "kma_weather_metro_am_lead_days_median": 3.0,
+        "kma_weather_metro_pm_lead_days_median": 3.0,
+        "kma_temp_issue_time_unique_issues": 1087,
+        "kma_weather_metro_am_issue_time_unique_issues": 1086,
+        "kma_weather_metro_pm_issue_time_unique_issues": 1086
+      },
+      "2": {
+        "kma_temp_forecast_available": 0.998165137614679,
+        "kma_weather_metro_am_available": 0.998165137614679,
+        "kma_weather_metro_pm_available": 0.998165137614679,
+        "kma_weather_metro_am_lead_days_median": 3.0,
+        "kma_weather_metro_pm_lead_days_median": 3.0,
+        "kma_temp_issue_time_unique_issues": 1088,
+        "kma_weather_metro_am_issue_time_unique_issues": 1087,
+        "kma_weather_metro_pm_issue_time_unique_issues": 1087
+      },
+      "3": {
+        "kma_temp_forecast_available": 0.9990825688073395,
+        "kma_weather_metro_am_available": 0.9990825688073395,
+        "kma_weather_metro_pm_available": 0.9990825688073395,
+        "kma_weather_metro_am_lead_days_median": 3.0,
+        "kma_weather_metro_pm_lead_days_median": 3.0,
+        "kma_temp_issue_time_unique_issues": 1089,
+        "kma_weather_metro_am_issue_time_unique_issues": 1088,
+        "kma_weather_metro_pm_issue_time_unique_issues": 1088
+      }
+    }
+  },
+  "conditional_future_known_input": "Group 8 domestic LNG fuel cost is intentionally matched by each target timestamp's month under the agreed same-month conditional historical experiment; it is not asserted to have been published by the forecast origin.",
+  "source_quality": {
+    "epsis_actual_demand": {
+      "five_minute_rows": 312023,
+      "hourly_rows": 26304,
+      "hourly_missing": 1095,
+      "requested_dates": 1096,
+      "dates_with_rows": 1092,
+      "request_or_parse_error_dates": 4,
+      "manifest": "SMP_SHARED_DATA\\raw\\epsis_actual_load_20261119T012745+0900\\manifest.json",
+      "response_archive": "SMP_SHARED_DATA\\raw\\epsis_actual_load_20261119T012745+0900\\epsis_realtime_load_http_responses.jsonl.gz",
+      "value_column": "current_load_mw",
+      "aggregation": "12 five-minute current-load snapshots per clock hour; mean only when all 12 exist; output is interval-end timestamp"
+    },
+    "kpx_generation": {
+      "path": "./SMP_72H_INPUT_DATA\\05_generation_by_fuel_amgo\\generation_2023_2025_hourly.csv",
+      "rows": 26304,
+      "dates": 1096,
+      "source_kind_counts": {
+        "api_2024": 8784,
+        "annual_2023": 8760,
+        "annual_2025": 8760
+      },
+      "date_min": "2023-01-01 00:00:00",
+      "date_max": "2025-12-31 23:00:00",
+      "duplicate_hourly_interval_rows": 0,
+      "missing_by_year": {
+        "2023": {
+          "lng_generation_mwh": 0,
+          "bituminous_coal_generation_mwh": 0,
+          "anthracite_coal_generation_mwh": 0,
+          "nuclear_generation_mwh": 0,
+          "coal_generation_mwh": 0
+        },
+        "2024": {
+          "lng_generation_mwh": 24,
+          "bituminous_coal_generation_mwh": 24,
+          "anthracite_coal_generation_mwh": 768,
+          "nuclear_generation_mwh": 768,
+          "coal_generation_mwh": 768
+        },
+        "2025": {
+          "lng_generation_mwh": 0,
+          "bituminous_coal_generation_mwh": 0,
+          "anthracite_coal_generation_mwh": 0,
+          "nuclear_generation_mwh": 0,
+          "coal_generation_mwh": 0
+        }
+      },
+      "missing_by_variable": {
+        "lng_generation_mwh": 24,
+        "bituminous_coal_generation_mwh": 24,
+        "anthracite_coal_generation_mwh": 768,
+        "nuclear_generation_mwh": 768,
+        "coal_generation_mwh": 768
+      },
+      "missing_fuels_by_date": {
+        "2024-02-29": [
+          "lng_generation_mwh",
+          "bituminous_coal_generation_mwh",
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-01": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-02": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-03": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-04": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-05": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-06": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-07": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-08": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-09": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-10": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-11": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-12": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-13": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-14": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-15": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-16": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-17": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-18": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-19": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-20": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-21": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-22": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-23": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-24": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-25": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-26": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-27": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-28": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-29": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-30": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ],
+        "2024-08-31": [
+          "anthracite_coal_generation_mwh",
+          "nuclear_generation_mwh"
+        ]
+      },
+      "missing_flag_mismatches": {
+        "lng_generation_mwh": 0,
+        "bituminous_coal_generation_mwh": 0,
+        "anthracite_coal_generation_mwh": 0,
+        "nuclear_generation_mwh": 0,
+        "coal_generation_mwh": 0
+      },
+      "availability_rule": "raw generation v2 values; only intervals ending at the common forecast_origin - 72h cutoff are used"
+    },
+    "kpx_renewables": {
+      "files": [
+        {
+          "path": "./SMP_72H_INPUT_DATA\\06_regional_solar_wind_actuals\\team_shared_originals\\renewable_source_0.csv",
+          "rows": 166440,
+          "dates": 365,
+          "start": "2025-01-01",
+          "end": "2025-12-31",
+          "sha256": "0c84865c4751b27c750f4748be328f3a1dfb25f2db85a32ca4b3004a34075ac4"
+        },
+        {
+          "path": "./SMP_72H_INPUT_DATA\\06_regional_solar_wind_actuals\\team_shared_originals\\renewable_source_1.csv",
+          "rows": 166896,
+          "dates": 366,
+          "start": "2024-01-01",
+          "end": "2024-12-31",
+          "sha256": "d0411e793a9b2597f6c9438d39d59e393733b3d277845cc59db2d0141170cd28"
+        },
+        {
+          "path": "./SMP_72H_INPUT_DATA\\06_regional_solar_wind_actuals\\team_shared_originals\\renewable_source_2.csv",
+          "rows": 14136,
+          "dates": 31,
+          "start": "2023-12-01",
+          "end": "2023-12-31",
+          "sha256": "898364817378a2dc3bc6a54692b9825eb64208877ed5bee532929be4029c72fd"
+        },
+        {
+          "path": "./SMP_72H_INPUT_DATA\\06_regional_solar_wind_actuals\\team_shared_originals\\renewable_source_3.csv",
+          "rows": 37128,
+          "dates": 91,
+          "start": "2023-09-01",
+          "end": "2023-11-30",
+          "sha256": "bd8b75c094224765aa7e57944c73bbb509802cf8846742a96feac5b4aebed07c"
+        },
+        {
+          "path": "./SMP_72H_INPUT_DATA\\06_regional_solar_wind_actuals\\team_shared_originals\\renewable_source_4.csv",
+          "rows": 37536,
+          "dates": 92,
+          "start": "2023-06-01",
+          "end": "2023-08-31",
+          "sha256": "21fea72bce022ad51a513133a314d848fede553626d6a252b3008653e1a0f725"
+        },
+        {
+          "path": "./SMP_72H_INPUT_DATA\\06_regional_solar_wind_actuals\\team_shared_originals\\renewable_source_5.csv",
+          "rows": 37536,
+          "dates": 92,
+          "start": "2023-03-01",
+          "end": "2023-05-31",
+          "sha256": "ac35d38395f0acc55e498f1508d74f2914ff9f5606f44bd9249a491a829082b3"
+        },
+        {
+          "path": "./SMP_72H_INPUT_DATA\\06_regional_solar_wind_actuals\\team_shared_originals\\renewable_source_6.csv",
+          "rows": 24072,
+          "dates": 59,
+          "start": "2023-01-01",
+          "end": "2023-02-28",
+          "sha256": "d6cdcf1d0337629b8a325b04e20832a7e95e10bcee3393d47f2c54ececdfb46b"
+        }
+      ],
+      "duplicate_interval_rows": 0,
+      "aggregation": "2023-01..11: sum province rows excluding Jeju only if all 16 land regions have values; 2023-12..2025: solar sums province/city rows excluding Jeju and excludes aggregate land row, wind selects explicit land row; MWh; blanks retained"
+    },
+    "kpx_supply_reserve": {
+      "path": "./SMP_72H_INPUT_DATA\\07_supply_reserve\\07_supply_reserve_mw_pct.csv",
+      "rows": 314563,
+      "expected_samples_in_contiguous_range": 315648,
+      "missing_sample_count_in_contiguous_range": 1085,
+      "hourly_rows": 26277,
+      "incomplete_hour_count": 676,
+      "aggregation": "mean of all 12 five-minute samples in clock hour; result timestamp is interval end; incomplete hours remain NaN"
+    },
+    "kma_asos": {
+      "path": "./SMP_72H_INPUT_DATA\\11_kma_asos_actuals\\11_kma_asos_actuals.csv",
+      "rows": 26269,
+      "expected_rows": 26304,
+      "missing_by_column": {
+        "timestamp_kst": 0,
+        "station_id": 0,
+        "temperature_c": 6,
+        "wind_speed_ms": 33,
+        "solar_radiation_mj_m2": 11921,
+        "source_file": 0,
+        "timestamp": 0,
+        "asos_si_night": 0,
+        "asos_si_observed_zero": 0,
+        "asos_si_missing": 0
+      },
+      "solar_night_missing": 11887,
+      "solar_day_missing": 34,
+      "solar_observed_zeros": 539,
+      "night_definition": "calculated solar elevation <= 0 degrees for Seoul ASOS 108; missing SI remains missing regardless of night"
+    },
+    "fred_wti_brent": {
+      "path": "./SMP_72H_INPUT_DATA\\09_fred_wti_brent\\09_fred_wti_brent.csv",
+      "sha256": "aa8c6953f5847d0f22846c325ce6d1323f6656f622bfa2cbc8256e333b790c47",
+      "rows": 78912,
+      "asof_rule": "source-built vintage as-of D-2"
+    },
+    "fred_lng_coal": {
+      "path": "./SMP_72H_INPUT_DATA\\10_fred_lng_coal\\10_fred_lng_coal.csv",
+      "sha256": "e238f1a37914113481dea6a93890b2fe7903bcb32d073801204436282e838e6a",
+      "rows": 78912,
+      "asof_rule": "source-built vintage as-of D-2"
+    },
+    "domestic_lng": {
+      "path": "./SMP_72H_INPUT_DATA\\08_domestic_lng_fuel_cost\\08_domestic_lng_fuel_cost.csv",
+      "sha256": "30ad5d64a184afbdaf29ace412f40a53e2440d2b4fdc1a4ce85c1fb1c7888fe5",
+      "months": 46,
+      "unit": [
+        "KRW/kWh"
+      ],
+      "actual_release_timestamp_present": 0
+    },
+    "kma_midrange": {
+      "weather_archive": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange",
+      "weather_files": [
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-01.csv",
+          "sha256": "bff52aecd642fb2ced0fd715527ee3e3c022453b91e9384db20404d2738f357f"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-02.csv",
+          "sha256": "c633591fa569050fd261625f1b5e30f99607f7735ceda85b5f833eaa6c746af8"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-03.csv",
+          "sha256": "8901f44a1f81e68c6d952277cffafc1051a4e28eb4f38098aa79ed8a4942a628"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-04.csv",
+          "sha256": "fb11e8b9579cd1a9bae8f0410ac5f63a96686fdf973c49b0f97d07a679c1e894"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-05.csv",
+          "sha256": "67176a6dafba068739e9dc9e2ac9bd37fa9e4e339e608e11132235ffb40aadfd"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-06.csv",
+          "sha256": "95518f90cbfe146002ef7ecdb29ef940f1a29dc4450a6d87b2c079668e82ac40"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-07.csv",
+          "sha256": "c53f2fdb27136afb37aa90fa838f6e12c7162afad46ad315abd0e27423c289a8"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-08.csv",
+          "sha256": "18900125cf2fd03f6ead16d71f83c742bad2f0ca129b456077eb35f3ac911051"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-09.csv",
+          "sha256": "5f43df6d340e5584d778b01658f1a5627ba3d7ec34fbbb72aee124962156a188"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-10.csv",
+          "sha256": "43d2a2829463eb04f25489f93ed206b7c58c9ab96ad0a44b98a575c41861abe2"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-11.csv",
+          "sha256": "a3ad0ce1e75b3e5cec39ff3d2d9c7937321637c9df88296c3df00ef5e45f461b"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2023-12.csv",
+          "sha256": "7df5c99e339837447f1de794256bc40b65f3bc2db6121889d5057f0fcdb9f0e9"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-01.csv",
+          "sha256": "8b9582b40a7fbc9395d97b8f09ea48558fa8ea471287340a6b7a729b6d61a522"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-02.csv",
+          "sha256": "01c568acc035d4292d765841c1f097a6195ffdb069c34d7671656a4a50d5ea2c"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-03.csv",
+          "sha256": "81b85f1bd1fb9d10fcd55a59a444979e163cf6fc0b4a7d4f6870971c30d6f7de"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-04.csv",
+          "sha256": "26e5ce72fe7e482568ff6da74e8795a97ba5f014645929482f910928c8039625"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-05.csv",
+          "sha256": "8af83c3c4f5505900e50fd3c26aa0c9ac3394188029b84c459b7953059de0835"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-06.csv",
+          "sha256": "f4a68aa19e7c0a6db03ecf9892ebe83b5ce3f42302f91baa5e85ad60e75ff3e8"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-07.csv",
+          "sha256": "29086468f0259742f202daae2f3ae7343ceefc7e7f881b4ae5f651944ee1522f"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-08.csv",
+          "sha256": "67c46665d16d5a62a337ee0ff8e13d81fa7561a6df6fb1cdb947ad90497dbebf"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-09.csv",
+          "sha256": "4fe3002c2115c63b484d1818088f8f24d1ed25129e636290fd8cf392a1f9edaf"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-10.csv",
+          "sha256": "04ac405cc5a1cdb0792400207f95ebab73c94456f0264f7fc1c34971cda9cc4d"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-11.csv",
+          "sha256": "297e04a1b866cc4a3c7c116fed7a6db2834a6bf2a55ef9f402fe07a6bca79590"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2024-12.csv",
+          "sha256": "13e4039835980871459d2f10c86a9ae479282c1a430a8ae2359af676e1cfd3ec"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-01.csv",
+          "sha256": "1d6961a824c0a2565ce21c49f08614e8714de341bd9e3990b9bb9185d60d46c4"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-02.csv",
+          "sha256": "b57220902526580b152ed7614bddb1b1a8bef1d83e3983c4f659cc00e85ff935"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-03.csv",
+          "sha256": "71a61957abeffcd35e37272caaab32d81d28f0650a7e1a72d67a1c51c28d45f2"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-04.csv",
+          "sha256": "2c432a7135ea6ebcb57303a3264906bc2a319651cbcb6dee321a7b55ae491d0e"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-05.csv",
+          "sha256": "09de6e86c88f895fcd2534f2df668d2c69879b61f012bb974d0c202e11c2b16f"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-06.csv",
+          "sha256": "63a75db14ad70ef9d44a9de85560110f2ef9aa187040f560cd909e4d5d6f16f5"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-07.csv",
+          "sha256": "b2c33b4b6eefa07e54c87250a88644dc730c4e1e3b5c2a218ba4f3b00084224d"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-08.csv",
+          "sha256": "2d12d5ac15418026a9c86a766af76916b9ceca2d994cce8cef98a8c5fd6de9b5"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-09.csv",
+          "sha256": "fbdcf952e937d2e03798a65470db635153694a443e05528f4c53795ccd115d91"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-10.csv",
+          "sha256": "586ea0943a811c4ab4ced7c3a826ce513121d2b55f29807b220031b1ef485ecb"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-11.csv",
+          "sha256": "53bd8400141b7c821a768926fcca79b0915fa3cbea7e7fdb8f8550cf2ac4eb4b"
+        },
+        {
+          "path": "./gradproject_shared_data_20261118\\shared_data\\kma_midrange\\forecast_2025-12.csv",
+          "sha256": "e6ec7f0b5583db37e2dfb6f6ed9ddc59f44eef181391bb89a38a1c8975e33681"
+        }
+      ],
+      "weather_rows": 26102,
+      "weather_regions": [
+        "metro"
+      ],
+      "weather_periods": [
+        "am",
+        "pm"
+      ],
+      "weather_categories": [
+        "구름많고 눈",
+        "구름많고 비",
+        "구름많고 비/눈",
+        "구름많고 소나기",
+        "구름많음",
+        "맑음",
+        "흐리고 눈",
+        "흐리고 비",
+        "흐리고 비/눈",
+        "흐리고 소나기",
+        "흐림"
+      ],
+      "temperature_path": "./SMP_72H_INPUT_DATA\\12_kma_midrange_forecast\\12_kma_midrange_temperature_seoul.csv",
+      "temperature_sha256": "6b935fba221b864ab3960ce4683d7ecdc2006cce848039924847005cdf7a91af",
+      "temperature_rows_seoul": 21231,
+      "temperature_min_column": "최저기온",
+      "temperature_max_column": "최고기온"
+    },
+    "smp": {
+      "path": "./SMP_SARIMAX_2026\\data\\processed\\hourly_smp_2023_2025.csv",
+      "sha256": "81c08e785e4db73a230712e2c885d7a739333e7478da50737a4dccaf8b412ea6",
+      "rows": 26304,
+      "missing": 0,
+      "warmup_path": "./SMP_72H_RESEARCH\\data\\raw\\epsis_land_hourly_smp_warmup_20221224_20221231.csv",
+      "warmup_sha256": "5edc93ca32610f7d3db784c19178099999a7fe81e26508795e082616f3fdafcb",
+      "warmup_hours": 192,
+      "range": [
+        "2022-12-24 00:00:00",
+        "2025-12-31 23:00:00"
+      ],
+      "availability_rule": "SMP hour values are treated as available only after their hourly interval ends; source hour-start timestamp + 1h must be <= the common observed cutoff because per-hour publication timestamps are unavailable"
+    },
+    "day_ahead_demand_forecast": {
+      "path": "./SMP_72H_INPUT_DATA\\02_day_ahead_demand_mlfd\\mainland_demand_forecast_2023_2025.csv",
+      "sha256": "5d93658f3e9055e8546bf3a764edb6b9beca8e55bffcde4d8a81b3dbb207beeb",
+      "rows": 26304,
+      "geography": [
+        "mainland"
+      ],
+      "publication_time_verified": false,
+      "rule": "past demand forecast history only at common cutoff; no target-day D+1/D+2/D+3 official forecast attached"
+    },
+    "old_group1_candidate": {
+      "path": "./SMP_72H_INPUT_DATA\\01_actual_hourly_demand\\01_actual_hourly_demand.csv",
+      "sha256": "86dd002af654b609aeefbde3b0408549763db65178a7efd9178e37b8291531ca",
+      "scope": "nationwide_including_Jeju",
+      "used": false,
+      "reason": "not the requested EPSIS land actual-load series"
+    },
+    "holiday": {
+      "path": "./SMP_72H_INPUT_DATA\\03_kasi_holidays\\03_kasi_holidays.csv",
+      "sha256": "2d5d82601c03d014f7224f2f6b10d9ab81ab3c7b8077e371245b37bab25868ae",
+      "official_dates": 78
+    }
+  },
+  "limitations": [
+    "EPSIS historical current-load page does not carry a row-level geography field; the main monitoring page is treated as the mainland system based on the separately exposed Jeju monitoring page, and this scope inference is recorded.",
+    "Actual publication timestamps for EPSIS/KPX/ASOS observations are not verified; the common 72-hour cutoff is a conservative research assumption, not a measured release-delay fact.",
+    "SMP hourly publication time is not present in the source; only completed hourly values through the common 72-hour cutoff are used.",
+    "Demand forecast issue timestamps are not verified; group 2 is used only as past forecast history and conservatively cut at 72 hours.",
+    "Group 6 excludes Jeju where region is explicit; 2023 provincial wind/sun values are summed only for complete rows and may remain missing; source coverage excludes PPA/BTM and may represent market trades only.",
+    "Domestic LNG same-target-month input is a conditional historical experiment, not a feature confirmed available at forecast origin.",
+    "Group 12 issue timestamps are used where archived; daily forecast periods and source categories are not expanded into hourly weather values."
+  ]
+}

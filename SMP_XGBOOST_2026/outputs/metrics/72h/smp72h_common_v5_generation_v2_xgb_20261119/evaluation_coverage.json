@@ -1,0 +1,13 @@
+{
+  "dataset_version": "smp72h_common_v5_generation_v2_xgb_20261119",
+  "expected_target_rows": 78480,
+  "prediction_rows": 78480,
+  "actual_smp_nonmissing_rows": 78480,
+  "prediction_nonmissing_rows": 78480,
+  "coverage_by_split": {
+    "final_test": 13104,
+    "train": 52488,
+    "validation": 12888
+  },
+  "failed_origins": 0
+}

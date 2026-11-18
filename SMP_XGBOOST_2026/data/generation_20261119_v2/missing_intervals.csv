@@ -1,0 +1,7 @@
+﻿variable,start,end,hours
+lng_generation_mwh,2024-02-29 00:00:00+09:00,2024-02-29 23:00:00+09:00,24
+bituminous_coal_generation_mwh,2024-02-29 00:00:00+09:00,2024-02-29 23:00:00+09:00,24
+anthracite_coal_generation_mwh,2024-02-29 00:00:00+09:00,2024-02-29 23:00:00+09:00,24
+anthracite_coal_generation_mwh,2024-08-01 00:00:00+09:00,2024-08-31 23:00:00+09:00,744
+nuclear_generation_mwh,2024-02-29 00:00:00+09:00,2024-02-29 23:00:00+09:00,24
+nuclear_generation_mwh,2024-08-01 00:00:00+09:00,2024-08-31 23:00:00+09:00,744
