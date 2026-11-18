@@ -75,3 +75,9 @@ Horizon 1–72, monthly metrics, surge/drop error slices, detailed bias, and cov
 The 72-hour observation cutoff is a study assumption; actual release timestamps were not verified. The Group 1 EPSIS feed lacks row-level mainland geography, so `data_gate_passed` remains false and this result is conditional. Group 5 missing periods stay missing and use the frozen panel's flags/native LightGBM missing handling; the 2024 periods absent from the source were not zero-filled. Same-month domestic LNG is conditional and not operationally available at historical issue time.
 
 Re-run from the repository root with `python SMP_LightGBM_2026/upgrades/upgrade_72h_20261119/scripts/run_lightgbm_upgrade.py`. The script discovers the immutable common v5 manifest or accepts `--dataset-root`; it writes only to this upgrade folder. Dependencies are listed in `SMP_LightGBM_2026/requirements.txt`.
+
+## GitHub publication
+
+- Repository branch: `codex/lightgbm-72h-upgrade-20261119`
+- Artifact folder: `SMP_LightGBM_2026/upgrades/upgrade_72h_20261119/`
+- Artifact commit: `136db21af2bb27bd514448fbc98114866638171f`
