@@ -1,1 +1,0 @@
-Existing outputs are from the calendar-only exploratory experiment. They are not complete-input Validation or Final Test results. Full selected input collection and point-in-time-safe SARIMAX integration are required before reporting model performance.

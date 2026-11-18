@@ -1,1 +1,0 @@
-"""SARIMAX SMP research pipeline."""
