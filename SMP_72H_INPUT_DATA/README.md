@@ -11,7 +11,7 @@
 | 3 | 공휴일 (`locdate`, `isHoliday`) | `03_kasi_holidays.csv` | KASI API 원자료. API 응답을 CSV로 보존. |
 | 4 | 달력 특성 | `04_calendar_features.csv` | 2023–2025 시간별 파생 패널. 공통 변환 기준(요일·계절·sin/cos)은 모델 간 확정 필요. |
 | 5 | 발전원별 발전량 (`tradeYmd`, `tradeNo`, `fuelTpCd`, `amgo`) | `05_generation_by_fuel_amgo.csv` | API 표본 100일(2023-01-01~2023-04-11), 전체 2023–2025 아님. 아래 첨부 연간 용량·거래량 CSV는 별도 공식 파일이며 `amgo`와 동일 필드·정의라 단정하지 말 것. |
-| 6 | 지역별 태양광·풍력 실적 | `06_regional_solar_wind_actuals.csv` | API/가공 패널. 풍력은 제주만 있고 태양광은 일부 날짜 표본. 계량 ZIP은 별도 정의(ESS 충방전 제외)이며 혼합 금지. |
+| 6 | 지역별 태양광·풍력 실적 | `06_regional_solar_wind_actuals/team_shared_originals/`의 원본 7개 CSV | 팀 GitHub `shared_datasets/kpx_renewables` 폴더를 복사했고 manifest의 SHA-256과 7개 CSV 모두 일치. 2023년 1~11월 풍력은 시도별 열, 2023-12~2025년은 육지/제주 구분 자료가 있음. 2024 육지 풍력 8,784시간, 2025 8,760시간, 2023-12~2025 원본 대조 차이 0. 2023년 시도별 빈칸 품질은 별도 확인 필요. 아래 과거 통합 패널은 불완전한 스냅샷으로 원본을 대체하지 않음. |
 | 7 | 공급예비력·공급예비율 | `07_supply_reserve_mw_pct.csv` | 5분 패널. 2023–2025 1,095시각 결측/산식·정의 검토 필요. 공급예비력과 운영예비력 구분. |
 | 8 | 국내 LNG 발전 연료비단가 (원/kWh) | `08_domestic_lng_fuel_cost.csv` | 원본 HOME 엑셀에서 연료비단가 표의 LNG 열 추출. 원본 시트·셀·기준월 및 조건부 동월 실험은 별도 출처 기록 필요. |
 | 9 | FRED WTI·Brent (USD/barrel) | `09_fred_wti_brent.csv` | 현재 패널은 과거 값/빈티지 반복 문제가 있어 D−2 as-of 입력으로 사용 불가. 원시 시리즈 ID는 DCOILWTICO, DCOILBRENTEU. |
@@ -34,3 +34,4 @@
 - 실측은 origin 이전 과거 lag에만 사용한다. 목표시각 이후 실측은 입력에 넣지 않는다.
 - 데이터 공백, 공개범위 밖, 실제 0은 서로 구분한다.
 - 팀 원본 및 상세 검수 근거: `gradproject_shared_data_20261118/shared_data/`의 현지 수집 사본과 `SMP_72H_RESEARCH/reports/required_input_availability_20261118.md`.
+- 6번 공식 원본 출처: https://github.com/gemmanzu-a11y/smp-graduation-2026/tree/main/shared_datasets/kpx_renewables ; 상세 지역/연도 범위와 파일 해시는 `06_regional_solar_wind_actuals/team_shared_originals/README.md` 및 `manifest.json` 참조.
