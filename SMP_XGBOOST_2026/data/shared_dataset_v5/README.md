@@ -11,10 +11,12 @@ This version was built from `gradproject` branch `codex/smp-72h-data` at a90141b
 
 ## Tables
 
-- `hourly.csv`: raw hourly panel. It preserves source NaNs and adds missing flags; observed interval aggregates are aligned to their corresponding interval start for presentation.
-- `forecast_inputs.csv`: one row per forecast origin and target hour. The repeated historical features are computed at the origin's common cutoff. Numeric missing values are filled using per-feature Train median; `__is_missing` columns retain the pre-fill state. All-missing Train features remain NaN for XGBoost's native handling.
+For GitHub packaging, the three largest CSV tables are stored as gzip files. Run `python SMP_XGBOOST_2026/scripts/restore_shared_dataset.py` from the repository root to restore the original CSV filenames in `SMP_SHARED_DATA/versions/`.
+
+- `hourly.csv` (`hourly.csv.gz` in this package): raw hourly panel. It preserves source NaNs and adds missing flags; observed interval aggregates are aligned to their corresponding interval start for presentation.
+- `forecast_inputs.csv` (`forecast_inputs.csv.gz` in this package): one row per forecast origin and target hour. The repeated historical features are computed at the origin's common cutoff. Numeric missing values are filled using per-feature Train median; `__is_missing` columns retain the pre-fill state. All-missing Train features remain NaN for XGBoost's native handling.
 - `evaluation_origins.csv`: the common issue schedule and cutoffs.
-- `evaluation_targets.csv`: fixed common target schedule, actual land SMP, and daily-repeat/weekly baselines.
+- `evaluation_targets.csv` (`evaluation_targets.csv.gz` in this package): fixed common target schedule, actual land SMP, and daily-repeat/weekly baselines.
 - `demand_reserve_missing_timestamps.csv`: hourly interval-end comparison showing which EPSIS demand and reserve aggregates are missing.
 - `feature_manifest.csv`: input source, group, units, availability, pre-imputation missing rate, and imputation value.
 - `quality_report.json`: source quality, coverage, leakage checks and limitations.

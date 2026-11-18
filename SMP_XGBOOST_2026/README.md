@@ -8,7 +8,7 @@ Only input group 5 changed from the prior run. It now uses the team's kpx_genera
 
 The v2 panel contains 26,304 hourly rows for 2023–2025. Source kinds are annual 2023, API 2024, and annual 2025. In 2024, 24 LNG and bituminous-coal observations and 768 anthracite, nuclear, and combined-coal observations are missing; these remain flagged and are imputed using Train-only medians. The source represents market-traded sent-out energy and does not separate mainland and Jeju.
 
-All other input groups, feature rules, issue times, targets, and Train/Validation/Final Test schedules match the prior common dataset. data/shared_dataset_v5/ contains the version manifest, quality report, feature manifest, and fixed evaluation-origin file. The full forecast-input panel is stored in the workspace common-data area, not duplicated here.
+All other input groups, feature rules, issue times, targets, and Train/Validation/Final Test schedules match the prior common dataset. The complete common dataset version is included under data/shared_dataset_v5/. To keep each GitHub file below its size limit, forecast_inputs.csv, hourly.csv, and evaluation_targets.csv are gzip-compressed. The restore script expands them into SMP_SHARED_DATA/versions/ and refuses to overwrite an existing dataset version.
 
 ## Results
 
@@ -31,6 +31,8 @@ Final Test MAE is worse than the recent-daily baseline (13.09 원/kWh) and weekl
 
 ## Reproduce
 
-From the repository root, install requirements.txt and provide common dataset version smp72h_common_v5_generation_v2_xgb_20261119 under SMP_SHARED_DATA/versions/, then run:
+From the repository root, install the project requirements, restore the bundled common dataset, then run:
 
+python -m pip install -r SMP_XGBOOST_2026/requirements.txt
+python SMP_XGBOOST_2026/scripts/restore_shared_dataset.py
 python SMP_XGBOOST_2026/src/models/train_xgboost_72h.py --dataset-version smp72h_common_v5_generation_v2_xgb_20261119
