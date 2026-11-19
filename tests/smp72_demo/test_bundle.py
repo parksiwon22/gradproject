@@ -44,5 +44,18 @@ class BundleTests(unittest.TestCase):
             self.assertIsNone(r['actual_smp']);self.assertAlmostEqual(r['predicted_smp'],.4*r['sarimax_prediction']+.6*r['weekly_baseline'],places=7)
             self.assertLessEqual(datetime.fromisoformat(r['weekly_reference_timestamp'])+timedelta(hours=1),cutoff)
         self.assertEqual({q['variable'] for q in f['quality'] if q['missing_hours']==168},{'generation_lng','generation_coal','generation_nuclear','solar_actual','wind_actual'})
-        offline=(ROOT/'docs/downloads/smp72-offline.html').read_text();self.assertIn('id="live-json"',offline)
+        offline=(ROOT/'docs/downloads/smp72-offline.html').read_text();self.assertNotIn('id="live-json"',offline)
+    def test_2025_presentation_and_full_semester_coverage(self):
+        o=next(o for o in self.d['origins'] if o['forecast_origin']=='2025-11-19T23:00:00+09:00')
+        self.assertEqual(o['targets'][0],'2025-11-20T00:00:00+09:00')
+        self.assertEqual(o['targets'][-1],'2025-11-22T23:00:00+09:00')
+        latest={}
+        for o in self.d['origins']:
+            for i,t in enumerate(o['targets']):
+                if t not in latest or latest[t]['origin']<o['forecast_origin']:latest[t]={'origin':o['forecast_origin'],'horizon':i+1}
+        self.assertEqual(len(latest),4416)
+        self.assertEqual([sum(t[5:7]==f'{m:02d}' for t in latest) for m in range(7,13)],[744,744,720,744,720,744])
+        html=(ROOT/'docs/index.html').read_text();self.assertNotIn('legacy-v20.html',html)
+        self.assertIn('2025-11-20T18:00',html)
+        self.assertNotIn('forecast-20261120.json',(ROOT/'docs/smp72_live.js').read_text())
 if __name__=='__main__':unittest.main()
