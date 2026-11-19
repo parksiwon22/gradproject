@@ -33,7 +33,7 @@ function selectForecast(value){
  $('liveStatus').textContent=past?'과거 예측 비교':'SARIMAX 사전 예측';$('liveStatus').classList.toggle('pending',!past);
  $('liveNotice').textContent=`${first.slice(0,10)} ~ ${last.slice(0,10)}의 72시간 예측입니다. ${past?'저장된 실제 SMP와 비교합니다.':`실제 계산시각 ${date(data.calculated_at)} KST. 예정 기준시각과 구분합니다.`}`;
  $('liveOrigin').textContent=date(data.forecast_origin);$('liveCreated').textContent=first.slice(0,10)+' ~ '+last.slice(0,10);$('liveCutoff').textContent=date(data.observed_cutoff);$('liveTarget').textContent=`${date(first)} ~ ${date(last)}`;
- $('liveQualityWarning').textContent=past?'선택한 과거 예측과 당시 시간 조건으로 충전 시뮬레이션을 계산합니다.':'LNG·석탄·원자력·태양광·풍력의 최근 입력은 학습기반 대체값입니다. 입력 보완 조건은 아래 연구 안내에서 확인할 수 있습니다.';
+ $('liveQualityWarning').textContent=past?'선택한 과거 예측과 당시 시간 조건으로 충전 시뮬레이션을 계산합니다.':'';$('liveQualityWarning').hidden=!past;
  $('selectedDataPolicy').textContent=past?'저장된 SARIMAX40%+주간60% 혼합 검증 결과입니다. 발전량 결측 대체 및 동월 LNG 제공 조건을 포함합니다.':'11월19일20:05에 계산한 사전 예측입니다. 11월16일23시까지의 실측과 10월 LNG를 사용하고 발전량5종은 대체했습니다. 23시 재발행은 취소된 상태로 새 발행을 주장하지 않습니다.';
  $('livePanel').querySelector('.chart-caption span:first-child').textContent=past?'원/kWh · 실선: 예측 / 진한 선: 실제 / 점선: 전주 기준선':'원/kWh · 실선: 예측 / 점선: 전주 기준선';
  $('livePanel').querySelector('.chart-caption span:last-child').textContent=past?'실제 SMP와 예측값을 비교합니다.':'선택한 기간의 예측 가격 흐름입니다.';
