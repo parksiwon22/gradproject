@@ -41,7 +41,8 @@ jobs:
           node --check docs/smp72_demo.js
           node --check docs/smp72_live.js
           node --check docs/smp72_charging.js
-          node --test tests/smp72_demo/charging.test.cjs
+          node --test tests/smp72_demo/charging.test.cjs tests/smp72_demo/weather.test.cjs
+          node --check docs/smp72_weather.js
       - name: Rebuild self-contained offline copy
         run: python scripts/build_smp72_offline.py
       - uses: actions/configure-pages@v5
