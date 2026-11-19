@@ -28,7 +28,7 @@ function draw(){
 }
 function selectForecast(value){
  $('evResult').hidden=true;$('evError').hidden=true;$('liveForecastContent').hidden=true;
- $('forecastPreparing').hidden=true;const chosen=choices.find(c=>c.value===value);if(!chosen){data=null;$('liveStatus').textContent=value?'예측 준비 중':'날짜 선택 대기';$('liveNotice').textContent=value?'예측이 준비되면 이곳에서 확인할 수 있어요.':'충전할 날짜를 선택해주세요.';if(value){$('preparingTitle').textContent=value+'의 충전 날씨를 준비하고 있어요';$('forecastPreparing').hidden=false;}return;}
+ $('forecastPreparing').hidden=true;const chosen=choices.find(c=>c.value===value);if(!chosen){data=null;$('liveStatus').textContent=value?'예측 준비 전':'날짜 선택 대기';$('liveNotice').textContent=value?'예측이 준비되면 이곳에서 확인할 수 있어요.':'충전할 날짜를 선택해주세요.';if(value){$('preparingTitle').textContent=value+'의 예측은 아직 준비되지 않았어요';$('forecastPreparing').hidden=false;}return;}
  data=chosen.data;day=0;validate(data);const past=data.mode==='historical_replay',first=data.rows[0].target_timestamp,last=data.rows[71].target_timestamp;
  $('liveStatus').textContent=past?'과거 예측 비교':'SARIMAX 사전 예측';$('liveStatus').classList.toggle('pending',!past);
  $('liveNotice').textContent=`${first.slice(0,10)} ~ ${last.slice(0,10)}의 72시간 예측입니다. ${past?'저장된 실제 SMP와 비교합니다.':`실제 계산시각 ${date(data.calculated_at)} KST. 예정 기준시각과 구분합니다.`}`;

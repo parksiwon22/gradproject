@@ -46,7 +46,7 @@
 <p class="eyebrow">SELECT A DATE / SMP FORECAST</p><h2>언제 충전할 계획인가요?</h2><p>예측 시작일을 선택하면 다음 72시간의 가격과 충전 추천을 확인할 수 있습니다.</p><label class="date-picker-label">예측 시작일<select id="forecastDateSelect"><option value="">날짜를 선택해주세요</option></select></label>
 <span id="liveStatus" class="badge pending">사용 가능한 예측 확인 중</span>
 <p id="liveNotice">선택 가능한 날짜의 저장된 예측만 표시합니다.</p>
-<div id="forecastPreparing" class="preparing-state" hidden><span aria-hidden="true">⛅</span><h3 id="preparingTitle">예측을 준비하고 있어요</h3><p>아직 이 날짜의 가격이 준비되지 않았습니다. 준비된 예측으로 충전 날씨를 먼저 살펴보세요.</p><button id="showPreparedForecast" class="primary">준비된 예측 살펴보기 →</button></div>
+<div id="forecastPreparing" class="preparing-state" hidden><span aria-hidden="true">⛅</span><h3 id="preparingTitle">예측이 아직 준비되지 않았어요</h3><p>아직 이 날짜의 가격이 준비되지 않았습니다. 준비된 예측으로 충전 날씨를 먼저 살펴보세요.</p><button id="showPreparedForecast" class="primary">준비된 예측 살펴보기 →</button></div>
 <div id="liveForecastContent" hidden>
 <dl class="live-grid"><div><dt>예측 기준시각 · KST</dt><dd id="liveOrigin"></dd></div><div><dt>예측 대상 기간 · KST</dt><dd id="liveCreated"></dd></div><div><dt>실측 입력 마감 · KST</dt><dd id="liveCutoff"></dd></div></dl>
 <div class="live-warning" id="liveQualityWarning"></div>
@@ -1442,7 +1442,7 @@ function draw(){
 }
 function selectForecast(value){
  $('evResult').hidden=true;$('evError').hidden=true;$('liveForecastContent').hidden=true;
- $('forecastPreparing').hidden=true;const chosen=choices.find(c=>c.value===value);if(!chosen){data=null;$('liveStatus').textContent=value?'예측 준비 중':'날짜 선택 대기';$('liveNotice').textContent=value?'예측이 준비되면 이곳에서 확인할 수 있어요.':'충전할 날짜를 선택해주세요.';if(value){$('preparingTitle').textContent=value+'의 충전 날씨를 준비하고 있어요';$('forecastPreparing').hidden=false;}return;}
+ $('forecastPreparing').hidden=true;const chosen=choices.find(c=>c.value===value);if(!chosen){data=null;$('liveStatus').textContent=value?'예측 준비 전':'날짜 선택 대기';$('liveNotice').textContent=value?'예측이 준비되면 이곳에서 확인할 수 있어요.':'충전할 날짜를 선택해주세요.';if(value){$('preparingTitle').textContent=value+'의 예측은 아직 준비되지 않았어요';$('forecastPreparing').hidden=false;}return;}
  data=chosen.data;day=0;validate(data);const past=data.mode==='historical_replay',first=data.rows[0].target_timestamp,last=data.rows[71].target_timestamp;
  $('liveStatus').textContent=past?'과거 예측 비교':'SARIMAX 사전 예측';$('liveStatus').classList.toggle('pending',!past);
  $('liveNotice').textContent=`${first.slice(0,10)} ~ ${last.slice(0,10)}의 72시간 예측입니다. ${past?'저장된 실제 SMP와 비교합니다.':`실제 계산시각 ${date(data.calculated_at)} KST. 예정 기준시각과 구분합니다.`}`;
