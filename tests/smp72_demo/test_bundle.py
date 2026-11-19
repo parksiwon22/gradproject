@@ -26,8 +26,23 @@ class BundleTests(unittest.TestCase):
             computed={'mae':sum(abs(e) for e in errors)/len(errors),'rmse':math.sqrt(sum(e*e for e in errors)/len(errors)),'r2':1-sum(e*e for e in errors)/sum((y-mean)**2 for y in ys)}
             for k,v in computed.items():self.assertAlmostEqual(v,m['metrics'][k],places=6)
     def test_no_claimed_live_forecast_and_offline_is_self_contained(self):
-        status=json.loads((ROOT/'docs/demo/live-status.json').read_text());self.assertEqual(status['status'],'not_connected')
+        status=json.loads((ROOT/'docs/demo/live-status.json').read_text());self.assertIn(status['status'],['not_connected','preliminary','issued'])
         html=(ROOT/'docs/downloads/smp72-offline.html').read_text()
         self.assertIn('id="demo-json"',html);self.assertNotIn('<script defer src=',html);self.assertNotIn('<link rel="stylesheet"',html)
         self.assertIn('과거 검증 재생',html)
+    def test_new_forecast_is_genuine_and_explicit_about_time_and_imputation(self):
+        f=json.loads((ROOT/'docs/demo/forecast-20261120.json').read_text())
+        origin=datetime.fromisoformat(f['forecast_origin']);cutoff=datetime.fromisoformat(f['observed_cutoff'])
+        self.assertEqual(f['mode'],'new_forecast');self.assertEqual(f['feature_count'],83)
+        self.assertEqual(origin-cutoff,timedelta(hours=72));self.assertEqual(len(f['rows']),72)
+        if f['status']=='issued':self.assertGreaterEqual(datetime.fromisoformat(f['calculated_at']),origin)
+        else:self.assertEqual(f['status'],'preliminary')
+        self.assertLessEqual(datetime.fromisoformat(f['input_snapshot_at']),origin)
+        self.assertEqual(f['domestic_lng']['reference_month'],'2026-10')
+        for i,r in enumerate(f['rows']):
+            self.assertEqual(datetime.fromisoformat(r['target_timestamp']),origin+timedelta(hours=i+1))
+            self.assertIsNone(r['actual_smp']);self.assertAlmostEqual(r['predicted_smp'],.4*r['sarimax_prediction']+.6*r['weekly_baseline'],places=7)
+            self.assertLessEqual(datetime.fromisoformat(r['weekly_reference_timestamp'])+timedelta(hours=1),cutoff)
+        self.assertEqual({q['variable'] for q in f['quality'] if q['missing_hours']==168},{'generation_lng','generation_coal','generation_nuclear','solar_actual','wind_actual'})
+        offline=(ROOT/'docs/downloads/smp72-offline.html').read_text();self.assertIn('id="live-json"',offline)
 if __name__=='__main__':unittest.main()

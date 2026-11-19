@@ -1,1 +1,14 @@
-{"schema_version":1,"status":"not_connected","model_policy":"sarimax40_weekly60_v3","presentation_at_kst":"2026-11-20T15:00:00+09:00","required_forecast_origin":"2026-11-19T23:00:00+09:00","required_target_start":"2026-11-20T00:00:00+09:00","required_target_end":"2026-11-22T23:00:00+09:00","reason":"새 SARIMAX 혼합 모델의 최신 12개 입력과 예측 발행이 검증되지 않았습니다. 과거 예측을 오늘 날짜로 옮겨 표시하지 않습니다.","api_keys_in_browser":false}
+{
+  "schema_version": 1,
+  "status": "preliminary",
+  "model_policy": "sarimax40_weekly60_v3",
+  "presentation_at_kst": "2026-11-20T15:00:00+09:00",
+  "required_forecast_origin": "2026-11-19T23:00:00+09:00",
+  "required_target_start": "2026-11-20T00:00:00+09:00",
+  "required_target_end": "2026-11-22T23:00:00+09:00",
+  "reason": "실제 SARIMAX 혼합 모델의 사전 계산 완료. 발전량·재생에너지 결측 대체 조건과 실제 계산시각을 확인해야 합니다.",
+  "api_keys_in_browser": false,
+  "calculated_at": "2026-11-19T20:05:17.546419+09:00",
+  "forecast_file": "forecast-20261120.json",
+  "input_snapshot_at": "2026-11-19T20:05:17.546419+09:00"
+}
