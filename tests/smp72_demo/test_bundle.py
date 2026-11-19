@@ -57,5 +57,7 @@ class BundleTests(unittest.TestCase):
         self.assertEqual([sum(t[5:7]==f'{m:02d}' for t in latest) for m in range(7,13)],[744,744,720,744,720,744])
         html=(ROOT/'docs/index.html').read_text();self.assertNotIn('legacy-v20.html',html)
         self.assertIn('2025-11-20T18:00',html)
-        self.assertNotIn('forecast-20261120.json',(ROOT/'docs/smp72_live.js').read_text())
+        self.assertIn('forecastDateSelect',html)
+        self.assertIn('forecast-20261120.json',(ROOT/'docs/smp72_live.js').read_text())
+        self.assertIn('id="latest-json"',(ROOT/'docs/downloads/smp72-offline.html').read_text())
 if __name__=='__main__':unittest.main()

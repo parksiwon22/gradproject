@@ -1,18 +1,18 @@
 <!doctype html>
-<html lang="ko" data-build="smp72-2025-presentation-20261119">
+<html lang="ko" data-build="smp72-date-picker-20261119">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#13394b"><meta name="description" content="실제 저장된 72시간 육지 SMP 예측과 검증 결과를 확인하는 졸업작품 연구 시연">
 <title>전력예보 · 72시간 SMP 연구 시연</title>
-<link rel="stylesheet" href="./smp72_demo.css?v=20261120-2025v1"><script defer src="./smp72_demo.js?v=20261120-2025v1"></script>
-<script defer src="./smp72_charging.js?v=20261120-2025v1"></script><script defer src="./smp72_live.js?v=20261120-2025v1"></script>
+<link rel="stylesheet" href="./smp72_demo.css?v=20261120-picker1"><script defer src="./smp72_demo.js?v=20261120-picker1"></script>
+<script defer src="./smp72_charging.js?v=20261120-picker1"></script><script defer src="./smp72_live.js?v=20261120-picker1"></script>
 </head>
 <body>
 <a class="skip" href="#forecast">예측 그래프로 바로가기</a>
 <header class="header"><div class="container nav"><a class="brand" href="#top"><span class="brand-icon">↗</span><span>전력예보<small>POWER FORECAST</small></span></a><nav aria-label="주요 메뉴"><a href="#forecast">72시간 예측</a><a href="#comparison">모델 비교</a><a href="#sources">데이터와 방법</a></nav><span class="nav-status"><i></i> 졸업작품 연구 시연</span></div></header>
 <main id="top" class="container">
 <section class="intro"><div><p class="eyebrow">SMP FORECAST · RESEARCH DEMONSTRATION</p><h1>72시간의 전력가격,<br>하나의 흐름으로.</h1><p class="lead">발행시각을 선택해 예측과 실제 가격을 비교합니다.<br>데이터와 모델의 조건까지 함께 확인하는 전력시장 예측 연구입니다.</p></div><div class="presentation-card"><span class="tiny-label">발표 시연 일정</span><strong>2026.11.20 <em>15:00 KST</em></strong><p>발표일과 데이터의 예측 기준일은 다릅니다.<br>아래의 발행시각을 기준으로 읽어주세요.</p></div></section>
-<div class="mode-tabs" role="group" aria-label="시연 종류"><button id="replayMode" class="active" aria-pressed="true">검증된 과거 예측 재생</button><button id="liveMode" aria-pressed="false">2025년 11월 20~22일 예측</button></div>
+<div class="mode-tabs" role="group" aria-label="시연 종류"><button id="replayMode" class="active" aria-pressed="true">검증된 과거 예측 재생</button><button id="liveMode" aria-pressed="false">예측일 선택 · 충전 추천</button></div>
 <div id="loadError" class="error" role="alert" hidden><h2>검증 데이터를 불러오지 못했습니다.</h2><p id="loadErrorText"></p><button id="retry">다시 불러오기</button><p>준비한 오프라인 시연 파일을 사용해도 됩니다. 임의의 예측값으로 대체하지 않습니다.</p></div>
 <section id="replayPanel">
 <div class="notice"><span class="badge">과거 검증 재생 · 2025년</span><p>실제 저장된 예측을 표시합니다. 오늘의 실시간 예측이나 공식 전기요금이 아닙니다.</p></div>
@@ -30,9 +30,9 @@
 <section id="sources" class="panel sources"><div class="section-top"><div><p class="eyebrow">03 / DATA & METHOD</p><h2>가격을 설명하는 네 가지 측면</h2><p class="sub">12개 공통 입력 그룹과 과거 육지 SMP를 같은 시간 기준으로 연결했습니다.</p></div></div><div class="source-grid"><article><span>DEMAND</span><h3>수요와 달력</h3><p>실제 전력수요, 과거 수요예측 이력, 공휴일과 달력 특성으로 필요량과 반복 패턴을 봅니다.</p></article><article><span>SUPPLY</span><h3>발전과 공급 여유</h3><p>LNG·석탄·원자력, 태양광·풍력 발전량과 공급예비력·예비율을 사용합니다.</p></article><article><span>FUEL</span><h3>발전비용의 변화</h3><p>국내 LNG 발전 연료비단가와 국제 원유·LNG·석탄 가격을 구분합니다.</p></article><article><span>WEATHER</span><h3>기상과 예보</h3><p>서울108 기온·일사·풍속 관측, 발표시각이 있는 중기예보를 연결합니다.</p></article></div><details><summary>학습 기간과 데이터 해석의 조건 확인</summary><div class="method-details"><p><strong>Train</strong> 2023~2024년 → <strong>Validation</strong> 2025년 1~6월 → 설정 확정 후 <strong>Train+Validation 재학습</strong> → 2025년 7~12월 재평가.</p><p>실측은 모든 예측거리에 공통으로 기준시각−72시간을 적용합니다. 이는 자료별 실제 공개시각을 모두 검증한 결과가 아닌 연구상 가정입니다. 미래 실측을 입력하지 않습니다.</p><p>국내 LNG는 동월 단가를 제공한 조건부 과거 실험입니다. 비교에 사용한 v3는 <strong>2025년 발전량의 약99.7%를 결측 대체</strong>한 조건입니다. 일부 입력은 전국/시장 범위로 육지 SMP와 완전히 같지 않으며, 서울 단일 관측소를 전국 대표로 간주하지 않습니다.</p><p>연간 발전량 보완과 추가 LSTM 후보 실험은 별도로 보존했습니다. 이 화면은 선택된 기존 혼합 실험의 저장 결과이며, 최신 운영 성능을 보증하지 않습니다.</p></div></details></section>
 </section>
 <section id="livePanel" class="panel live-panel" hidden>
-<p class="eyebrow">2025 NOVEMBER 20–22 / SAVED RESULTS</p><h2>2025년 11월 20~22일 예측 결과</h2>
-<span id="liveStatus" class="badge pending">저장된 2025년 결과 확인 중</span>
-<p id="liveNotice">실제로 저장된 2025년 SARIMAX 예측을 확인합니다.</p>
+<p class="eyebrow">SELECT A DATE / SMP FORECAST</p><h2>언제 충전할 계획인가요?</h2><p>예측 시작일을 선택하면 다음 72시간의 가격과 충전 추천을 확인할 수 있습니다.</p><label class="date-picker-label">예측 시작일<select id="forecastDateSelect"><option value="">날짜를 선택해주세요</option></select></label>
+<span id="liveStatus" class="badge pending">사용 가능한 예측 확인 중</span>
+<p id="liveNotice">선택 가능한 날짜의 저장된 예측만 표시합니다.</p>
 <div id="liveForecastContent" hidden>
 <dl class="live-grid"><div><dt>예측 기준시각 · KST</dt><dd id="liveOrigin"></dd></div><div><dt>예측 대상 기간 · KST</dt><dd id="liveCreated"></dd></div><div><dt>실측 입력 마감 · KST</dt><dd id="liveCutoff"></dd></div></dl>
 <div class="live-warning" id="liveQualityWarning"></div>
@@ -53,8 +53,8 @@
 <button class="primary" type="submit">충전 추천 계산 →</button></form>
 <p id="evError" role="alert" class="error" hidden></p>
 <div id="evResult" hidden aria-live="polite"><div class="ev-metrics"><div><span>배터리 충전량 / 계통 구매량</span><strong id="evEnergy"></strong></div><div><span>추천 시간의 SMP 가상비용</span><strong id="evCost"></strong></div><div><span>가능한 즉시 충전 대비 가상비용 차이</span><strong id="evDifference"></strong></div></div><p id="evSummary"></p><div class="table-scroll"><table><thead><tr><th>추천 충전 구간 · KST</th><th>충전 시간</th><th>계통 전력량</th><th>예측 SMP</th></tr></thead><tbody id="evSchedule"></tbody></table></div></div>
-<p class="sub">도매 SMP × 계통 구매량으로 계산한 가상비용입니다. 실제 충전요금·실제 절감액과 구분합니다. 일정 출력·고정 효율을 가정하며, 저가 시간에 분산 충전하고 마지막 구간은 필요한 만큼만 충전합니다. 2025년 당시의 조건으로 계산하는 충전 시뮬레이션입니다.</p></section>
-<details class="study-notes"><summary>이 결과의 데이터 조건 보기</summary><p>저장된 최종 SARIMAX 40% + 주간 기준선 60% 혼합 결과입니다. 2025년 발전량은 결측 대체 조건이며 국내 LNG는 동월 단가를 제공한 과거 실험입니다. 2026년 실시간 예측과 구분합니다.</p></details>
+<p class="sub">도매 SMP × 계통 구매량으로 계산한 가상비용입니다. 실제 충전요금·실제 절감액과 구분합니다. 일정 출력·고정 효율을 가정하며, 저가 시간에 분산 충전하고 마지막 구간은 필요한 만큼만 충전합니다. 과거 검증은 당시 기준으로, 2026년 예측은 현재시각 이후의 충전 가능 구간으로 계산합니다.</p></section>
+<details class="study-notes"><summary>선택한 예측의 데이터 조건 보기</summary><p id="selectedDataPolicy"></p></details>
 </div>
 <button id="backToReplay" class="primary">과거 검증 결과로 돌아가기 →</button></section>
 <footer><div><strong>전력예보 · 육지 SMP 72시간 예측</strong><p>연구 시연 · 실제 소매 전기요금이나 충전 수익 안내가 아닙니다.</p></div><div class="footer-links"><a href="./downloads/smp72-offline.html" download="smp72-offline.html">오프라인 시연 파일 ↓</a><a href="./demo/smp72-2025.json" download>검증 데이터 JSON ↓</a></div></footer>

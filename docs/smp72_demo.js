@@ -68,7 +68,7 @@ function drawSemester(){
  root.onpointermove=e=>{const r=root.getBoundingClientRect();show(Math.max(0,Math.min(rows.length-1,Math.round(((e.clientX-r.left)/r.width*W-L)/pw*(rows.length-1)))));};root.onpointerleave=()=>{$('semesterTooltip').hidden=true;line.setAttribute('visibility','hidden');};root.onkeydown=e=>{if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();show(Math.max(0,Math.min(rows.length-1,current+(e.key==='ArrowRight'?1:-1))));}};
 }
 
-function mode(live){const u=new URL(location.href);if(live)u.hash='live';else if(u.hash==='#live')u.hash='';window.history.replaceState(null,'',u);$('livePanel').hidden=!live;$('replayPanel').hidden=live;for(const [id,active]of [['liveMode',live],['replayMode',!live]]){$(id).classList.toggle('active',active);$(id).setAttribute('aria-pressed',active);}}
+function mode(live){const u=new URL(location.href);if(live)u.hash='live';else if(u.hash==='#live'||!u.hash)u.hash='replay';window.history.replaceState(null,'',u);$('livePanel').hidden=!live;$('replayPanel').hidden=live;for(const [id,active]of [['liveMode',live],['replayMode',!live]]){$(id).classList.toggle('active',active);$(id).setAttribute('aria-pressed',active);}}
 function download(){
  const o=data.origins[state.origin],m=data.models.find(m=>m.id===state.model),header=['dataset_version','mode','model','model_weight','forecast_origin','observed_cutoff','target_timestamp','horizon','actual_smp','predicted_smp','weekly_baseline'];
  const rows=o.targets.map((t,i)=>[data.dataset_version,data.mode,m.id,m.model_weight,o.forecast_origin,o.observed_cutoff,t,i+1,o.actual[i],o.predictions[m.id][i],o.weekly[i]].join(','));
@@ -93,6 +93,6 @@ $('horizonButtons').onclick=e=>{const b=e.target.closest('[data-day]');if(b&&dat
 $('toggleActual').onclick=()=>{if(data){state.actual=!state.actual;draw();}};$('toggleBaseline').onclick=()=>{if(data){state.baseline=!state.baseline;draw();}};
 $('liveMode').onclick=()=>mode(true);$('replayMode').onclick=()=>mode(false);$('backToReplay').onclick=()=>mode(false);
 document.querySelectorAll('.nav nav a').forEach(a=>a.addEventListener('click',()=>mode(false)));
-if(location.hash==='#live')mode(true);
+mode(!location.hash||location.hash==='#live');
 init();
 })();
