@@ -4,8 +4,8 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#13394b"><meta name="description" content="실제 저장된 72시간 육지 SMP 예측과 검증 결과를 확인하는 졸업작품 연구 시연">
 <title>전력예보 · 72시간 SMP 연구 시연</title>
-<link rel="stylesheet" href="./smp72_demo.css?v=20261120-picker1"><script defer src="./smp72_demo.js?v=20261120-picker1"></script>
-<script defer src="./smp72_charging.js?v=20261120-picker1"></script><script defer src="./smp72_live.js?v=20261120-picker1"></script>
+<link rel="stylesheet" href="./smp72_demo.css?v=20261120-weather1"><script defer src="./smp72_demo.js?v=20261120-weather1"></script>
+<script defer src="./smp72_weather.js?v=20261120-weather1"></script><script defer src="./smp72_charging.js?v=20261120-weather1"></script><script defer src="./smp72_live.js?v=20261120-weather1"></script>
 </head>
 <body>
 <a class="skip" href="#forecast">예측 그래프로 바로가기</a>
@@ -33,6 +33,7 @@
 <p class="eyebrow">SELECT A DATE / SMP FORECAST</p><h2>언제 충전할 계획인가요?</h2><p>예측 시작일을 선택하면 다음 72시간의 가격과 충전 추천을 확인할 수 있습니다.</p><label class="date-picker-label">예측 시작일<select id="forecastDateSelect"><option value="">날짜를 선택해주세요</option></select></label>
 <span id="liveStatus" class="badge pending">사용 가능한 예측 확인 중</span>
 <p id="liveNotice">선택 가능한 날짜의 저장된 예측만 표시합니다.</p>
+<div id="forecastPreparing" class="preparing-state" hidden><span aria-hidden="true">⛅</span><h3 id="preparingTitle">예측을 준비하고 있어요</h3><p>아직 이 날짜의 가격이 준비되지 않았습니다. 준비된 예측으로 충전 날씨를 먼저 살펴보세요.</p><button id="showPreparedForecast" class="primary">준비된 예측 살펴보기 →</button></div>
 <div id="liveForecastContent" hidden>
 <dl class="live-grid"><div><dt>예측 기준시각 · KST</dt><dd id="liveOrigin"></dd></div><div><dt>예측 대상 기간 · KST</dt><dd id="liveCreated"></dd></div><div><dt>실측 입력 마감 · KST</dt><dd id="liveCutoff"></dd></div></dl>
 <div class="live-warning" id="liveQualityWarning"></div>
@@ -41,7 +42,8 @@
 <div class="chart-wrap" id="liveChartWrap"><svg id="livePriceChart" viewBox="0 0 1100 380" tabindex="0" role="img" aria-label="2025년 11월 20~22일 예측. 좌우 화살표로 시간별 가격 확인"></svg><div id="liveTooltip" class="tooltip" role="status" hidden></div></div>
 <div class="chart-caption"><span>원/kWh · 한국시간 · 실선: 혼합 예측 / 진한 선: 실제 SMP / 점선: 전주 기준선</span><span>2025년 실제 SMP와 저장된 예측을 비교합니다.</span></div>
 <div id="liveDayCards" class="day-cards"></div>
-<section class="charging-panel" aria-labelledby="chargingTitle"><div><p class="eyebrow">G2V / CHARGING PLAN</p><h3 id="chargingTitle">예측 가격이 낮은 시간에 충전하기</h3><p class="sub">필요한 전력량을 계산해 충전 가능한 시간 안에서 저가 시간부터 나눠 배분합니다.</p></div>
+<section class="charging-weather" aria-labelledby="weatherHeading"><div class="weather-heading"><div><h3 id="weatherHeading">충전 날씨를 확인해보세요</h3><p>☀️ 맑음은 충전하기 좋은 가격, ☁️ 흐림은 상대적으로 높은 가격이에요.</p></div><label>날짜<select id="weatherDaySelect"></select></label></div><p class="weather-rule">실제 기상예보가 아닌 충전 지수입니다. 하루 예측 가격의 중앙값 이하를 ‘맑음’, 초과를 ‘흐림’으로 표시합니다.</p><div id="weatherHourGrid" class="weather-hours"></div></section>
+<section class="charging-panel" aria-labelledby="chargingTitle"><div><p class="eyebrow">G2V / CHARGING PLAN</p><h3 id="chargingTitle">나에게 맞는 맑은 충전 시간 찾기</h3><p class="sub">필요한 전력량을 계산해 충전 가능한 시간 안에서 저가 시간부터 나눠 배분합니다.</p></div>
 <form id="chargingForm" novalidate><div class="charging-inputs">
 <label>배터리 용량 (kWh)<input id="evCapacity" type="number" min="1" step="1" value="60"></label>
 <label>현재 SOC (%)<input id="evCurrent" type="number" min="0" max="100" value="30"></label>
@@ -52,8 +54,8 @@
 <label>충전 종료 기한 (KST)<input id="evEnd" type="datetime-local" value="2025-11-21T07:00"></label></div>
 <button class="primary" type="submit">충전 추천 계산 →</button></form>
 <p id="evError" role="alert" class="error" hidden></p>
-<div id="evResult" hidden aria-live="polite"><div class="ev-metrics"><div><span>배터리 충전량 / 계통 구매량</span><strong id="evEnergy"></strong></div><div><span>추천 시간의 SMP 가상비용</span><strong id="evCost"></strong></div><div><span>가능한 즉시 충전 대비 가상비용 차이</span><strong id="evDifference"></strong></div></div><p id="evSummary"></p><div class="table-scroll"><table><thead><tr><th>추천 충전 구간 · KST</th><th>충전 시간</th><th>계통 전력량</th><th>예측 SMP</th></tr></thead><tbody id="evSchedule"></tbody></table></div></div>
-<p class="sub">도매 SMP × 계통 구매량으로 계산한 가상비용입니다. 실제 충전요금·실제 절감액과 구분합니다. 일정 출력·고정 효율을 가정하며, 저가 시간에 분산 충전하고 마지막 구간은 필요한 만큼만 충전합니다. 과거 검증은 당시 기준으로, 2026년 예측은 현재시각 이후의 충전 가능 구간으로 계산합니다.</p></section>
+<div id="evResult" hidden aria-live="polite"><div class="ev-metrics"><div><span>배터리 충전량 / 계통 구매량</span><strong id="evEnergy"></strong></div><div><span>추천 시간의 SMP 가상비용</span><strong id="evCost"></strong></div><div><span>가능한 즉시 충전 대비 가상비용 차이</span><strong id="evDifference"></strong></div></div><p id="evSummary"></p><div class="table-scroll"><table><thead><tr><th>충전 날씨</th><th>추천 충전 구간 · KST</th><th>충전 시간</th><th>계통 전력량</th><th>예측 SMP</th></tr></thead><tbody id="evSchedule"></tbody></table></div></div>
+<p class="sub">도매 SMP × 계통 구매량으로 계산한 가상비용입니다. 실제 충전요금·실제 절감액과 구분합니다. 일정 출력·고정 효율을 가정하며, 충전 지수는 하루 전체 가격 기준이고 추천 일정은 입력한 가능 시간 안에서 배분합니다.  저가 시간에 분산 충전하고 마지막 구간은 필요한 만큼만 충전합니다. 과거 검증은 당시 기준으로, 2026년 예측은 현재시각 이후의 충전 가능 구간으로 계산합니다.</p></section>
 <details class="study-notes"><summary>선택한 예측의 데이터 조건 보기</summary><p id="selectedDataPolicy"></p></details>
 </div>
 <button id="backToReplay" class="primary">과거 검증 결과로 돌아가기 →</button></section>
