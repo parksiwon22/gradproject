@@ -68,7 +68,7 @@ async function init(){try{
  let latest=null;try{const e=$('latest-json');if(e)latest=JSON.parse(e.textContent);else{const r=await fetch('./demo/forecast-20261120.json',{cache:'no-cache'});if(r.ok)latest=await r.json();}if(latest)validate(latest);}catch(error){latest=null;}
  choices=[...historical,...(latest?[{value:latest.rows[0].target_timestamp.slice(0,10),data:latest}]:[])];
  const select=$('forecastDateSelect');
- const futureGroup=node('optgroup');futureGroup.label='2026년 11월 · 충전 계획';for(let d=1;d<=30;d++){const value=`2026-11-${String(d).padStart(2,'0')}`,o=node('option',value);o.value=value;futureGroup.append(o);}select.append(futureGroup);
+ const futureGroup=node('optgroup');futureGroup.label='2026년 11월 · 충전 계획';for(const d of [...Array.from({length:20},(_,i)=>20-i),...Array.from({length:10},(_,i)=>21+i)]){const value=`2026-11-${String(d).padStart(2,'0')}`,o=node('option',value);o.value=value;futureGroup.append(o);}select.append(futureGroup);
  const historyGroup=node('optgroup');historyGroup.label='2025년 · 과거 예측 비교';for(const c of historical){const o=node('option',`${c.value} ~ ${c.data.rows[71].target_timestamp.slice(0,10)}`);o.value=c.value;historyGroup.append(o);}select.append(historyGroup);
  $('showPreparedForecast').onclick=()=>{select.value=latest?'2026-11-20':'2025-11-20';selectForecast(select.value);};
  select.onchange=()=>selectForecast(select.value);selectForecast('');document.body.dataset.liveReady='true';
