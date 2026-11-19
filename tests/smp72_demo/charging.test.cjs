@@ -1,0 +1,11 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const {plan}=require('../../docs/smp72_charging.js');
+const t=Date.parse('2026-11-20T00:00:00+09:00');
+const rows=[30,10,20,40].map((p,i)=>({target_timestamp:new Date(t+i*3600000).toISOString(),predicted_smp:p}));
+const base={capacity:10,currentSoc:0,targetSoc:100,power:4,efficiency:100,start:'2026-11-20T00:00:00+09:00',end:'2026-11-20T04:00:00+09:00'};
+test('lowest prices first; last hour fractional; same-energy baseline',()=>{const p=plan(rows,base,t-1);assert.equal(p.gridEnergy,10);assert.equal(p.cost,180);assert.equal(p.baselineCost,200);assert.equal(p.difference,20);assert.deepEqual(p.allocations.map(r=>r.energy),[2,4,4]);assert.equal(p.chargingHours,2.5);});
+test('efficiency and partial availability conserve grid/battery energy',()=>{const p=plan(rows,{...base,capacity:9,efficiency:90,start:'2026-11-20T00:30:00+09:00'},t-1);assert.equal(p.gridEnergy,10);assert.equal(p.allocations.reduce((s,r)=>s+r.energy,0)*.9,9);assert.ok(p.allocations.every(r=>r.start+r.duration*3600000<=r.end+1));});
+test('insufficient time fails instead of claiming goal reached',()=>{assert.throws(()=>plan(rows,{...base,end:'2026-11-20T02:00:00+09:00'},t-1),/도달/);});
+test('past intervals excluded; goal must still be feasible',()=>{const p=plan(rows,{...base,capacity:4},t+3600000);assert.equal(p.allocations[0].start,t+3600000);assert.equal(p.excludedPast,true);assert.throws(()=>plan(rows,base,t+2*3600000),/도달/);});
+test('invalid SOC, efficiency and out-of-forecast windows rejected',()=>{for(const settings of[{...base,currentSoc:90,targetSoc:80},{...base,efficiency:0},{...base,start:'2026-11-19T23:00:00+09:00'}])assert.throws(()=>plan(rows,settings,t-1));});
+test('overnight windows are literal dates, not reversed hours',()=>{const midnight=Date.parse('2026-11-20T23:00:00+09:00');const r=[5,1,3].map((price,i)=>({target_timestamp:new Date(midnight+i*3600000).toISOString(),predicted_smp:price}));const p=plan(r,{...base,capacity:4,start:'2026-11-20T23:00:00+09:00',end:'2026-11-21T02:00:00+09:00'},midnight-1);assert.equal(p.allocations[0].start,midnight+3600000);assert.equal(p.cost,4);});

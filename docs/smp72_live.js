@@ -38,6 +38,22 @@ async function init(){try{
  $('liveDayButtons').onclick=e=>{const b=e.target.closest('[data-live-day]');if(b){day=Number(b.dataset.liveDay);draw();}};
  $('liveCsv').onclick=()=>{const fields=Object.keys(data.rows[0]),csv='\uFEFF'+[fields.join(','),...data.rows.map(r=>fields.map(k=>r[k]===null?'':r[k]).join(','))].join('\r\n'),url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=node('a');a.href=url;a.download='smp72_2026-11-20_22.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
  const snapshot=node('p',`입력 스냅샷: ${date(data.input_snapshot_at||data.calculated_at)} KST. 예정 기준시각 이후 재추론도 이 고정 입력을 사용합니다.`,'sub');$('liveNotice').after(snapshot);
+ function charge(){
+  $('evError').hidden=true;$('evResult').hidden=true;
+  try{
+   if(['evCapacity','evCurrent','evTarget','evPower','evEfficiency','evStart','evEnd'].some(id=>!$(id).value.trim()))throw Error('모든 충전 조건을 입력해주세요.');
+   const localKst=id=>$(id).value+':00+09:00';
+   const result=window.SMP72Charging.plan(data.rows,{capacity:Number($('evCapacity').value),currentSoc:Number($('evCurrent').value),targetSoc:Number($('evTarget').value),power:Number($('evPower').value),efficiency:Number($('evEfficiency').value),start:localKst('evStart'),end:localKst('evEnd')});
+   const time=ms=>{const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(ms)).map(p=>[p.type,p.value]));return `${parts.month}/${parts.day} ${parts.hour}:${parts.minute}:${parts.second}`;};
+   $('evEnergy').textContent=`${fmt(result.batteryEnergy)} / ${fmt(result.gridEnergy)} kWh`;$('evCost').textContent=`${fmt(result.cost)} 원`;$('evDifference').textContent=`${fmt(result.difference)} 원`;
+   $('evSummary').textContent=`총 ${fmt(result.chargingHours)}시간 충전 · 가능한 즉시 충전의 SMP 가상비용 ${fmt(result.baselineCost)}원.${result.excludedPast?' 현재시각 이전 구간을 제외했습니다.':''} 입력을 바꾸면 다시 계산해주세요.`;
+   $('evSchedule').replaceChildren(...result.allocations.map(r=>{const tr=node('tr');for(const value of[`${time(r.start)} ~ ${time(r.start+r.duration*3600000)}`,`${fmt(r.duration*60)}분`,`${fmt(r.energy)} kWh`,`${fmt(r.price)} 원/kWh`])tr.append(node('td',value));return tr;}));
+   $('evResult').hidden=false;
+  }catch(error){$('evError').textContent=error.message;$('evError').hidden=false;}
+ }
+ $('chargingForm').onsubmit=e=>{e.preventDefault();charge();};
+ $('chargingForm').oninput=()=>{$('evResult').hidden=true;$('evError').hidden=true;};
+ charge();
  $('liveForecastContent').hidden=false;draw();document.body.dataset.liveReady='true';
  }catch(error){$('liveStatus').textContent='최신 모델 결과 · 연결 검증 미완료';$('liveNotice').textContent=error.message;document.body.dataset.liveReady='unavailable';}}
 init();
