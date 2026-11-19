@@ -1,0 +1,50 @@
+name: SMP72 static presentation Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/smp72-static-pages.yml'
+      - 'tests/smp72_demo/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smp-pages
+  cancel-in-progress: false
+
+jobs:
+  publish-static:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify saved presentation data and JavaScript
+        run: |
+          python -m unittest discover -s tests/smp72_demo -v
+          node --check docs/smp72_demo.js
+      - name: Rebuild self-contained offline copy
+        run: python scripts/build_smp72_offline.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - name: Publish static files only
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -41,4 +41,4 @@
 
 ## 기존 화면과 배포
 
-이전 `index.html`은 `legacy-v20.html`로 보존했습니다. 기존 JS/CSS/자동 수집 코드는 삭제하지 않았습니다. GitHub Pages는 workflow 방식이며 main/docs를 기존 `SMP public forecast and Pages refresh` 작업이 배포합니다. 수동 실행해도 기존 설정상 당일23시까지 기다립니다. 최신 자동 수집 결과와 이 과거 재생 화면을 혼동하지 않습니다.
+이전 `index.html`은 `legacy-v20.html`로 보존했습니다. 기존 JS/CSS/자동 수집 코드는 삭제하지 않았습니다. GitHub Pages는 workflow 방식입니다. `SMP72 static presentation Pages`는 main/docs 변경 시 저장된 데이터만 검사하고 정적 파일을 게시합니다. API 키·모델 실행·수집·상태 저장이 없습니다. 기존 `SMP public forecast and Pages refresh`는 별도의 과거 자동 수집 작업이며, 이 과거 재생 화면의 예측을 생성하지 않습니다. 최신 자동 수집 결과와 이 과거 재생 화면을 혼동하지 않습니다.
