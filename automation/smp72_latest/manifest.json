@@ -1,0 +1,13 @@
+{
+  "origin": "2026-11-19T23:00:00+09:00",
+  "input_snapshot_at": "2026-11-19T20:05:17.546419+09:00",
+  "feature_count": 83,
+  "source_experiment": "E3",
+  "training_performed": false,
+  "source_branch": "codex/lstm-sarimax-72h-upgrade-20261119",
+  "sha256": {
+    "inputs.npz": "db9002017ab8ca8730dc56d26c075b2a42e396953ee5a9d11ca6cff2d1f87897",
+    "model.npz": "0d228328f62e629a18e92b85d99e0732b4d7d3a3f4db5d7201b8ce749c24be04",
+    "estimator.py": "cc3561128c50fd9a22c0dff9ed51426805578e5ea6162ebd1a28969a739395a7"
+  }
+}

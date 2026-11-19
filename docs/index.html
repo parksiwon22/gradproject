@@ -5,13 +5,14 @@
 <meta name="theme-color" content="#13394b"><meta name="description" content="실제 저장된 72시간 육지 SMP 예측과 검증 결과를 확인하는 졸업작품 연구 시연">
 <title>전력예보 · 72시간 SMP 연구 시연</title>
 <link rel="stylesheet" href="./smp72_demo.css?v=20261120"><script defer src="./smp72_demo.js?v=20261120"></script>
+<script defer src="./smp72_live.js?v=20261120"></script>
 </head>
 <body>
 <a class="skip" href="#forecast">예측 그래프로 바로가기</a>
 <header class="header"><div class="container nav"><a class="brand" href="#top"><span class="brand-icon">↗</span><span>전력예보<small>POWER FORECAST</small></span></a><nav aria-label="주요 메뉴"><a href="#forecast">72시간 예측</a><a href="#comparison">모델 비교</a><a href="#sources">데이터와 방법</a></nav><span class="nav-status"><i></i> 졸업작품 연구 시연</span></div></header>
 <main id="top" class="container">
 <section class="intro"><div><p class="eyebrow">SMP FORECAST · RESEARCH DEMONSTRATION</p><h1>72시간의 전력가격,<br>하나의 흐름으로.</h1><p class="lead">발행시각을 선택해 예측과 실제 가격을 비교합니다.<br>데이터와 모델의 조건까지 함께 확인하는 전력시장 예측 연구입니다.</p></div><div class="presentation-card"><span class="tiny-label">발표 시연 일정</span><strong>2026.11.20 <em>15:00 KST</em></strong><p>발표일과 데이터의 예측 기준일은 다릅니다.<br>아래의 발행시각을 기준으로 읽어주세요.</p></div></section>
-<div class="mode-tabs" role="group" aria-label="시연 종류"><button id="replayMode" class="active" aria-pressed="true">검증된 과거 예측 재생</button><button id="liveMode" aria-pressed="false">11월 20일 최신 연결 상태</button></div>
+<div class="mode-tabs" role="group" aria-label="시연 종류"><button id="replayMode" class="active" aria-pressed="true">검증된 과거 예측 재생</button><button id="liveMode" aria-pressed="false">11월 20~22일 새 예측</button></div>
 <div id="loadError" class="error" role="alert" hidden><h2>검증 데이터를 불러오지 못했습니다.</h2><p id="loadErrorText"></p><button id="retry">다시 불러오기</button><p>준비한 오프라인 시연 파일을 사용해도 됩니다. 임의의 예측값으로 대체하지 않습니다.</p></div>
 <section id="replayPanel">
 <div class="notice"><span class="badge">과거 검증 재생 · 2025년</span><p>실제 저장된 예측을 표시합니다. 오늘의 실시간 예측이나 공식 전기요금이 아닙니다.</p></div>
@@ -27,7 +28,21 @@
 <section id="comparison" class="panel comparison"><div class="section-top"><div><p class="eyebrow">02 / MODEL COMPARISON</p><h2>같은 데이터, 같은 평가 시간</h2><p class="sub">2025년 7~12월 · 182개 발행일 · 모델별 13,104개 예측</p></div><span class="badge subtle">발전량 보완 전 공통 v3</span></div><p class="comparison-note">아래는 모두 <strong>Train+Validation 재학습 모델과 주간 기준선의 혼합 성능</strong>입니다. 모델 단독 성능으로 해석하지 않습니다.</p><div class="table-scroll"><table><thead><tr><th>모델</th><th>모델 : 주간 기준선</th><th>MAE ↓</th><th>RMSE ↓</th><th>R² ↑</th><th>실험 기록</th></tr></thead><tbody id="modelRows"></tbody></table></div><p class="table-caption">주간 기준선 MAE <strong>11.43원/kWh</strong>. MAE·RMSE는 낮을수록 좋습니다. 하반기는 이미 확인한 구간의 후속 재평가이며 새 독립 시험이 아닙니다.</p></section>
 <section id="sources" class="panel sources"><div class="section-top"><div><p class="eyebrow">03 / DATA & METHOD</p><h2>가격을 설명하는 네 가지 측면</h2><p class="sub">12개 공통 입력 그룹과 과거 육지 SMP를 같은 시간 기준으로 연결했습니다.</p></div></div><div class="source-grid"><article><span>DEMAND</span><h3>수요와 달력</h3><p>실제 전력수요, 과거 수요예측 이력, 공휴일과 달력 특성으로 필요량과 반복 패턴을 봅니다.</p></article><article><span>SUPPLY</span><h3>발전과 공급 여유</h3><p>LNG·석탄·원자력, 태양광·풍력 발전량과 공급예비력·예비율을 사용합니다.</p></article><article><span>FUEL</span><h3>발전비용의 변화</h3><p>국내 LNG 발전 연료비단가와 국제 원유·LNG·석탄 가격을 구분합니다.</p></article><article><span>WEATHER</span><h3>기상과 예보</h3><p>서울108 기온·일사·풍속 관측, 발표시각이 있는 중기예보를 연결합니다.</p></article></div><details><summary>학습 기간과 데이터 해석의 조건 확인</summary><div class="method-details"><p><strong>Train</strong> 2023~2024년 → <strong>Validation</strong> 2025년 1~6월 → 설정 확정 후 <strong>Train+Validation 재학습</strong> → 2025년 7~12월 재평가.</p><p>실측은 모든 예측거리에 공통으로 기준시각−72시간을 적용합니다. 이는 자료별 실제 공개시각을 모두 검증한 결과가 아닌 연구상 가정입니다. 미래 실측을 입력하지 않습니다.</p><p>국내 LNG는 동월 단가를 제공한 조건부 과거 실험입니다. 비교에 사용한 v3는 <strong>2025년 발전량의 약99.7%를 결측 대체</strong>한 조건입니다. 일부 입력은 전국/시장 범위로 육지 SMP와 완전히 같지 않으며, 서울 단일 관측소를 전국 대표로 간주하지 않습니다.</p><p>연간 발전량 보완과 추가 LSTM 후보 실험은 별도로 보존했습니다. 이 화면은 선택된 기존 혼합 실험의 저장 결과이며, 최신 운영 성능을 보증하지 않습니다.</p></div></details></section>
 </section>
-<section id="livePanel" class="panel live-panel" hidden><p class="eyebrow">PRESENTATION DAY / CONNECTION STATUS</p><h2>발표 시각과 예측 발행시각을 구분합니다.</h2><span class="badge pending">최신 SARIMAX 예측 · 연결 검증 미완료</span><p>11월 20일 오후 3시에 당일 예측을 보여주려면, <strong>11월 19일 23시 기준</strong>으로 계산한 결과가 필요합니다.</p><dl class="live-grid"><div><dt>발표 시각</dt><dd>2026.11.20 15:00 KST</dd></div><div><dt>필요한 예측 기준시각</dt><dd>2026.11.19 23:00 KST</dd></div><div><dt>필요한 예측 범위</dt><dd>2026.11.20 00시 ~ 11.22 23시</dd></div></dl><p>현재 확인된 최신 SARIMAX 혼합 모델의 12개 입력과 발행 결과가 연결되지 않았습니다. 과거 예측의 날짜만 바꿔 당일 예측처럼 표시하지 않습니다.</p><p>정적 GitHub Pages 화면은 API 키를 보관하거나 모델을 학습하지 않습니다. 향후 서버 또는 Actions에서 최신 입력을 검증하고 발행한 결과만 공개 JSON으로 연결해야 합니다.</p><button id="backToReplay" class="primary">검증된 과거 결과로 시연하기 →</button></section>
+<section id="livePanel" class="panel live-panel" hidden>
+<p class="eyebrow">NOVEMBER 20–22 / NEW FORECAST</p><h2>11월 20일부터 사흘의 가격 흐름</h2>
+<span id="liveStatus" class="badge pending">실제 추론 결과 확인 중</span>
+<p id="liveNotice">최신 입력과 저장된 모델의 결과를 확인합니다. 계산된 결과가 없으면 가격을 임의로 표시하지 않습니다.</p>
+<div id="liveForecastContent" hidden>
+<dl class="live-grid"><div><dt>예측 기준시각 · KST</dt><dd id="liveOrigin"></dd></div><div><dt>실제 계산시각 · KST</dt><dd id="liveCreated"></dd></div><div><dt>실측 입력 마감 · KST</dt><dd id="liveCutoff"></dd></div></dl>
+<div class="live-warning" id="liveQualityWarning"></div>
+<div class="chart-title"><div><h3>SARIMAX 40% + 주간 기준선 60%</h3><p class="sub" id="liveTarget"></p></div><button id="liveCsv" class="secondary">72시간 예측 CSV ↓</button></div>
+<div id="liveDayButtons" class="live-day-buttons" role="group" aria-label="최신 예측 일자"><button data-live-day="0" aria-pressed="true" class="active">전체 72시간</button><button data-live-day="1" aria-pressed="false">11/20 · D+1</button><button data-live-day="2" aria-pressed="false">11/21 · D+2</button><button data-live-day="3" aria-pressed="false">11/22 · D+3</button></div>
+<div class="chart-wrap" id="liveChartWrap"><svg id="livePriceChart" viewBox="0 0 1100 380" tabindex="0" role="img" aria-label="11월 20~22일 새 예측. 좌우 화살표로 시간별 가격 확인"></svg><div id="liveTooltip" class="tooltip" role="status" hidden></div></div>
+<div class="chart-caption"><span>원/kWh · 한국시간 · 실선: 혼합 예측 / 점선: 전주 기준선</span><span>미래 실제 가격과 오차는 아직 없습니다.</span></div>
+<div id="liveDayCards" class="day-cards"></div>
+<details><summary>최신 입력의 결측·대체 및 예보 발표시각 확인</summary><p class="sub">실측 입력창은 11월 9일 23시부터 11월 16일 22시까지 168시간입니다. 결측은 학습 때 고정한 규칙으로 대체했습니다.</p><div class="table-scroll"><table><thead><tr><th>실측 입력</th><th>168시간 중 결측</th><th>마지막 원자료 시각</th></tr></thead><tbody id="liveQualityRows"></tbody></table></div><p id="liveForecastSources" class="sub"></p><p class="sub">국내 LNG는 2026년 10월 단가입니다. 동월 LNG를 제공했던 과거 평가와 조건이 다릅니다. 2026년 정확도는 아직 평가하지 않았으며, 이 곡선은 공식 공표 가격이 아닙니다. 대상일 SMP의 실제 공표 여부와 별개로 미래 대상일 가격을 입력에서 제외한 연구용 추론입니다.</p></details>
+</div>
+<button id="backToReplay" class="primary">과거 검증 결과로 돌아가기 →</button></section>
 <footer><div><strong>전력예보 · 육지 SMP 72시간 예측</strong><p>연구 시연 · 실제 소매 전기요금이나 충전 수익 안내가 아닙니다.</p></div><div class="footer-links"><a href="./downloads/smp72-offline.html" download="smp72-offline.html">오프라인 시연 파일 ↓</a><a href="./demo/smp72-2025.json" download>검증 데이터 JSON ↓</a><a href="./legacy-v20.html">이전 V20 연구 화면</a></div></footer>
 </main>
 </body></html>

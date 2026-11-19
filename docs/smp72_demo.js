@@ -77,5 +77,6 @@ $('retry').onclick=init;$('downloadCsv').onclick=download;
 $('horizonButtons').onclick=e=>{const b=e.target.closest('[data-day]');if(b&&data){state.day=Number(b.dataset.day);draw();}};
 $('toggleActual').onclick=()=>{if(data){state.actual=!state.actual;draw();}};$('toggleBaseline').onclick=()=>{if(data){state.baseline=!state.baseline;draw();}};
 $('liveMode').onclick=()=>mode(true);$('replayMode').onclick=()=>mode(false);$('backToReplay').onclick=()=>mode(false);
+if(location.hash==='#live')mode(true);
 init();
 })();
