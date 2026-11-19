@@ -54,6 +54,20 @@ function showPoint(i){
  if(state.actual)tip.append(el('p',`실제 ${fmt(o.actual[i])} · 오차 ${fmt(Math.abs(p[i]-o.actual[i]))}`));if(state.baseline)tip.append(el('p',`주간 기준선 ${fmt(o.weekly[i])}`));
  tip.hidden=false;const width=$('chartWrap').clientWidth;tip.style.left=`${Math.max(4,Math.min(width-240,chart.x(i)/1100*width+12))}px`;tip.style.top='12px';chart.cross.setAttribute('x1',chart.x(i));chart.cross.setAttribute('x2',chart.x(i));chart.cross.setAttribute('visibility','visible');chart.dot.setAttribute('cx',chart.x(i));chart.dot.setAttribute('cy',chart.y(p[i]));chart.dot.setAttribute('visibility','visible');
 }
+function drawSemester(){
+ const latest=new Map();for(const o of data.origins)for(let i=0;i<72;i++){const t=o.targets[i],previous=latest.get(t);if(!previous||o.forecast_origin>previous.origin)latest.set(t,{t,origin:o.forecast_origin,actual:o.actual[i],pred:o.predictions[state.model][i],horizon:i+1});}
+ const month=$('semesterMonth').value,rows=[...latest.values()].sort((a,b)=>a.t.localeCompare(b.t)).filter(r=>month==='all'||r.t.slice(5,7)===month);
+ const score=metrics(rows.map(r=>r.actual),rows.map(r=>r.pred));$('semesterSummary').textContent=`${month==='all'?'2025년 7~12월':`2025년 ${Number(month)}월`} · ${rows.length.toLocaleString()}시간 · 그래프 구간 MAE ${fmt(score.mae)}원/kWh`;
+ const root=$('semesterChart');root.replaceChildren();$('semesterTooltip').hidden=true;const W=1100,H=380,L=65,R=22,T=25,B=50,pw=W-L-R,ph=H-T-B;
+ const values=rows.flatMap(r=>[r.actual,r.pred]),lo=Math.floor((Math.min(...values)-8)/10)*10,hi=Math.ceil((Math.max(...values)+8)/10)*10,x=i=>L+i/(rows.length-1)*pw,y=v=>T+(hi-v)/(hi-lo)*ph;
+ for(let j=0;j<=5;j++){const value=lo+(hi-lo)*j/5,yy=y(value);root.append(svg('line',{x1:L,x2:W-R,y1:yy,y2:yy,stroke:'#e0e8eb'}),svg('text',{x:L-10,y:yy+5,'text-anchor':'end',fill:'#627d88','font-size':15},fmt(value,0)));}
+ for(let i=0;i<rows.length;i++){const t=rows[i].t;if(i===0||i===rows.length-1||(month==='all'?t.slice(8,16)==='01T00:00':t.slice(11,16)==='00:00'&&['08','15','22'].includes(t.slice(8,10))))root.append(svg('text',{x:x(i),y:H-16,'text-anchor':i===0?'start':i===rows.length-1?'end':'middle',fill:'#627d88','font-size':15},t.slice(5,10)));}
+ for(const[field,color]of[['actual','#243e53'],['pred','#138b93']])root.append(svg('polyline',{'data-series':field,'data-points':rows.length,points:rows.map((r,i)=>`${x(i).toFixed(2)},${y(r[field]).toFixed(2)}`).join(' '),fill:'none',stroke:color,'stroke-width':month==='all'?1.2:1.8}));
+ let current=0;const line=svg('line',{y1:T,y2:H-B,stroke:'#138b93',visibility:'hidden'});root.append(line);
+ const show=i=>{current=i;const r=rows[i],tip=$('semesterTooltip');tip.replaceChildren(el('strong',date(r.t)),el('p',`예측 ${fmt(r.pred)} · 실제 ${fmt(r.actual)} 원/kWh`),el('p',`${date(r.origin)} 발행 · D+${Math.ceil(r.horizon/24)}`));tip.hidden=false;tip.style.top='10px';const width=$('semesterWrap').clientWidth;tip.style.left=Math.max(0,Math.min(width-260,x(i)/W*width+10))+'px';line.setAttribute('x1',x(i));line.setAttribute('x2',x(i));line.setAttribute('visibility','visible');};
+ root.onpointermove=e=>{const r=root.getBoundingClientRect();show(Math.max(0,Math.min(rows.length-1,Math.round(((e.clientX-r.left)/r.width*W-L)/pw*(rows.length-1)))));};root.onpointerleave=()=>{$('semesterTooltip').hidden=true;line.setAttribute('visibility','hidden');};root.onkeydown=e=>{if(['ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();show(Math.max(0,Math.min(rows.length-1,current+(e.key==='ArrowRight'?1:-1))));}};
+}
+
 function mode(live){const u=new URL(location.href);if(live)u.hash='live';else if(u.hash==='#live')u.hash='';window.history.replaceState(null,'',u);$('livePanel').hidden=!live;$('replayPanel').hidden=live;for(const [id,active]of [['liveMode',live],['replayMode',!live]]){$(id).classList.toggle('active',active);$(id).setAttribute('aria-pressed',active);}}
 function download(){
  const o=data.origins[state.origin],m=data.models.find(m=>m.id===state.model),header=['dataset_version','mode','model','model_weight','forecast_origin','observed_cutoff','target_timestamp','horizon','actual_smp','predicted_smp','weekly_baseline'];
@@ -67,12 +81,13 @@ async function init(){
   state.origin=Math.max(0,data.origins.findIndex(o=>o.forecast_origin===data.default_origin));
   $('originSelect').replaceChildren(...data.origins.map((o,i)=>{const n=el('option',date(o.forecast_origin)+' KST');n.value=i;return n;}));$('originSelect').value=state.origin;
   $('modelSelect').replaceChildren(...data.models.map(m=>{const n=el('option',m.label);n.value=m.id;return n;}));$('modelSelect').value=state.model;
-  $('originSelect').onchange=e=>{state.origin=Number(e.target.value);draw();};$('modelSelect').onchange=e=>{state.model=e.target.value;draw();};
+  $('originSelect').onchange=e=>{state.origin=Number(e.target.value);draw();};$('modelSelect').onchange=e=>{state.model=e.target.value;draw();drawSemester();};
   for(const id of ['originSelect','modelSelect','downloadCsv'])$(id).disabled=false;
   $('modelRows').replaceChildren(...data.models.map(m=>{const row=el('tr');if(m.id==='sarimax')row.className='best';for(const v of [m.label,`${Math.round(m.model_weight*100)} : ${Math.round(m.weekly_weight*100)}`,fmt(m.metrics.mae),fmt(m.metrics.rmse),fmt(m.metrics.r2,4)])row.append(el('td',v));const td=el('td'),a=el('a','보고서 ↗');a.href=m.report_url;a.target='_blank';a.rel='noopener noreferrer';td.append(a);row.append(td);return row;}));
-  draw();document.body.dataset.ready='true';
+  draw();drawSemester();document.body.dataset.ready='true';
  }catch(error){$('loadError').hidden=false;$('loadErrorText').textContent=error.message;document.body.dataset.ready='error';}
 }
+$('semesterMonth').onchange=()=>{if(data)drawSemester();};
 $('retry').onclick=init;$('downloadCsv').onclick=download;
 $('horizonButtons').onclick=e=>{const b=e.target.closest('[data-day]');if(b&&data){state.day=Number(b.dataset.day);draw();}};
 $('toggleActual').onclick=()=>{if(data){state.actual=!state.actual;draw();}};$('toggleBaseline').onclick=()=>{if(data){state.baseline=!state.baseline;draw();}};
