@@ -27,6 +27,7 @@ function draw(){
 async function init(){try{
  const embedded=$('live-json');if(embedded)data=JSON.parse(embedded.textContent);else{const r=await fetch('./demo/forecast-20261120.json',{cache:'no-cache'});if(!r.ok)throw Error('검증된 최신 모델 결과가 아직 게시되지 않았습니다.');data=await r.json();}validate(data);
  $('liveStatus').textContent=data.status==='preliminary'?'실제 모델 사전 계산본 · 23시 정식 발행 전':'실제 모델 추론 완료 · 계산시각 확인';
+ if(data.status==='issued')$('liveStatus').classList.remove('pending');
  $('liveNotice').textContent=data.status==='preliminary'?'23시 예정 기준으로 미리 계산한 새 예측입니다. 아래 실제 계산시각에 확보한 자료를 사용했으며, 23시에 계산된 결과라고 표시하지 않습니다.':'저장된 SARIMAX 모델을 최신 입력 스냅샷에 적용했습니다. 실제 계산시각과 입력 조건을 함께 확인해주세요.';
  $('liveOrigin').textContent=date(data.forecast_origin)+(data.status==='preliminary'?' (예정)':'');$('liveCreated').textContent=date(data.calculated_at);$('liveCutoff').textContent=date(data.observed_cutoff);$('liveTarget').textContent=`${date(data.target_start)} ~ ${date(data.target_end)} · 83개 입력 · 재학습 없음`;
  const entirelyMissing=data.quality.filter(q=>q.missing_hours===168).map(q=>labels[q.variable]||q.variable);$('liveQualityWarning').textContent=entirelyMissing.length?`입력 대체 조건: ${entirelyMissing.join(', ')}의 최근 168시간 원자료가 없어 고정된 학습기반 대체값을 사용했습니다. 최신 실측을 모두 확보한 예측으로 해석하지 않습니다.`:'일부 원자료 결측에는 학습 때 고정한 대체 규칙을 적용했습니다. 아래 입력 상태를 확인해주세요.';

@@ -54,7 +54,7 @@ function showPoint(i){
  if(state.actual)tip.append(el('p',`실제 ${fmt(o.actual[i])} · 오차 ${fmt(Math.abs(p[i]-o.actual[i]))}`));if(state.baseline)tip.append(el('p',`주간 기준선 ${fmt(o.weekly[i])}`));
  tip.hidden=false;const width=$('chartWrap').clientWidth;tip.style.left=`${Math.max(4,Math.min(width-240,chart.x(i)/1100*width+12))}px`;tip.style.top='12px';chart.cross.setAttribute('x1',chart.x(i));chart.cross.setAttribute('x2',chart.x(i));chart.cross.setAttribute('visibility','visible');chart.dot.setAttribute('cx',chart.x(i));chart.dot.setAttribute('cy',chart.y(p[i]));chart.dot.setAttribute('visibility','visible');
 }
-function mode(live){$('livePanel').hidden=!live;$('replayPanel').hidden=live;for(const [id,active]of [['liveMode',live],['replayMode',!live]]){$(id).classList.toggle('active',active);$(id).setAttribute('aria-pressed',active);}}
+function mode(live){const u=new URL(location.href);if(live)u.hash='live';else if(u.hash==='#live')u.hash='';window.history.replaceState(null,'',u);$('livePanel').hidden=!live;$('replayPanel').hidden=live;for(const [id,active]of [['liveMode',live],['replayMode',!live]]){$(id).classList.toggle('active',active);$(id).setAttribute('aria-pressed',active);}}
 function download(){
  const o=data.origins[state.origin],m=data.models.find(m=>m.id===state.model),header=['dataset_version','mode','model','model_weight','forecast_origin','observed_cutoff','target_timestamp','horizon','actual_smp','predicted_smp','weekly_baseline'];
  const rows=o.targets.map((t,i)=>[data.dataset_version,data.mode,m.id,m.model_weight,o.forecast_origin,o.observed_cutoff,t,i+1,o.actual[i],o.predictions[m.id][i],o.weekly[i]].join(','));
@@ -77,6 +77,7 @@ $('retry').onclick=init;$('downloadCsv').onclick=download;
 $('horizonButtons').onclick=e=>{const b=e.target.closest('[data-day]');if(b&&data){state.day=Number(b.dataset.day);draw();}};
 $('toggleActual').onclick=()=>{if(data){state.actual=!state.actual;draw();}};$('toggleBaseline').onclick=()=>{if(data){state.baseline=!state.baseline;draw();}};
 $('liveMode').onclick=()=>mode(true);$('replayMode').onclick=()=>mode(false);$('backToReplay').onclick=()=>mode(false);
+document.querySelectorAll('.nav nav a').forEach(a=>a.addEventListener('click',()=>mode(false)));
 if(location.hash==='#live')mode(true);
 init();
 })();

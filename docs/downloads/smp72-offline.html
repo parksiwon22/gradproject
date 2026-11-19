@@ -1278,6 +1278,7 @@ function draw(){
 async function init(){try{
  const embedded=$('live-json');if(embedded)data=JSON.parse(embedded.textContent);else{const r=await fetch('./demo/forecast-20261120.json',{cache:'no-cache'});if(!r.ok)throw Error('검증된 최신 모델 결과가 아직 게시되지 않았습니다.');data=await r.json();}validate(data);
  $('liveStatus').textContent=data.status==='preliminary'?'실제 모델 사전 계산본 · 23시 정식 발행 전':'실제 모델 추론 완료 · 계산시각 확인';
+ if(data.status==='issued')$('liveStatus').classList.remove('pending');
  $('liveNotice').textContent=data.status==='preliminary'?'23시 예정 기준으로 미리 계산한 새 예측입니다. 아래 실제 계산시각에 확보한 자료를 사용했으며, 23시에 계산된 결과라고 표시하지 않습니다.':'저장된 SARIMAX 모델을 최신 입력 스냅샷에 적용했습니다. 실제 계산시각과 입력 조건을 함께 확인해주세요.';
  $('liveOrigin').textContent=date(data.forecast_origin)+(data.status==='preliminary'?' (예정)':'');$('liveCreated').textContent=date(data.calculated_at);$('liveCutoff').textContent=date(data.observed_cutoff);$('liveTarget').textContent=`${date(data.target_start)} ~ ${date(data.target_end)} · 83개 입력 · 재학습 없음`;
  const entirelyMissing=data.quality.filter(q=>q.missing_hours===168).map(q=>labels[q.variable]||q.variable);$('liveQualityWarning').textContent=entirelyMissing.length?`입력 대체 조건: ${entirelyMissing.join(', ')}의 최근 168시간 원자료가 없어 고정된 학습기반 대체값을 사용했습니다. 최신 실측을 모두 확보한 예측으로 해석하지 않습니다.`:'일부 원자료 결측에는 학습 때 고정한 대체 규칙을 적용했습니다. 아래 입력 상태를 확인해주세요.';
@@ -1349,7 +1350,7 @@ function showPoint(i){
  if(state.actual)tip.append(el('p',`실제 ${fmt(o.actual[i])} · 오차 ${fmt(Math.abs(p[i]-o.actual[i]))}`));if(state.baseline)tip.append(el('p',`주간 기준선 ${fmt(o.weekly[i])}`));
  tip.hidden=false;const width=$('chartWrap').clientWidth;tip.style.left=`${Math.max(4,Math.min(width-240,chart.x(i)/1100*width+12))}px`;tip.style.top='12px';chart.cross.setAttribute('x1',chart.x(i));chart.cross.setAttribute('x2',chart.x(i));chart.cross.setAttribute('visibility','visible');chart.dot.setAttribute('cx',chart.x(i));chart.dot.setAttribute('cy',chart.y(p[i]));chart.dot.setAttribute('visibility','visible');
 }
-function mode(live){$('livePanel').hidden=!live;$('replayPanel').hidden=live;for(const [id,active]of [['liveMode',live],['replayMode',!live]]){$(id).classList.toggle('active',active);$(id).setAttribute('aria-pressed',active);}}
+function mode(live){const u=new URL(location.href);if(live)u.hash='live';else if(u.hash==='#live')u.hash='';window.history.replaceState(null,'',u);$('livePanel').hidden=!live;$('replayPanel').hidden=live;for(const [id,active]of [['liveMode',live],['replayMode',!live]]){$(id).classList.toggle('active',active);$(id).setAttribute('aria-pressed',active);}}
 function download(){
  const o=data.origins[state.origin],m=data.models.find(m=>m.id===state.model),header=['dataset_version','mode','model','model_weight','forecast_origin','observed_cutoff','target_timestamp','horizon','actual_smp','predicted_smp','weekly_baseline'];
  const rows=o.targets.map((t,i)=>[data.dataset_version,data.mode,m.id,m.model_weight,o.forecast_origin,o.observed_cutoff,t,i+1,o.actual[i],o.predictions[m.id][i],o.weekly[i]].join(','));
@@ -1372,6 +1373,7 @@ $('retry').onclick=init;$('downloadCsv').onclick=download;
 $('horizonButtons').onclick=e=>{const b=e.target.closest('[data-day]');if(b&&data){state.day=Number(b.dataset.day);draw();}};
 $('toggleActual').onclick=()=>{if(data){state.actual=!state.actual;draw();}};$('toggleBaseline').onclick=()=>{if(data){state.baseline=!state.baseline;draw();}};
 $('liveMode').onclick=()=>mode(true);$('replayMode').onclick=()=>mode(false);$('backToReplay').onclick=()=>mode(false);
+document.querySelectorAll('.nav nav a').forEach(a=>a.addEventListener('click',()=>mode(false)));
 if(location.hash==='#live')mode(true);
 init();
 })();
