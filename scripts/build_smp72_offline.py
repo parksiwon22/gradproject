@@ -6,8 +6,8 @@ html=(docs/'index.html').read_text()
 css=(docs/'smp72_demo.css').read_text()
 js=(docs/'smp72_demo.js').read_text()
 data=(docs/'demo/smp72-2025.json').read_text().replace('</','<\\/')
-html=html.replace('<link rel="stylesheet" href="./smp72_demo.css?v=20261120"><script defer src="./smp72_demo.js?v=20261120"></script>',f'<style>{css}</style>')
-html=html.replace('<script defer src="./smp72_live.js?v=20261120"></script>', '')
+html=html.replace('<link rel="stylesheet" href="./smp72_demo.css?v=20261120-live1"><script defer src="./smp72_demo.js?v=20261120-live1"></script>',f'<style>{css}</style>')
+html=html.replace('<script defer src="./smp72_live.js?v=20261120-live1"></script>', '')
 live_path=docs/'demo/forecast-20261120.json'
 if live_path.exists():
     live=live_path.read_text().replace('</','<\\/')
