@@ -1,0 +1,197 @@
+{
+  "target_definition": "V5-compatible hourly land SMP (same 2023 SMP labels as aligned_hourly_all_features_2023.csv)",
+  "target_price_product_note": "Inherited labels have no explicit day-ahead/final-settlement field or publication vintage; see report.",
+  "frequency": "hourly; one stacked row per target hour; each daily origin is prior calendar day at 23:00 KST",
+  "warmup_rows_dropped": 192,
+  "row_counts": {
+    "train": 17352,
+    "validation": 4344,
+    "final_test": 4416
+  },
+  "date_splits": {
+    "train": [
+      "2023-01-01",
+      "2024-12-31"
+    ],
+    "validation": [
+      "2025-01-01",
+      "2025-06-30"
+    ],
+    "final_test": [
+      "2025-07-01",
+      "2025-12-31"
+    ]
+  },
+  "features": [
+    "horizon",
+    "smp_same_hour_prev_day",
+    "smp_same_hour_prev_week",
+    "smp_daily_weekly_spread",
+    "origin_smp",
+    "origin_smp_lag_1h",
+    "origin_smp_lag_2h",
+    "origin_smp_lag_24h",
+    "origin_smp_lag_168h",
+    "origin_smp_roll24_mean",
+    "origin_smp_roll24_std",
+    "origin_smp_roll168_mean",
+    "origin_smp_roll168_std",
+    "origin_smp_change_1h",
+    "origin_smp_change_24h",
+    "target_hour",
+    "target_hour_sin",
+    "target_hour_cos",
+    "target_weekday",
+    "target_weekday_sin",
+    "target_weekday_cos",
+    "target_month",
+    "target_month_sin",
+    "target_month_cos",
+    "target_is_weekend",
+    "weather_temp_c_lag48h",
+    "weather_wind_speed_ms_lag48h"
+  ],
+  "excluded_feature_groups": {
+    "actual_demand_generation_reserve": "target-day observations are unavailable at D-1 23:00; source publication delays for safe lags are not verified",
+    "kpx_mlfd": "coverage/vintage timestamp insufficient for full train period",
+    "solar_generation_and_weather_forecasts": "EWP panel starts 2025-07-18 so it has no training-period coverage; KMA point-vintage panel absent",
+    "holiday_flag": "announcement vintages for ad-hoc/special days are absent",
+    "fuel_and_fred": "cutoff publication timestamps not available",
+    "asos_solar_radiation": "many missing/sentinel cells; omitted"
+  },
+  "asof_contract": {
+    "forecast_origin": "target calendar date minus one day at 23:00 KST",
+    "historical_sources_must_be_at_or_before_origin": true,
+    "weather_lag": "KMA temperature and wind at target timestamp minus 48 hours; prior-day ASOS data is published after 10:00 the next day",
+    "max_source_timestamp_after_origin_rows": 0
+  },
+  "baseline": "same-hour previous-day SMP; V5 uses this as its primary day-ahead baseline",
+  "validation_selected_candidate": 3,
+  "selected_config": {
+    "max_depth": 5,
+    "learning_rate": 0.025,
+    "n_estimators": 119,
+    "min_child_weight": 12,
+    "subsample": 0.8,
+    "colsample_bytree": 0.85,
+    "reg_lambda": 14.0,
+    "reg_alpha": 0.15
+  },
+  "best_iteration_from_validation": 119,
+  "validation_candidate_metrics": [
+    {
+      "candidate": 1,
+      "max_depth": 3,
+      "learning_rate": 0.035,
+      "n_estimators": 1200,
+      "min_child_weight": 8,
+      "subsample": 0.85,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 8.0,
+      "reg_alpha": 0.05,
+      "best_iteration": 137,
+      "n": 4344,
+      "mae": 9.224187455594231,
+      "rmse": 14.252235577263635,
+      "r2": 0.5367850272574429,
+      "bias_pred_minus_actual": 0.5197061955756517
+    },
+    {
+      "candidate": 2,
+      "max_depth": 4,
+      "learning_rate": 0.03,
+      "n_estimators": 1400,
+      "min_child_weight": 10,
+      "subsample": 0.85,
+      "colsample_bytree": 0.9,
+      "reg_lambda": 10.0,
+      "reg_alpha": 0.1,
+      "best_iteration": 136,
+      "n": 4344,
+      "mae": 9.105493933756684,
+      "rmse": 14.219459490737533,
+      "r2": 0.5389131027266469,
+      "bias_pred_minus_actual": 0.3534267694058677
+    },
+    {
+      "candidate": 3,
+      "max_depth": 5,
+      "learning_rate": 0.025,
+      "n_estimators": 1600,
+      "min_child_weight": 12,
+      "subsample": 0.8,
+      "colsample_bytree": 0.85,
+      "reg_lambda": 14.0,
+      "reg_alpha": 0.15,
+      "best_iteration": 119,
+      "n": 4344,
+      "mae": 9.10423163961482,
+      "rmse": 14.313432718845977,
+      "r2": 0.5327985239322817,
+      "bias_pred_minus_actual": 0.36272761512434537
+    }
+  ],
+  "metrics": [
+    {
+      "split": "validation",
+      "model": "xgboost",
+      "n": 4344,
+      "mae": 9.10423163961482,
+      "rmse": 14.313432718845977,
+      "r2": 0.5327985239322817,
+      "bias_pred_minus_actual": 0.36272761512434537
+    },
+    {
+      "split": "validation",
+      "model": "previous_day_baseline",
+      "n": 4344,
+      "mae": 11.96694290976059,
+      "rmse": 19.12516398658616,
+      "r2": 0.1658830631868825,
+      "bias_pred_minus_actual": -0.08994935543278079
+    },
+    {
+      "split": "validation",
+      "model": "previous_week_baseline",
+      "n": 4344,
+      "mae": 12.27200276243094,
+      "rmse": 19.161310980459326,
+      "r2": 0.16272708369385203,
+      "bias_pred_minus_actual": -0.4335036832412522
+    },
+    {
+      "split": "final_test",
+      "model": "xgboost",
+      "n": 4416,
+      "mae": 9.241195906484348,
+      "rmse": 13.483875977000292,
+      "r2": 0.6579878327003701,
+      "bias_pred_minus_actual": 2.4338905455519786
+    },
+    {
+      "split": "final_test",
+      "model": "previous_day_baseline",
+      "n": 4416,
+      "mae": 10.774245923913043,
+      "rmse": 17.44770185375011,
+      "r2": 0.42735098123140314,
+      "bias_pred_minus_actual": 0.19320878623188412
+    },
+    {
+      "split": "final_test",
+      "model": "previous_week_baseline",
+      "n": 4416,
+      "mae": 11.43521286231884,
+      "rmse": 17.760509710113713,
+      "r2": 0.4066336564054801,
+      "bias_pred_minus_actual": 1.2545561594202899
+    }
+  ],
+  "xgboost_version": "3.4.1",
+  "elapsed_seconds": 11.252,
+  "v5_reference": {
+    "mae": 11.0938,
+    "period": "2023-10-01 through 2023-12-31",
+    "comparable_to_final_test": false
+  }
+}

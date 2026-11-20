@@ -2,6 +2,11 @@
 
 KPX 시간별 SMP 예측 결과를 사용해 EV 충전에 유리한 시간대를 추천하는 Streamlit MVP입니다.
 
+
+## 2026 하루전 SMP 모델 결과
+
+같은 입력 데이터와 기간 분할로 평가한 XGBoost·LightGBM 결과와 그래프는 [SMP_Forecast_2026](SMP_Forecast_2026/README.md)에서 확인할 수 있습니다.
+
 ## 기능
 
 - 내일 24시간 SMP 예측 그래프 표시
