@@ -35,11 +35,11 @@
   {
     "market": "land",
     "year": 2026,
-    "hours": 7800,
-    "days": 325,
+    "hours": 7824,
+    "days": 326,
     "expected_full_year": 8760,
     "missing_between_endpoints": 0,
-    "latest": "2026-11-21T23:00:00+09:00",
+    "latest": "2026-11-22T23:00:00+09:00",
     "exogenous_status": "SMP-only",
     "publication_time": "unknown; first_seen is current collection time"
   }
