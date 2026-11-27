@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-26T22:38:19.795268+00:00",
+  "at": "2026-11-27T22:22:28.880018+00:00",
   "failures": [],
   "coverage": [
     {
@@ -38,11 +38,11 @@
     {
       "market": "land",
       "year": 2026,
-      "hours": 7944,
-      "days": 331,
+      "hours": 7968,
+      "days": 332,
       "expected_full_year": 8760,
       "missing_between_endpoints": 0,
-      "latest": "2026-11-27T23:00:00+09:00",
+      "latest": "2026-11-28T23:00:00+09:00",
       "exogenous_status": "SMP-only",
       "publication_time": "unknown; first_seen is current collection time"
     }
